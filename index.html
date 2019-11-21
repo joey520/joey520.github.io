@@ -159,15 +159,14 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>##前言</p>
-<p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
+        <p>[TOC]</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
 <p>我们知道编译器前端可以把不同的高级语言转换为中间代码（IR），再由编译器后端将中间代码转换成指定平台的目标代码，再通过链接器把目标代码和依赖的库文件link到一起即可变成可执行文件。因此理论上只需要中间代码即可生成任一平台的目标代码（只要编译器后端支持），因为中间代码已经包含了源程序所所要表达的全部意思。</p>
 <p>再看下LLVM官方文档的描述：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The LLVM code representation is designed to be used in three different forms: as an in-memory compiler IR, as an on-disk bitcode representation (suitable for fast loading by a Just-In-Time compiler), and as a human readable assembly language representation.This allows LLVM to provide a powerful intermediate representation for efficient compiler transformations and analysis, while providing a natural means to debug and visualize the transformations. The three different forms of LLVM are all equivalent.</span><br></pre></td></tr></table></figure>
 
 <p>重点是三种代码表现形式：编译过程中的中间代码IR；编译出的bitcode；可读的汇编代码。其实都是对源代码的一种描述，只是面向了不同的对象时的表现形态。由此可知bitcode其实只是IR的另一种表现形式。</p>
-<p>##bitcode可以做什么</p>
-<p>1.首先我们写一个小demo:</p>
+<h2 id="bitcode可以做什么"><a href="#bitcode可以做什么" class="headerlink" title="bitcode可以做什么"></a>bitcode可以做什么</h2><p>1.首先我们写一个小demo:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hello\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>2.把源文件转换为LLVM的中间表示bitcode文件：</p>
@@ -183,12 +182,8 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">➜  TestBitcode clang -c hello.c -o hello.o</span><br><span class="line">➜  TestBitcode md5 hello.o hello.bc.o</span><br><span class="line">MD5 (hello.o) = 92311036e62f4b3e4468b3c93c314960</span><br><span class="line">MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960</span><br></pre></td></tr></table></figure>
 
 <p>可以发现通过bitcode获取和直接编译出来的目标代码是一模一样的。因此只需要得到bicode文件就可以编译出一样的目标文件。</p>
-<hr>
-<p>##Bitcode是什么：</p>
-<p>通过LLVM官方对bitcode的描述，可以知道bitcode是一种以位为单位存取的二进制文件，它可以存在于包装结构中，如上一节中看到<code>LLVM bitcode, wrapper x86_64</code> ,也可以存在于<code>Object</code>文件中，例如<code>Mach-O</code>文件等。<strong>对于<code>Mach-O</code>文件并且必定存在于名为<code>__LLVM</code>或者<code>__bitcode</code>的section中，因此我们可以根据这两个字段来判断生成的Mach-O文件是否包含bitcode.</strong></p>
-<hr>
-<p>###Bitcode的优化</p>
-<p>1.标识符</p>
+<h2 id="Bitcode是什么："><a href="#Bitcode是什么：" class="headerlink" title="Bitcode是什么："></a>Bitcode是什么：</h2><p>通过LLVM官方对bitcode的描述，可以知道bitcode是一种以位为单位存取的二进制文件，它可以存在于包装结构中，如上一节中看到<code>LLVM bitcode, wrapper x86_64</code> ,也可以存在于<code>Object</code>文件中，例如<code>Mach-O</code>文件等。<strong>对于<code>Mach-O</code>文件并且必定存在于名为<code>__LLVM</code>或者<code>__bitcode</code>的section中，因此我们可以根据这两个字段来判断生成的Mach-O文件是否包含bitcode.</strong></p>
+<h3 id="Bitcode的优化"><a href="#Bitcode的优化" class="headerlink" title="Bitcode的优化"></a>Bitcode的优化</h3><p>1.标识符</p>
 <p>目前bitcode文件前4个字节是固定的<code>magic number</code>用于bitcode工具识别文件，当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。</p>
 <p>![image-20191113115547724](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191113115547724.png)</p>
 <p>2.整形长度</p>
@@ -208,8 +203,7 @@
 
 <p>大概可以了解到bitcode文件记录了源文件的一些基本信息如ModuleID(参考XXXX)，文件名，ABI。然后包含源代码的解析。最后保留了构建bitcode文件的编译器的版本。</p>
 <hr>
-<p>###Bitcode的结构</p>
-<p>我们分别编译一个不带bitcode的Object文件和一个带有bitcode的object文件，然后进行对比：</p>
+<h3 id="Bitcode的结构"><a href="#Bitcode的结构" class="headerlink" title="Bitcode的结构"></a>Bitcode的结构</h3><p>我们分别编译一个不带bitcode的Object文件和一个带有bitcode的object文件，然后进行对比：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">➜  otool -l main_bitcode.o &gt;&gt; main_bitcode.o.txt</span><br><span class="line">➜  otool -l main.o &gt;&gt; main.o.txt</span><br><span class="line">➜  vimdiff main.o.txt main_bitcode.o.txt</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/bitcode_bundle.png?raw=true" alt="image-20191119111851211"></p>
@@ -261,11 +255,8 @@
 <p>通过刚才的测试可以看到如果没有<code>-fembed-bitcode</code>编译的产物是不包含<code>__LLVM</code>和<code>__bitcode</code>字段的，对编出来的<code>fat file</code>进行检查如下，可以看到已经包含了bitcode文件：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">➜ otool -arch arm64 -l /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/Output/DJINetworkRTKHelper.framework/DJINetworkRTKHelper | grep __LLVM</span><br><span class="line">  segname __LLVM</span><br><span class="line">   segname __LLVM</span><br></pre></td></tr></table></figure>
 
-
-
 <hr>
-<p>###Bitcode应用上架</p>
-<p>使用bitcode嘛最终目的还是为了应用的上架，但是比较坑爹是所有依赖的库文件必须支持bitcode。否则构建的mach-O文件就不能支持bitcode。假设我们目前所有依赖的库文件都已经支持bitcode了，我们使用一个MSDK预上架的工程archive一个支持bitcode的和一个不支持bitcode。可以看到以下区别</p>
+<h3 id="Bitcode应用上架"><a href="#Bitcode应用上架" class="headerlink" title="Bitcode应用上架"></a>Bitcode应用上架</h3><p>使用bitcode嘛最终目的还是为了应用的上架，但是比较坑爹是所有依赖的库文件必须支持bitcode。否则构建的mach-O文件就不能支持bitcode。假设我们目前所有依赖的库文件都已经支持bitcode了，我们使用一个MSDK预上架的工程archive一个支持bitcode的和一个不支持bitcode。可以看到以下区别</p>
 <p>1.惊人发现开启bitcode之前归档出的文件只有118.5MB,而开启bitcode之后直接增加到254MB。这下是不是要超过Apple的文件大小限制了啊。根据前面的测试我们知道bitcode放在<code>__LLVM</code>section，而苹果二进制文件大小限制只是针对<code>__Text</code>段，即代码段的，因此bitcode文件并不会影响苹果的限制。</p>
 <p>2.当我们需要上传App时，若果开启了bitcode的App会提示选择是否上传bitcode内容。如果勾选了bitcode，则同时会上传bitcode到苹果服务器，并且用户下载的ipa是苹果针对bitcode再次编译出来的。而如果不勾选，则用户下载的是我们上传的ipa，并且会剔除bitcode。 如果选择的Development发布方式，则会出现选择<code>Rebuild from bitcode</code>，此时如果勾选则会发现会利用<code>bitcode-build-tool</code>来构建ipa文件，而不是直接利用归档出的ipa。这样就跟苹果在服务器归档后发布给用户的ipa一致了：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> /Applications/Xcode.app/Contents/Developer/usr/bin/bitcode-build-tool -v -t /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin --sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS13.2.sdk -o /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-out/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview --generate-dsym /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-out/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview.dSYM --strip-swift-symbols /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-in/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview</span></span><br></pre></td></tr></table></figure>
