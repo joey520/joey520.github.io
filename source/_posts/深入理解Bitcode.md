@@ -6,9 +6,7 @@ tags: Bitcode LLVM
 
 [TOC]
 
-
-
-##前言
+## 前言
 
 在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？
 
@@ -22,7 +20,7 @@ The LLVM code representation is designed to be used in three different forms: as
 
 重点是三种代码表现形式：编译过程中的中间代码IR；编译出的bitcode；可读的汇编代码。其实都是对源代码的一种描述，只是面向了不同的对象时的表现形态。由此可知bitcode其实只是IR的另一种表现形式。
 
-##bitcode可以做什么
+## bitcode可以做什么
 
 1.首先我们写一个小demo:
 
@@ -66,15 +64,11 @@ MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960
 
 可以发现通过bitcode获取和直接编译出来的目标代码是一模一样的。因此只需要得到bicode文件就可以编译出一样的目标文件。
 
----
-
-##Bitcode是什么：
+## Bitcode是什么：
 
 通过LLVM官方对bitcode的描述，可以知道bitcode是一种以位为单位存取的二进制文件，它可以存在于包装结构中，如上一节中看到``LLVM bitcode, wrapper x86_64`` ,也可以存在于``Object``文件中，例如``Mach-O``文件等。**对于``Mach-O``文件并且必定存在于名为``__LLVM``或者``__bitcode``的section中，因此我们可以根据这两个字段来判断生成的Mach-O文件是否包含bitcode.**
 
----
-
-###Bitcode的优化
+### Bitcode的优化
 
 1.标识符
 
@@ -146,11 +140,9 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 
 大概可以了解到bitcode文件记录了源文件的一些基本信息如ModuleID(参考XXXX)，文件名，ABI。然后包含源代码的解析。最后保留了构建bitcode文件的编译器的版本。
 
+---
 
-
-----
-
-###Bitcode的结构
+### Bitcode的结构
 
 我们分别编译一个不带bitcode的Object文件和一个带有bitcode的object文件，然后进行对比：
 
@@ -364,11 +356,9 @@ lipo -create "${SRCROOT}/Build/Products/${CONFIGURATION}-${MT_SIMUL_DIR}/${PROJE
 
 ```
 
-
-
 ---
 
-###Bitcode应用上架
+### Bitcode应用上架
 
 使用bitcode嘛最终目的还是为了应用的上架，但是比较坑爹是所有依赖的库文件必须支持bitcode。否则构建的mach-O文件就不能支持bitcode。假设我们目前所有依赖的库文件都已经支持bitcode了，我们使用一个MSDK预上架的工程archive一个支持bitcode的和一个不支持bitcode。可以看到以下区别
 
