@@ -46,40 +46,7 @@
     </script>
     <% } %>
     <!-- 目录内容结束 -->
-    <div class="article-entry" itemprop="articleBody">
-        <!-- <% if (page.type === "tags") { %>
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-            <%- _p('counter.tag_cloud', site.tags.length) %>
-            </div>
-          
-            <div class="tag-cloud-tags">
-            <%- tagcloud({
-              min_font: 12,
-              max_font: 30,
-              amount: 200,
-              color: true,
-              start_color: '#ccc',
-              end_color: '#111'
-              }) %>
-            </div>
-          </div>
-          
-          <% } else if (page.type === 'categories') { %>
-          
-          <div class="category-all-page">
-            <div class="category-all-title">
-            <%- _p('counter.categories', site.categories.length) %>
-            </div>
-            
-            <div class="category-all">
-            <%- list_categories() %>
-            </div>
-            
-          </div>
-          
-          <% } else { %> -->
-          
+    <div class="article-entry" itemprop="articleBody">         
             <% if (post.excerpt && index){ %>
               <%- post.excerpt %>
               <% if (theme.excerpt_link) { %>
@@ -88,8 +55,6 @@
             <% } else { %>
               <%- post.content %>
             <% } %>
-          <!-- <% } %> -->
-
       <% if ((theme.reward_type === 2 || (theme.reward_type === 1 && post.reward)) && !index){ %>
         <div class="page-reward">
           <a href="javascript:;" class="page-reward-btn tooltip-top">
