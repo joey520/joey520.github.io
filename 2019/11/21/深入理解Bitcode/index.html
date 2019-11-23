@@ -8,16 +8,16 @@
   <link rel="dns-prefetch" href="http://joey.github.io.com">
   <title>深入理解Bitcode | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="toc:  true 前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我">
+  <meta name="description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
 <meta name="keywords" content="Bitcode LLVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解Bitcode">
 <meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;11&#x2F;21&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="toc:  true 前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我">
+<meta property="og:description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
-<meta property="og:updated_time" content="2019-11-23T06:23:26.147Z">
+<meta property="og:updated_time" content="2019-11-23T06:28:50.315Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
   
@@ -176,11 +176,34 @@
     
     <!-- 目录内容 -->
     
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bitcode可以做什么"><span class="toc-number">2.</span> <span class="toc-text">bitcode可以做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode是什么："><span class="toc-number">3.</span> <span class="toc-text">Bitcode是什么：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的优化"><span class="toc-number">3.1.</span> <span class="toc-text">Bitcode的优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的结构"><span class="toc-number">3.2.</span> <span class="toc-text">Bitcode的结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode使用"><span class="toc-number">4.</span> <span class="toc-text">Bitcode使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode应用上架"><span class="toc-number">4.1.</span> <span class="toc-text">Bitcode应用上架</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
     <!-- 目录内容结束 -->
     <div class="article-entry" itemprop="articleBody">
       
-        <p>toc:  true</p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
 <p>我们知道编译器前端可以把不同的高级语言转换为中间代码（IR），再由编译器后端将中间代码转换成指定平台的目标代码，再通过链接器把目标代码和依赖的库文件link到一起即可变成可执行文件。因此理论上只需要中间代码即可生成任一平台的目标代码（只要编译器后端支持），因为中间代码已经包含了源程序所所要表达的全部意思。</p>
 <p>再看下LLVM官方文档的描述：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The LLVM code representation is designed to be used in three different forms: as an in-memory compiler IR, as an on-disk bitcode representation (suitable for fast loading by a Just-In-Time compiler), and as a human readable assembly language representation.This allows LLVM to provide a powerful intermediate representation for efficient compiler transformations and analysis, while providing a natural means to debug and visualize the transformations. The three different forms of LLVM are all equivalent.</span><br></pre></td></tr></table></figure>
@@ -385,6 +408,19 @@
             </div>
         </div>
         
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bitcode可以做什么"><span class="toc-number">2.</span> <span class="toc-text">bitcode可以做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode是什么："><span class="toc-number">3.</span> <span class="toc-text">Bitcode是什么：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的优化"><span class="toc-number">3.1.</span> <span class="toc-text">Bitcode的优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的结构"><span class="toc-number">3.2.</span> <span class="toc-text">Bitcode的结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode使用"><span class="toc-number">4.</span> <span class="toc-text">Bitcode使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode应用上架"><span class="toc-number">4.1.</span> <span class="toc-text">Bitcode应用上架</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
         
     </div>
 </aside>
