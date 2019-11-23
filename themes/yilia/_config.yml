@@ -9,9 +9,9 @@ menu:
 # SubNav
 subnav:
   github: "https://github.com/joey520"
-#  weibo: "#"
-#  rss: "#"
- # zhihu: "#"
+  #weibo: "#"
+  #rss: "#"
+  #zhihu: "#"
   #qq: "#"
   #weixin: "#"
   #jianshu: "#"
@@ -19,7 +19,7 @@ subnav:
   #segmentfault: "#"
   #bilibili: "#"
   #acfun: "#"
-  mail: "mailto:616489220@qq.com"
+  mail: "mailto:616489220@qq.com?subject=From%20Github20%Blog"
   #facebook: "#"
   #google: "#"
   #twitter: "#"

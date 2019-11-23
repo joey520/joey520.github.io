@@ -32,7 +32,11 @@
 		<nav class="header-nav">
 			<div class="social">
 				<% for (var i in theme.subnav){ %>
-					<a class="<%= i %>" target="_blank" href="<%- url_for(theme.subnav[i]) %>" title="<%= i %>"><i class="icon-<%= i %>"></i></a>
+					<% if(i == "mail"){ %>
+						<a class="<%= i %>" target="_blank" href="mailto:616489220@qq.com?subject=From Github Blog" title="<%= i %>"><i class="icon-<%= i %>"></i></a>
+					<%}else { %>
+						<a class="<%= i %>" target="_blank" href="<%- url_for(theme.subnav[i]) %>" title="<%= i %>"><i class="icon-<%= i %>"></i></a>
+					<% } %>
 		        <%}%>
 			</div>
 		</nav>
