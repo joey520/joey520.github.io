@@ -18,7 +18,7 @@
 <meta property="og:description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
-<meta property="og:updated_time" content="2019-11-23T09:35:51.393Z">
+<meta property="og:updated_time" content="2019-11-23T10:27:32.741Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
   
@@ -221,6 +221,8 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The LLVM code representation is designed to be used in three different forms: as an in-memory compiler IR, as an on-disk bitcode representation (suitable for fast loading by a Just-In-Time compiler), and as a human readable assembly language representation.This allows LLVM to provide a powerful intermediate representation for efficient compiler transformations and analysis, while providing a natural means to debug and visualize the transformations. The three different forms of LLVM are all equivalent.</span><br></pre></td></tr></table></figure>
 
 <p>重点是三种代码表现形式：编译过程中的中间代码IR；编译出的bitcode；可读的汇编代码。其实都是对源代码的一种描述，只是面向了不同的对象时的表现形态。由此可知bitcode其实只是IR的另一种表现形式。</p>
+<a id="more"></a>
+
 <h2 id="bitcode可以做什么"><a href="#bitcode可以做什么" class="headerlink" title="bitcode可以做什么"></a>bitcode可以做什么</h2><p>1.首先我们写一个小demo:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hello\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
