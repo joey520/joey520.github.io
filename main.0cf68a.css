@@ -10,7 +10,8 @@
     margin: 10px 0;
 }
 
-.category-count {
+  /* category layout */
+  .category-count {
 	text-align:center;
 	line-height:3;
 	font-size:18px;
