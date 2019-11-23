@@ -57,6 +57,10 @@
 	        
 				<li><a href="/archives">归档</a></li>
 	        
+				<li><a href="/categories">分类</a></li>
+	        
+				<li><a href="/tags">标签</a></li>
+	        
 			</ul>
 		</nav>
 		<nav>
@@ -110,6 +114,10 @@
 			
 				
 			
+				
+			
+				
+			
 			
 			
 			<nav class="header-nav">
@@ -121,12 +129,16 @@
 			</nav>
 
 			<nav class="header-menu js-header-menu">
-				<ul style="width: 50%">
+				<ul style="width: 70%">
 				
 				
-					<li style="width: 50%"><a href="/">主页</a></li>
+					<li style="width: 25%"><a href="/">主页</a></li>
 		        
-					<li style="width: 50%"><a href="/archives">归档</a></li>
+					<li style="width: 25%"><a href="/archives">归档</a></li>
+		        
+					<li style="width: 25%"><a href="/categories">分类</a></li>
+		        
+					<li style="width: 25%"><a href="/tags">标签</a></li>
 		        
 				</ul>
 			</nav>
@@ -168,8 +180,10 @@
     
     <!-- 目录内容结束 -->
     <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
+        
+          
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
 <p>我们知道编译器前端可以把不同的高级语言转换为中间代码（IR），再由编译器后端将中间代码转换成指定平台的目标代码，再通过链接器把目标代码和依赖的库文件link到一起即可变成可执行文件。因此理论上只需要中间代码即可生成任一平台的目标代码（只要编译器后端支持），因为中间代码已经包含了源程序所所要表达的全部意思。</p>
 <p>再看下LLVM官方文档的描述：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The LLVM code representation is designed to be used in three different forms: as an in-memory compiler IR, as an on-disk bitcode representation (suitable for fast loading by a Just-In-Time compiler), and as a human readable assembly language representation.This allows LLVM to provide a powerful intermediate representation for efficient compiler transformations and analysis, while providing a natural means to debug and visualize the transformations. The three different forms of LLVM are all equivalent.</span><br></pre></td></tr></table></figure>
@@ -281,7 +295,8 @@
 <li><a href="https://blog.csdn.net/sinat_31177681/article/details/87355711" target="_blank" rel="noopener">https://blog.csdn.net/sinat_31177681/article/details/87355711</a></li>
 </ol>
 
-      
+            
+          
 
       
     </div>
@@ -492,7 +507,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
     
     	<section class="tools-section tools-section-me" q-show="aboutme">
   	  	
-  	  		<div class="aboutme-wrap" id="js-aboutme">iOS程序员，爱好C++, python, 正在学习一些跨平台开发技术，视频编解码结束  &lt;br&gt;PS4粉， 减肥党</div>
+  	  		<div class="aboutme-wrap" id="js-aboutme">iOS程序员，爱好C++, python &lt;br&gt;&lt;br&gt;PS4粉， 减肥党</div>
   	  	
     	</section>
     
