@@ -3,20 +3,92 @@
     <% if (post.link || post.title){ %>
       <header class="article-header">
         <%- partial('post/title', {class_name: 'article-title'}) %>
+        <!--显示阅读次数-->
+        <% if (!index && post.comments){ %>
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        <% } %>
+        <!--显示阅读次数完毕-->
         <% if (!post.noDate){ %>
         <%- partial('post/date', {class_name: 'archive-article-date', date_format: null}) %>
         <% } %>
       </header>
     <% } %>
+    <!-- 目录内容 -->
+    <% if (!index && post.toc){ %>
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <%- toc(post.content) %>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    <% } %>
+    <!-- 目录内容结束 -->
     <div class="article-entry" itemprop="articleBody">
-      <% if (post.excerpt && index){ %>
-        <%- post.excerpt %>
-        <% if (theme.excerpt_link) { %>
-          <a class="article-more-a" href="<%- url_for(post.path) %>#more"><%= theme.excerpt_link %> >></a>
-        <% } %>
-      <% } else { %>
-        <%- post.content %>
-      <% } %>
+        <!-- <% if (page.type === "tags") { %>
+          <div class="tag-cloud">
+            <div class="tag-cloud-title">
+            <%- _p('counter.tag_cloud', site.tags.length) %>
+            </div>
+          
+            <div class="tag-cloud-tags">
+            <%- tagcloud({
+              min_font: 12,
+              max_font: 30,
+              amount: 200,
+              color: true,
+              start_color: '#ccc',
+              end_color: '#111'
+              }) %>
+            </div>
+          </div>
+          
+          <% } else if (page.type === 'categories') { %>
+          
+          <div class="category-all-page">
+            <div class="category-all-title">
+            <%- _p('counter.categories', site.categories.length) %>
+            </div>
+            
+            <div class="category-all">
+            <%- list_categories() %>
+            </div>
+            
+          </div>
+          
+          <% } else { %> -->
+          
+            <% if (post.excerpt && index){ %>
+              <%- post.excerpt %>
+              <% if (theme.excerpt_link) { %>
+                <a class="article-more-a" href="<%- url_for(post.path) %>#more"><%= theme.excerpt_link %> >></a>
+              <% } %>
+            <% } else { %>
+              <%- post.content %>
+            <% } %>
+          <!-- <% } %> -->
 
       <% if ((theme.reward_type === 2 || (theme.reward_type === 1 && post.reward)) && !index){ %>
         <div class="page-reward">
@@ -88,6 +160,20 @@
     }) %>
   <% } %>
   
+  <% if (theme.valine && theme.valine.appid && theme.valine.appkey){ %>
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <%- partial('post/valine', {
+        key: post.slug,
+        title: post.title,
+        url: config.url+url_for(post.path)
+        }) %>
+      </section>
+    <% } %>
+
   <% if (theme.wangyiyun){ %>
   <%- partial('post/wangyiyun', {
       key: post.slug,

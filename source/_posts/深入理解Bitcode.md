@@ -1,10 +1,10 @@
 ---
+toc: true
 title: 深入理解Bitcode
 date: 2019-11-21 9:51:15
-tags: Bitcode LLVM
+categories: [iOS,LLVM]
+tags: [Bitcode,LLVM]
 ---
-
-[TOC]
 
 ## 前言
 

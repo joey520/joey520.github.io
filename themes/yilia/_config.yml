@@ -2,7 +2,9 @@
 
 menu:
   主页: /
-  随笔: /tags/随笔/
+  归档: /archives
+  分类: /categories
+#  标签: /tags
 
 # SubNav
 subnav:
@@ -120,7 +122,23 @@ smart_menu:
   aboutme: '关于我'
 
 friends:
-  友情链接1: http://localhost:4000/
+  Vince.Zheng: https://jsonseng.github.io
 
 
-aboutme: 很惭愧<br><br>只做了一点微小的工作<br>谢谢大家
+aboutme: 'iOS程序员，爱好C++, python <br><br>PS4粉， 减肥党'
+
+valine:
+  enable: true
+  appid:  'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz'
+  appkey:  '6aqkifq4vKMCSsLExEGzL0Wl'
+  notify: false # mail notifier , https://github.com/xCss/Valine/wiki
+  verify: false # Verification code
+  placeholder: "老铁，唠个嗑呗" # comment box placeholder//留言框占位提示文字
+  avatar: monsterid # gravatar style
+  guest_info: nick,mail,link # custom comment header
+  pageSize: 10 # pagination size
+
+leancloud_visitors:
+  enable: true
+  app_id:  'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz'
+  app_key: '6aqkifq4vKMCSsLExEGzL0Wl'
