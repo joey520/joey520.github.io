@@ -20,6 +20,8 @@ The LLVM code representation is designed to be used in three different forms: as
 
 重点是三种代码表现形式：编译过程中的中间代码IR；编译出的bitcode；可读的汇编代码。其实都是对源代码的一种描述，只是面向了不同的对象时的表现形态。由此可知bitcode其实只是IR的另一种表现形式。
 
+<!--more-->
+
 ## bitcode可以做什么
 
 1.首先我们写一个小demo:
