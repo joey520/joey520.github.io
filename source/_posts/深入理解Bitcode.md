@@ -37,20 +37,20 @@ int main() {
 2.把源文件转换为LLVM的中间表示bitcode文件：
 
 ```shell
-➜  TestBitcode clang -emit-llvm -c hello.c -o hello.bc
+$ clang -emit-llvm -c hello.c -o hello.bc
 ```
 
 可以看到hello.bc文件格式如下：
 
 ```shell
-➜  TestBitcode file hello.bc
+$ file hello.bc
 hello.bc: LLVM bitcode, wrapper x86_64
 ```
 
 3.然后把bitcode转换成目标文件,输出为Mach-O文件：
 
 ```shell
-➜  TestBitcode clang -c hello.bc -o hello.bc.o
+$ clang -c hello.bc -o hello.bc.o
 file hello.bc.o
 hello.bc.o: Mach-O 64-bit object x86_64
 ```
@@ -58,8 +58,8 @@ hello.bc.o: Mach-O 64-bit object x86_64
 4.直接把源代码编译成目标文件并和由bitcode生成目标文件进行对比：
 
 ```shell
-➜  TestBitcode clang -c hello.c -o hello.o
-➜  TestBitcode md5 hello.o hello.bc.o
+$ clang -c hello.c -o hello.o
+$ md5 hello.o hello.bc.o
 MD5 (hello.o) = 92311036e62f4b3e4468b3c93c314960
 MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960
 ```
@@ -92,14 +92,14 @@ bitcode为了减少体积，充分利用了按位存取的特定，根据数据�
 
 上面我们知道bitcode文件是一种LLVM bitcode文件，实际是一些字节因此无法阅读，不过llvm-dis是一个可以可以把bitcode文件转换为LLVM表示的反汇编的可视化的汇编语言(注意与Clang下的表示不一致):
 
-```
-➜  llvm-dis < hello.bc
+```shell
+$ llvm-dis < hello.bc
 ```
 
 同样的-S选项可以把源文件转换为LLVM表示的汇编语言(注意与Clang下的表示不一致):
 
 ```shell
-➜  clang -emit-llvm -S hello.c -o hello.ll
+$ clang -emit-llvm -S hello.c -o hello.ll
 ```
 
 打开hello.ll可以看到如下，我加了一些comment来简单的描述：
@@ -137,7 +137,6 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 !1 = !{i32 1, !"wchar_size", i32 4}
 !2 = !{i32 7, !"PIC Level", i32 2}
 !3 = !{!"Apple clang version 11.0.0 (clang-1100.0.33.8)"}
-
 ```
 
 大概可以了解到bitcode文件记录了源文件的一些基本信息如ModuleID(参考XXXX)，文件名，ABI。然后包含源代码的解析。最后保留了构建bitcode文件的编译器的版本。
@@ -148,11 +147,10 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 
 我们分别编译一个不带bitcode的Object文件和一个带有bitcode的object文件，然后进行对比：
 
-```
-➜  otool -l main_bitcode.o >> main_bitcode.o.txt
-➜  otool -l main.o >> main.o.txt
-➜  vimdiff main.o.txt main_bitcode.o.txt
-
+```shell
+$ otool -l main_bitcode.o >> main_bitcode.o.txt
+$ otool -l main.o >> main.o.txt
+$ vimdiff main.o.txt main_bitcode.o.txt
 ```
 
 ![image-20191119111851211](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/bitcode_bundle.png?raw=true)
@@ -162,29 +160,26 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 通过`segedit`可以提取出指定section.
 
 ```shell
-➜  segedit -extract __LLVM __bitcode main_bitcode.o.bc \
+$ segedit -extract __LLVM __bitcode main_bitcode.o.bc \
 -extract __LLVM __cmdline main_bitcode.o.cmdline \
 main_bitcode.o
-
 ```
 
 对提取出的bitcode和直接编译出的bitcode文件进行MD5校验：
 
 ```shell
-➜  md5 main.bc main_bitcode.o.bc
+$ md5 main.bc main_bitcode.o.bc
 MD5 (main.bc) = e9e80622c4830574dc2a6ed209bb662c
 MD5 (main_bitcode.o.bc) = 2dee4301533eef0be4d91670d5de3187
-
 ```
 
 并且查看文件大小可以看到:
 
 ```shell
-➜  ls -al main.o main.bc main_bitcode.o.bc
+$ ls -al main.o main.bc main_bitcode.o.bc
 -rw-r--r--  1 joey.cao  staff  3184 11 19 12:47 main.bc
 -rw-r--r--  1 joey.cao  staff   896 11 19 12:41 main.o
 -rw-r--r--  1 joey.cao  staff  3168 11 19 12:41 main_bitcode.o.bc
-
 ```
 
 可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多，因为。
@@ -196,7 +191,7 @@ MD5 (main_bitcode.o.bc) = 2dee4301533eef0be4d91670d5de3187
 直接查看含有bitcode的可执行文件中的`__LLVM`segment下的`__bundle`section如下, otool -v可以打印出可视化的符号:
 
 ```shell
-➜  otool -v -s __LLVM __bundle a.out
+$ otool -v -s __LLVM __bundle a.out
 a.out:
 Contents of (__LLVM,__bundle) section
 For (__LLVM,__bundle) section: xar table of contents:
@@ -249,7 +244,6 @@ For (__LLVM,__bundle) section: xar table of contents:
   </file>
  </toc>
 </xar>
-
 ```
 
 可以看到，里面`__bundule`section就是一个xml配置文件，包含了link选项配置，数据长度，和通过`__cmdline`重建object文件的clang选项等等。因此通过它就可以创建可执行文件。
@@ -258,22 +252,20 @@ For (__LLVM,__bundle) section: xar table of contents:
 
 ```shell
 //1.提取出bitcode相关的bundle
-➜ segedit -extract __LLVM __bundle bundle main_bitcode.out
+$ segedit -extract __LLVM __bundle bundle main_bitcode.out
 //2.解压出头文件
-➜ xar -d toc.xml -f bundle
-
+$ xar -d toc.xml -f bundle
 ```
 
 我们对比bundle描述头文件和通过otool打印出的bundle描述文件一模一样。
 
-```
+```shell
 //1.加压出bitcode文件，自动生成在当前文件夹下名为1
-➜ xar -x -f bundle
+$ xar -x -f bundle
 //2.比较提取出的bitcode文件和编译出的bitcode文件
-➜ md5 main_bitcode.o.bc 1
+$ md5 main_bitcode.o.bc 1
 MD5 (main_bitcode.o.bc) = 5d6b72f817fb8fb92550cc9aae6340ab
 MD5 (1) = 5d6b72f817fb8fb92550cc9aae6340ab
-
 ```
 
 比较从`__bitcode`section和 链接后从`__bundle`中提取出的bitcode文件发现是完全一致的，说明链接时只是单纯的对bitcode进行拷贝。
@@ -285,22 +277,19 @@ MD5 (1) = 5d6b72f817fb8fb92550cc9aae6340ab
 通过Clang的`-fembed-bitcode`描述是生成的Object文件内嵌bitcode:
 
 ```shell
-➜ clang -fembed-bitcode -c main.cc -o main.o
-
+$ clang -fembed-bitcode -c main.cc -o main.o
 ```
 
 利用objdump或者otool工具可以查看Object文件，根据官方文档说明，内嵌bitcode文件后，会出现__LLVM字段，因此可以依据此来判断bitcode是否生效：
 
 ```shell
-➜ otool -l main.o | grep __LLVM
-
+$ otool -l main.o | grep __LLVM
 ```
 
 或是：
 
 ```shell
-➜ objdump -all-headers mian_bitcode.out | grep __LLVM
-
+$ objdump -all-headers mian_bitcode.out | grep __LLVM
 ```
 
 需要注意的一点是，如果单纯在buildSetting中`Enable Bitcode`编出来的products是不带bitcode。例如，现在需要编译一个动态库，设置`Enable Bitcode`为YES。 然后选择模拟器，编译一个`x86_64`版本的动态库。通过查找`__LLVM`section发现并没有bitcode。
@@ -334,7 +323,6 @@ mkdir -p "${MT_OUTPUT_DIR}"
 cp -a -f "${SRCROOT}/Build/Products/${CONFIGURATION}-${MT_DEVICE_DIR}/${PROJECT_NAME}.framework" "${MT_OUTPUT_DIR}"
 cp -a -f "${SRCROOT}/Build/Products/${CONFIGURATION}-${MT_DEVICE_DIR}/${PROJECT_NAME}.framework.dSYM" "${MT_OUTPUT_DIR}"
 lipo -create "${SRCROOT}/Build/Products/${CONFIGURATION}-${MT_SIMUL_DIR}/${PROJECT_NAME}.framework/${PROJECT_NAME}" "${MT_OUTPUT_DIR}/${PROJECT_NAME}.framework/${PROJECT_NAME}" -output "${MT_OUTPUT_DIR}/${PROJECT_NAME}.framework/${PROJECT_NAME}"
-
 ```
 
 我们利用xcodebuild传入`OTHER_CFLAGS`，`OTHER_CFLAGS`的选项会直接传递给编译器，因此clang就具有了`-fembed-bitcode`选项：
@@ -346,16 +334,14 @@ lipo -create "${SRCROOT}/Build/Products/${CONFIGURATION}-${MT_SIMUL_DIR}/${PROJE
 /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/DJINetworkRTKHelper/DJINRTKManager.m 
 -o 
 /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/Build/Intermediates.noindex/DJINetworkRTKHelper.build/Release-iphonesimulator/DJINetworkRTKHelper.build/Objects-normal/x86_64/DJINRTKManager.o
-
 ```
 
 通过刚才的测试可以看到如果没有`-fembed-bitcode`编译的产物是不包含`__LLVM`和`__bitcode`字段的，对编出来的`fat file`进行检查如下，可以看到已经包含了bitcode文件：
 
 ```shell
-➜ otool -arch arm64 -l /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/Output/DJINetworkRTKHelper.framework/DJINetworkRTKHelper | grep __LLVM
+$ otool -arch arm64 -l /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/Output/DJINetworkRTKHelper.framework/DJINetworkRTKHelper | grep __LLVM
   segname __LLVM
    segname __LLVM
-
 ```
 
 ---
@@ -370,7 +356,6 @@ lipo -create "${SRCROOT}/Build/Products/${CONFIGURATION}-${MT_SIMUL_DIR}/${PROJE
 
 ```shell
 $ /Applications/Xcode.app/Contents/Developer/usr/bin/bitcode-build-tool -v -t /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin --sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS13.2.sdk -o /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-out/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview --generate-dsym /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-out/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview.dSYM --strip-swift-symbols /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-in/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview
-
 ```
 
 3.开启bitcode的归档文件下面多了个`BCSymbolMaps`的文件夹。这也可以作为一个判定开启bitcode成功的标志。`BCSymbolMaps`是一个类似dSYM的文件，可以辅助定位crash，因为我们知道苹果会根据bitcode再次构建ipa，那么原有的dSYM已经不能用了。因此当出现crash，必须通过App Store Connect下载新的dSYM来进行定位。
@@ -385,7 +370,6 @@ post_install do |installer|
         end
     end
 end
-
 ```
 
 ---
