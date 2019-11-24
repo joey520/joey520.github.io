@@ -2,7 +2,7 @@
 toc: true
 title: 深入理解Bitcode
 date: 2019-11-21 9:51:15
-categories: [iOS,LLVM]
+categories: iOS
 tags: [Bitcode,LLVM]
 ---
 
@@ -72,11 +72,15 @@ MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960
 
 ### Bitcode的优化
 
-1.标识符
+1.首部
 
-目前bitcode文件前4个字节是固定的``magic number``用于bitcode工具识别文件，当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。
+Bitcode的利用首部简单明了的描述了Bitcode文件的信息。
 
-![image-20191113115547724](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191113115547724.png)
+采用前4个字节是固定的``magic number``来标识，就我这个clang 10.15编出来的是`FEEDFACF`。当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。
+
+然后4个字节描述了CPU架构，实际是为了表示Bitcode文件的字节序，以便编译器可以正确读取。
+
+之后描述了`Load command`，文件类型信息等。
 
 2.整形长度
 
@@ -86,7 +90,7 @@ bitcode为了减少体积，充分利用了按位存取的特定，根据数据�
 
 咋一看浪费了两个bit来表示是否连续，但是首先它只占用了一个字节，，而且对于比``1111 0111``略大一点的数时，只需要在连续一个feild即4个bit即可，而整形恰好又是最基本的数据。可见这里的可以减少非常多的内存空间。
 
-6个bit的字符
+3.6个bit的字符
 
 在bitcode中，只用6个bit来表示字符。因为它只需要``a-z``,``A-Z``，``0-9``和``.-``共64个字符。所以所谓优化，最重要的就是把不需要的东西都去掉。。。
 
@@ -272,7 +276,15 @@ MD5 (1) = 5d6b72f817fb8fb92550cc9aae6340ab
 
 ---
 
+### 小结
+
+经过本章的分析，对Bitcode文件是什么，所做的优化，文件结构，以及怎么使用有了比较深的认识。其中可以学习到的是Bitcode优化的部分，其中的思想其实也可以应用再我们的业务中。同时再次遇到Bitcode时也不在会是一脸懵逼。同时还更熟悉了一些系统工具的使用，可以有效的帮助我们在遇到一些难解问题时进行分析。
+
+---
+
 ## Bitcode使用
+
+#### 通过Bitcode文件生成Mach-O文件
 
 通过Clang的`-fembed-bitcode`描述是生成的Object文件内嵌bitcode:
 
@@ -304,6 +316,10 @@ $ objdump -all-headers mian_bitcode.out | grep __LLVM
 ```
 
 为了好看，把中间的option选项省略了，可以看到其实就是利用clang，然后把build setting里的编译配置作为option来编译出了一个Object文件到build文件夹下面。 但是build option中并没有bitcode，所以编出来的产物自然不带bitcode。
+
+---
+
+### 利用脚本直接编译带有Bitcode的Maco-O文件
 
 因此我们应该利用脚本主动调用`-fembed-bitcode`来生成带有bitcode的产物。正好，我们编出的动态库还需要同时支持多个架构，如果完全依赖xcode，我们得真机下编一次，模拟器编一次，再手动合并成`fat file`。而这都可以通过脚本来处理：
 
