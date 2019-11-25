@@ -74,7 +74,7 @@ MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960
 
 1.首部
 
-Bitcode的利用首部简单明了的描述了Bitcode文件的信息。
+Bitcode利用首部简单明了的描述了Bitcode文件的信息。通过该首部编译器可以快速确定该如何编当前的Bitcode文件。
 
 采用前4个字节是固定的``magic number``来标识，就我这个clang 10.15编出来的是`FEEDFACF`。当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。
 
@@ -144,8 +144,6 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 ```
 
 大概可以了解到bitcode文件记录了源文件的一些基本信息如ModuleID(参考XXXX)，文件名，ABI。然后包含源代码的解析。最后保留了构建bitcode文件的编译器的版本。
-
----
 
 ### Bitcode的结构
 
@@ -274,13 +272,9 @@ MD5 (1) = 5d6b72f817fb8fb92550cc9aae6340ab
 
 比较从`__bitcode`section和 链接后从`__bundle`中提取出的bitcode文件发现是完全一致的，说明链接时只是单纯的对bitcode进行拷贝。
 
----
-
 ### 小结
 
 经过本章的分析，对Bitcode文件是什么，所做的优化，文件结构，以及怎么使用有了比较深的认识。其中可以学习到的是Bitcode优化的部分，其中的思想其实也可以应用再我们的业务中。同时再次遇到Bitcode时也不在会是一脸懵逼。同时还更熟悉了一些系统工具的使用，可以有效的帮助我们在遇到一些难解问题时进行分析。
-
----
 
 ## Bitcode使用
 
@@ -317,9 +311,7 @@ $ objdump -all-headers mian_bitcode.out | grep __LLVM
 
 为了好看，把中间的option选项省略了，可以看到其实就是利用clang，然后把build setting里的编译配置作为option来编译出了一个Object文件到build文件夹下面。 但是build option中并没有bitcode，所以编出来的产物自然不带bitcode。
 
----
-
-### 利用脚本直接编译带有Bitcode的Maco-O文件
+#### 脚本构建带有Bitcode的Maco-O文件
 
 因此我们应该利用脚本主动调用`-fembed-bitcode`来生成带有bitcode的产物。正好，我们编出的动态库还需要同时支持多个架构，如果完全依赖xcode，我们得真机下编一次，模拟器编一次，再手动合并成`fat file`。而这都可以通过脚本来处理：
 
@@ -360,9 +352,7 @@ $ otool -arch arm64 -l /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJ
    segname __LLVM
 ```
 
----
-
-### Bitcode应用上架
+#### Bitcode应用上架
 
 使用bitcode嘛最终目的还是为了应用的上架，但是比较坑爹是所有依赖的库文件必须支持bitcode。否则构建的mach-O文件就不能支持bitcode。假设我们目前所有依赖的库文件都已经支持bitcode了，我们使用一个MSDK预上架的工程archive一个支持bitcode的和一个不支持bitcode。可以看到以下区别
 
@@ -387,8 +377,6 @@ post_install do |installer|
     end
 end
 ```
-
----
 
 ## 参考资料
 
