@@ -7,11 +7,15 @@ categories: iOS
 tags: [LLVM]
 ---
 
-toc: true
-
 ## 前言
 
-在MSDK的工程中是拥有多个子工程嵌套组成的而不是利用workspace进行平铺，虽然这些都是历史问题，但是
+首先抛出几个个问题：
+
+1.如果编译时一个Class的文件没有被加入到指定的target会导致什么问题，如果是一个Category的文件呢？
+
+2.如果一个类的方法只有声明没有定义，则编译时会出现问题吗？
+
+2.如果编译的文件Import了一个非Public的framework会怎么样？
 
 ### 什么是链接
 
@@ -102,7 +106,7 @@ Section
 
 main.o表示的是物理地址为页中偏移472，大小为152。 虚拟地址为0和大小为152。test.0表示的是物理地址为页中偏移552，大小为144。 虚拟地址为0和大小为144。 而且代码段总是在地址起始位置。
 
-***
+
 
 ### 链接过程
 
@@ -110,13 +114,13 @@ main.o表示的是物理地址为页中偏移472，大小为152。 虚拟地址�
 
 LLVM的做法是把相似的段合并到一起，把两者的`text`段，`data`段，符号表等等分别进行合并。利用LD工具可以把目标文件进行链接：
 
+```shell
+$ LD main.o test.o -e _main -o main.out -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a
 ```
 
-```
+`-e`指定了程序起始的符号，即main函数。同时链接还依赖libclang_rt.osx.a这个库。
 
----
-
-而这么需要经过一下步骤：
+这么简单的一行语句实际需要经过以下步骤：
 
 1.取出所有目标文件的符号表合成全局符号表
 
@@ -208,6 +212,66 @@ total 0x100004000
 ----
 
 ### iOS的链接
+
+这里我们先回到文章开头的问题：
+
+1.如果编译时一个Class的文件没有被加入到指定的target，则只要这个文件被别的地方引用了一定会导致编译不过，因为符号找不到。但是如果是Category的话则可以正常编过。
+
+2.如果一个方法没有被定义，即使被被其他地方调用，仍然可以正常编译，只是会在运行时崩溃。
+
+我们以一个例子来分析为什么：
+
+首先我们分别创建一个文件main.m和一个Test.h和Test.m：
+
+```objective-c
+#import <Foundation/Foundation.h>
+#import "Test.h"
+int main(int argc, char * argv[]) {
+    NSString * appDelegateClassName;
+    @autoreleasepool {
+        [Test test];
+    }
+    return 0;
+}
+```
+
+```objective-c
+#import <Foundation/Foundation.h>
+@interface Test : NSObject
++ (void)test;
+@end
+
+#import "Test.h"
+
+@implementation Test
++ (void)test {
+    NSLog(@"test");
+}
+@end
+```
+
+然后我们尝试编译Test.m文件如下，指定编译文件为OC文件，优化等级为0：
+
+```shell
+$ clang -x objective-c -O0 -c Test.m -o Test.o
+```
+
+然后查看Test.o的符号:
+
+```shell
+$ nm -nm Test.o
+                 (undefined) external _NSLog
+                 (undefined) external _OBJC_CLASS_$_NSObject
+                 (undefined) external _OBJC_METACLASS_$_NSObject
+                 (undefined) external ___CFConstantStringClassReference
+                 (undefined) external __objc_empty_cache
+0000000000000000 (__TEXT,__text) non-external +[Test test]
+0000000000000068 (__DATA,__objc_const) non-external l_OBJC_$_CLASS_METHODS_Test
+0000000000000088 (__DATA,__objc_const) non-external l_OBJC_METACLASS_RO_$_Test
+00000000000000d0 (__DATA,__objc_const) non-external l_OBJC_CLASS_RO_$_Test
+0000000000000118 (__DATA,__objc_data) external _OBJC_METACLASS_$_Test
+0000000000000140 (__DATA,__objc_data) external _OBJC_CLASS_$_Test
+```
 
 
 
