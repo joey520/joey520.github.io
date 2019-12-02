@@ -18,7 +18,7 @@
 <meta property="og:description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
-<meta property="og:updated_time" content="2019-12-02T02:34:36.579Z">
+<meta property="og:updated_time" content="2019-12-02T02:40:15.619Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
   
@@ -279,7 +279,7 @@
 <p>并且查看文件大小可以看到:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ls -al main.o main.bc main_bitcode.o.bc</span></span><br><span class="line">-rw-r--r--  1 joey.cao  staff  3184 11 19 12:47 main.bc</span><br><span class="line">-rw-r--r--  1 joey.cao  staff   896 11 19 12:41 main.o</span><br><span class="line">-rw-r--r--  1 joey.cao  staff  3168 11 19 12:41 main_bitcode.o.bc</span><br></pre></td></tr></table></figure>
 
-<p>可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多，因为。</p>
+<p>可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多。</p>
 <p><code>s__cmdline</code>section存储了一些用于bitcode重建object文件是的clang编译选项，只有会影响代码生成和没有存在bitcode section的属性才会存在这里。</p>
 <p>链接时，链接器把Object文件链接到一起生成Mach-O文件，把不同的object文件中的<code>__bitcode</code>section中的数据取出来并放到不同的文件中，这里文件会连同<code>__cmdline</code>中的编译选项整合为<a href="https://en.wikipedia.org/wiki/Xar_%28archiver%29" target="_blank" rel="noopener">xar-archive</a>，这是macOS上的一种归档格式，类似我们archive出来的文件。产生的archive文件会保存在<code>__LLVM</code>segment中的<code>__bundle</code>section中。</p>
 <p>直接查看含有bitcode的可执行文件中的<code>__LLVM</code>segment下的<code>__bundle</code>section如下, otool -v可以打印出可视化的符号:</p>
