@@ -2,7 +2,7 @@
 
 toc: true
 title: 谈谈iOS的链接问题
-date: 2019-11-23 17:29:33
+date: 2019-12-2 09:29:33
 categories: iOS
 tags: [LLVM,LINKER]
 ---
@@ -19,7 +19,7 @@ tags: [LLVM,LINKER]
 
 4.如果编译时主工程（注意不是来自外部link的库）中有个Class的.m文件没有被加入到指定的target的complie files里会导致什么问题，如果是一个Category的文件呢？[答案](#answer4)
 
-5.如果一个类里的方法只有声明没有定义，则编译时会出现`undefinde symbol`吗, 为什么？[答案](#answer4)
+5.如果一个类里的方法只有声明没有定义，则编译时会出现`undefined symbol`吗, 为什么？[答案](#answer4)
 
 6.如果一个静态库里面有两个相同的类会出现`duplictate symbols`错误吗？如果是动态库呢，如果是可执行文件呢？[答案](#answer6)
 
@@ -80,7 +80,7 @@ $ otool -r main.o
 $ otool -r test.o
 ```
 
-只截取`LC_SEGMENT_64`这个command，对于`Load command`不了解的可以查看[这里]()。可以看到结果如下:
+只截取`LC_SEGMENT_64`这个command，对于`Load command`不了解的可以查看[这里](https://lief.quarkslab.com/doc/latest/tutorials/11_macho_modification.html)。可以看到结果如下:
 
 ```shell
 ##main.o的`LC_SEGMENT_64`cmd输出
@@ -182,7 +182,7 @@ $ nm -nm main.out
 0000000100002018 (__DATA,__data) external _age2
 ```
 
-链接之后，undefined符号终于找到了自己的归属。。。age2也找到了自己的归属。而prinft也找到，只是标记了需要从`libSystem`标准库中去找。这样符号表就组合到了一起。
+链接之后，undefined符号终于找到了自己的归属。。。age2也找到了自己的归属。而printf也找到，只是标记了需要从`libSystem`标准库中去找。这样符号表就组合到了一起。
 
 ---
 
@@ -211,9 +211,7 @@ Segment __LINKEDIT: 0x1000 (vmaddr 0x100003000 fileoff 12288)
 total 0x100004000
 ```
 
-可以看到代码段已经变成从逻辑地址0x10000000开始了。原来是一个叫做`_PAGEZERO`的segement占了，这一段主要是系统的区域，因此不允许访问。它的地址是0x0，这也是为啥我们访问空指针是会提示`EXC_BAD_ACCESS 0x0`这样类似的错误。动态连接器调用相关的代码，代码中的一些字符串常量`__cstring`,数据常量区，数据区都被插入进来了也被插入进来。
-
-需要注意的是`__la_symbol_pt`表示的是延迟符号指针，可以用于调用一些可执行文件中没有定义的函数，例如前面的`printf`，它可以允许动态连接器进行延迟链接。 
+可以看到代码段已经变成从逻辑地址0x10000000开始了。原来是一个叫做`_PAGEZERO`的segement占了，这一段主要是系统的区域，因此不允许访问。它的地址是0x0，这也是为啥我们访问空指针是会提示`EXC_BAD_ACCESS 0x0`这样类似的错误。动态连接器调用相关的代码，代码中的一些字符串常量`__cstring`,数据常量区，数据区都被插入进来了也被插入进来。__la_symbol_pt`表示的是延迟符号指针，可以用于调用一些可执行文件中没有定义的函数，例如前面的`printf`，它可以允许动态连接器进行延迟链接。 
 
 ### 小结
 
@@ -229,11 +227,11 @@ total 0x100004000
 
 Clang编译器具有和GCC相同[搜索指令](http://gcc.gnu.org/onlinedocs/cpp/Search-Path.html)。对于`#include ""`修饰首先在当前文件夹内查找，然后在自定义的路径中进行搜索。对于`#include <>`修饰的首先在系统标准库中进行搜索，然后是自定义的路径。
 
-但是在使用iOS工程时我们发现只要是在工程的根目录文件下的文件都可以直接通过`#include ""`到，而不需要像C，C++里面一下指定详细的相对路径。这是因为<b>hmap</b>这个东西。默认xcode的build setting里有一个选项是`Uses Headers Map`打开的。我们build一下当前的工程并导出编译log可以看到:
+但是在使用iOS工程时我们发现只要是在工程的根目录文件下的文件都可以直接通过`#include ""`到，而不需要像C，C++里面一下指定详细的相对路径。这是因为<b>hmap</b>这个东西。默认Xcode的`build setting`里有一个选项是`Uses Headers Map`打开的。我们build一下当前的工程并导出编译log可以看到:
 
 ![image-20191127111720240](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image1.png?raw=true)
 
-在编译源文件之前，先会创建一些列hmap文件到derivedData中，我们先关注这个工程名+-project-headers.hmap`的文件中。
+在编译源文件之前，先会创建一些列hmap文件到derivedData中，我们先关注这个`工程名+-project-headers.hmap`的文件中。
 
 ```shell
 $ hexdump -C Build/Intermediates.noindex/TestLink.build/Debug-iphonesimulator/TestLink.build/TestLink-project-headers.hmap
@@ -277,15 +275,17 @@ $ hexdump -C Build/Intermediates.noindex/TestLink.build/Debug-iphonesimulator/Te
 
 另一种引用方式是`@class XXX.h`。这种引用不会把头文件引入，它只是一种前向声明，只是告诉编译器有这么一个类，然后就可以在代码中使用引用这个类了，但是能知道的仅仅是这个类名。更神奇的是由于只是作为一个符号引用，编译器根本不会对它做任何检查，即使是一个根本不存在类一样可以。 
 
-这种引入的好处：1是可以避免头文件引入混乱，比如A，B两个文件互相引用了对方，并在代码中使用到了对方，则会导致编译器提示某个文件不存在，因为这时候互相依赖导致编译器不知道要先编译哪个对象，此时两个源文件都没有目标文件。2：减少预处理时间，比如A.h中有一个`#import B.h`，则如果C.h文件import了A.h就会潜在的把B.h也import进来，而@class 仍然只是插入一个前向声明而已。 
+它一般用在有两个类互相都需要引用对方，或者是Protocol写在头文件之前时这样，需要知道到对方的符号，而并不想import对方。因为如果循环引用可能导致编译不过，因为在查找符号时，编译器会发现彼此都需要对方，而不知道到底该先编译哪一个文件了。但是循环`#import`一定会导致编译问题吗？答案是不一定，如果仅仅只是引用了头文件而没有在代码中引用具体符号，唯一的影响只是白白做了预处理时的头文件展开。而一旦引用到了具体符号，则编译器必须要编译引入的文件以查找符号。那么就必然产生鸡生蛋蛋生鸡的问题。
 
-<b>这里涉及到我们的一个编程规范，尽量减少暴露头文件，尽量在头文件中使用@class，而在.m中才#import头文件。对于有些不想Public出去的属性和方法，可以利用extension来处理，例如拉出一个A_Private.h来提供某些类使用</b>>
+所以使用的`@class`引入的好处：1是可以避免头文件引入混乱，比如A，B两个文件互相引用了对方，并在代码中使用到了对方，则会导致编译器提示某个文件不存在，因为这时候互相依赖导致编译器不知道要先编译哪个对象，此时两个源文件都没有目标文件。2：减少预处理时间，比如A.h中有一个`#import B.h`，则如果C.h文件import了A.h就会潜在的把B.h也import进来，而@class 仍然只是插入一个前向声明而已，可以看到预处理之后的文件也仅仅只是插入了一行`@class XXXX`, 类似一个助记符。 
+
+<b>这里涉及到我们的一个编程规范，尽量减少暴露头文件，尽量在头文件中使用@class，而在.m中才#import头文件。对于有些不想Public出去的属性和方法，可以利用extension来处理，例如拉出一个A_Private.h来提供某些类使用。</b>
 
 ---
 
 @import Framework
 
-还有一种比较少见的引用方式为`@import framework`。首先可以首先可以看下`Build Setting`里有个`Link`Frameworks Automatically 默认是Yes的，这也是为啥我们把一个framework导入工程时会自动在`Build Phases`中进行Link，而`Enable Modules`选项可以允许我们通过@import来引入framework。
+还有一种比较少见的引用方式为`@import framework`。首先可以首先可以看下`Build Setting`里有个`LinkFrameworks Automatically `默认是Yes的，这也是为啥我们把一个framework导入工程时会自动在`Build Phases`中进行Link，而`Enable Modules`选项可以允许我们通过@import来引入framework。
 
 ![image-20191127200736984](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image2.png?raw=true)
 
@@ -475,13 +475,13 @@ objc[9953]: Class Method1 is implemented in both /Users/joey.cao/Desktop/Learnin
 2019-12-01 16:03:19.616667+0800 TestLink[9953:9185455] 主工程 method3
 ```
 
-好在Xcode帮我们指出了有重复方法声明，但是可惜的是通过它并不能定位出到底是哪个方法发生重复了。更可怕的是当库文件本身发生符号冲突时，十一点警告都没有。那么当我们引用的第三方库中符号发生冲突，则可能导致方法执行错误而我们不自知的情况，尤其是不同的第三方库使用同一个库的不同版本，可能导致运行时奇怪的崩溃，甚至完全代码跑偏。
+好在Xcode帮我们指出了有重复方法声明，但是可惜的是通过它并不能定位出到底是哪个方法发生重复了。更可怕的是当库文件本身发生符号冲突时，一点警告都没有。那么当我们引用的第三方库中符号发生冲突，则可能导致方法执行错误而我们不自知的情况，尤其是不同的第三方库使用同一个库的不同版本，可能导致运行时奇怪的崩溃，甚至完全代码跑偏。
 
-如果这些库文件都是开源的，那么还可以通过脚本对依赖的库进行比对，从而找到不同的地方，并根据实际情况进行选择。比如之前MSDK在进行跨平台开发时，发现有一些文件在Linux系统和安卓系统上时不一样的，这是只能通过预编译宏进行控制，更麻烦的可能还需要手动添加一些实现来弥补平台的缺失。
+如果这些库文件都是开源的，那么还可以通过脚本对依赖的库进行比对，从而找到不同的地方，并根据实际情况进行选择。比如之前MSDK在进行跨平台开发时，发现有一些文件在`*nux`系统和安卓系统上时不一样的，可以通过预编译宏进行控制，更麻烦的可能还需要手动添加一些实现来弥补平台的缺失。
 
-而对于闭源的第三方库，我们知道.a只是一个目标文件集合，因此我们可以通过ar把指定的不兼容的目标文件删除掉即可。具体实现可以参照[这篇文章](http://atnan.com/blog/2012/01/12/avoiding-duplicate-symbol-errors-during-linking-by-removing-classes-from-static-libraries)。
+而对于闭源的第三方库，我们知道.a只是一个目标文件集合，因此我们可以通过ar把指定的不兼容的目标文件删除掉,具体实现可以参照[这篇文章](http://atnan.com/blog/2012/01/12/avoiding-duplicate-symbol-errors-during-linking-by-removing-classes-from-static-libraries)。
 
-为了避免这些问题，所以作为SDK开发时，或者封装库文件时一定要指定好依赖的第三方库文件的版本。或是通过给给文件加前缀来避免符号重复，就好像加了命名空间一样。当然还可以把依赖的库文件分离出来，让用户进行引入，例如`DJIWidget`中使用`FFMpeg`，避免多份库文件的存在。
+为了避免这些问题，作为SDK开发时，或者封装库文件时一定要指定好依赖的第三方库文件的版本。或是通过给文件加前缀来避免符号重复，就好像加了命名空间一样。当然还可以把依赖的库文件分离出来，让用户进行引入，例如`DJIWidget`中使用`FFMpeg`，避免多份库文件的存在。
 
 #### 库文件多层链接
 
@@ -517,7 +517,7 @@ objc[9953]: Class Method1 is implemented in both /Users/joey.cao/Desktop/Learnin
 
 在`Build Setting`中有一个选项为`Other Link Flag`,很多人碰到过引用第三方库中有Category时发生`Unrecongnized Selector`崩溃，都知道可以通过添加`-Objc`来进行解决，那么这里到底是干了什么呢？
 
-查看编译log可以看到，添加`-Objc`之后会在为Clang添加`-Objc`这个编译选项，同理添加`-all_load`, `-force_load`都只是链接器添加一个选项而已。因为编译器为了避免生成的可执行文件太大，默认只连接Class，c, C++相关的目标文件，而Category和一些未使用的文件符号都会被Strip掉。因此第三方库虽然存在Category的符号，但是链接时被Strip掉了，因此会出现`Unrecongnized Selector`。而`-all_load`则是把库文件所有的目标文件以及所有依赖的第三方库全部链接，比较常见的场景是使用静态库时，发现找不到符号，需要添加一些第三方库，网上有些回答添加`-all_load`。当然这样可以解决，但是带来的问题也很明显，它会导致所有的库文件都执行这样的操作，会导致可执行文件的增大，并且如果两个静态库中的目标文件有相同的符号就会导致重复符号错误。另一种解决方法就是`-force_load`，指定某一个第三方库进行all_load。 <b>这里还有一个重要的应用场景是， 动态库会丢弃内部没有使用的其它静态库文件或者是静态库文件的Object对象，可能会导致运行时崩溃，为了解决就得使其all_load</b>
+查看编译log可以看到，添加`-Objc`之后会在为Clang添加`-Objc`这个编译选项，同理添加`-all_load`, `-force_load`都只是链接器添加一个选项而已。因为编译器为了避免生成的可执行文件太大，默认只连接Class，c, C++相关的目标文件，而Category和一些未使用的文件符号都会被Strip掉。因此第三方库虽然存在Category的符号，但是链接时被Strip掉了，因此会出现`Unrecongnized Selector`。而`-all_load`则是把库文件所有的目标文件以及所有依赖的第三方库全部链接，比较常见的场景是使用静态库时，发现找不到符号，需要添加一些第三方库，网上有些回答添加`-all_load`。当然这样可以解决，但是带来的问题也很明显，它会导致所有的库文件都执行这样的操作，会导致可执行文件的增大，并且如果两个静态库中的目标文件有相同的符号就会导致重复符号错误。另一种解决方法就是`-force_load`，指定某一个第三方库进行all_load。 <b>这里还有一个重要的应用场景是， 动态库会丢弃内部没有使用的其它静态库文件或者是静态库文件的Object对象，可能会导致运行时崩溃，为了解决就得使其all_load。</b>
 
 还有一个选项`-dead_strip`，它可以把使用不到的代码，block，以及目标文件进行strip，可以参见苹果的[release note](https://opensource.apple.com/source/cctools/cctools-622.5.1/RelNotes/CompilerTools.html?txt)。
 
@@ -535,11 +535,11 @@ objc[9953]: Class Method1 is implemented in both /Users/joey.cao/Desktop/Learnin
 
 1.如果编译时一个Class的文件没有被加入到指定的target，则只要这个文件被别的地方引用了一定会导致编译不过，因为符号找不到。但是如果是Category的话则可以正常编过。
 
-2.如果一个方法没有被定义，即使被被其他地方调用，仍然可以正常编译，只是会在运行时崩溃。
+2.如果一个方法没有被定义，即使被其他地方调用，仍然可以正常编译，只是会在运行时崩溃。
 
 我们以一个例子来分析为什么：
 
- 首先我们只为test1添加定义。build一下之后去derivedData中`/Build/Intermediates.noindex/TestLink.build/Debug-iphonesimulator/TestLink.build/Objects-normal/x86_64`文件就下寻找编译的中间产物：
+首先我们只为test1添加定义。build一下之后去derivedData中`/Build/Intermediates.noindex/TestLink.build/Debug-iphonesimulator/TestLink.build/Objects-normal/x86_64`文件就下寻找编译的中间产物：
 
 首先我们查看Test.o的符号：
 
@@ -605,3 +605,5 @@ $ nm -nm /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/TestLink/DerivedData/T
 5.https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/DynamicLibraries/000-Introduction/Introduction.html#//apple_ref/doc/uid/TP40001869
 
 6.https://forums.developer.apple.com/thread/98369
+
+7.https://lief.quarkslab.com/doc/latest/tutorials/11_macho_modification.html
