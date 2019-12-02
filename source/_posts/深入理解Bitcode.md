@@ -184,9 +184,9 @@ $ ls -al main.o main.bc main_bitcode.o.bc
 -rw-r--r--  1 joey.cao  staff  3168 11 19 12:41 main_bitcode.o.bc
 ```
 
-可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多，因为。
+可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多。
 
-`s__cmdline`section存储了一些用于bitcode重建object文件是的clang编译选项，只有会影响代码生成和没有存在bitcode section的属性才会存在这里。
+`__cmdline`section存储了一些用于bitcode重建object文件是的clang编译选项，只有会影响代码生成和没有存在bitcode section的属性才会存在这里。
 
 链接时，链接器把Object文件链接到一起生成Mach-O文件，把不同的object文件中的`__bitcode`section中的数据取出来并放到不同的文件中，这里文件会连同`__cmdline`中的编译选项整合为[xar-archive](https://en.wikipedia.org/wiki/Xar_%28archiver%29)，这是macOS上的一种归档格式，类似我们archive出来的文件。产生的archive文件会保存在`__LLVM`segment中的`__bundle`section中。
 
@@ -311,7 +311,7 @@ $ objdump -all-headers mian_bitcode.out | grep __LLVM
 
 为了好看，把中间的option选项省略了，可以看到其实就是利用clang，然后把build setting里的编译配置作为option来编译出了一个Object文件到build文件夹下面。 但是build option中并没有bitcode，所以编出来的产物自然不带bitcode。
 
-#### 脚本构建带有Bitcode的Maco-O文件
+#### 脚本构建带有Bitcode的Mach-O文件
 
 因此我们应该利用脚本主动调用`-fembed-bitcode`来生成带有bitcode的产物。正好，我们编出的动态库还需要同时支持多个架构，如果完全依赖xcode，我们得真机下编一次，模拟器编一次，再手动合并成`fat file`。而这都可以通过脚本来处理：
 
