@@ -20,12 +20,13 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image1.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image2.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image3.png?raw=true">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image4.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image5.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image6.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image7.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image8.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image9.png?raw=true">
-<meta property="og:updated_time" content="2019-12-02T02:18:56.467Z">
+<meta property="og:updated_time" content="2019-12-02T02:31:30.402Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image1.png?raw=true">
   
@@ -329,7 +330,7 @@
 <p>样例如下，Function1和Method1都是Function1这个framework下的文件，通过直接拉头文件引用来<code>#import Method1.h</code>,通过库引用得到方式来引用Function1:</p>
 <p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image3.png?raw=true" alt="image-20191201230430748"></p>
 <p>结果编译会出错，重复定义了Method1这个类，为了避免因为<code>Function1.h</code>是<code>Umbrella header</code>的原因，我们改成另一个header，发现依然还是一样的问题：</p>
-<p>![image-20191201230650759](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191201230650759.png)</p>
+<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image4.png?raw=true" alt="image-20191201230650759"></p>
 <p>首先这种引用方式当然是不合理的，<b>建议要么都用 “”, 要么都用&lt;&gt;</b>。但是奇怪的是如果我们把<code>#import Method1.h</code>这一句放在上面就不会报错，这里我们首先要理解在<code>#import</code>的时候Clang做了什么，由于Function1是一个动态库，所以在构建时创建了Modules。当我们通过<code>import &lt;Function1/xxx.h&gt;</code>方式import时就会直接把module引入。而在<code>#import &quot;Method1.h&quot;</code>只是添加hmap并查找这个符号。作为证据我们删除掉DerviedData，并删掉<code>import &lt;Function1/xxx.h&gt;</code>这一句。重新编译，可以看到ModuleCache里已经没有Function1了。</p>
 <p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image5.png?raw=true" alt="image-20191201234223020"></p>
 <p>而当我们把<code>import &lt;Function1/xxx.h&gt;</code>加上时在编译：</p>
