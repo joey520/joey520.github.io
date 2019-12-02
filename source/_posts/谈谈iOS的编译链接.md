@@ -569,7 +569,7 @@ $ nm -nm /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/TestLink/DerivedData/T
 00000000000003d8 (__DATA,__objc_ivar) private external _OBJC_IVAR_$_Test._name
 ```
 
-不意外数据段存放了class,metaclass和私有的Ivar。 而程序段也有Property自动生成的getter和setter。<b>但是需要注意的是：这些方法并不是external的，前面我们说了external表示的是其可见性，这里表明了这些方法其实外部是并不可见的。说明在链接的时候并不会去检查符号表，因此即使没有为方法添加定义仍然可以正常编译</b>。
+不意外数据段存放了class,metaclass和私有的Ivar。 而程序段也有Property自动生成的getter和setter。<b>但是需要注意的是：这些方法并不是external的，前面我们说了external表示的是其可见性，这里表明了这些方法其实外部是并不可见的。说明在链接的时候并不会链接类的方法的符号，只有类名作为external的符号参与链接，因此即使没有为方法添加定义仍然可以正常编译</b>。
 
 但是class文件仍然是external的，因此如果被外部引用到了，但是没有参与编译直接会报错 `Undefined symbols _OBJC_CLASS_$_Test`。而我们查看一下Test的分类的符号：
 
@@ -584,9 +584,11 @@ $ nm -nm /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/TestLink/DerivedData/T
 00000000000000e8 (__DATA,__objc_const) non-external l_OBJC_$_CATEGORY_Test_$_test
 ```
 
-可以惊奇的发现它是没有类符号的，分类并不是类，所以即使import了Category， 并调用了其中的方法，也不会导致编译不过，因为他没有一个符号是外部可见的。同样可以看到添加的属性都生成了Properlist，但是却没有生成对应Ivars, 也没有getter和setter。因此我们可以分类添加的property属性列表里看到有这些属性，但是无法get, set。
+可以惊奇的发现它是没有类符号的，同样可以看到添加的属性都生成了Properlist，但是却没有生成对应Ivars, 也没有getter和setter。因此我们可以分类添加的property属性列表里看到有这些属性，但是无法get, set。
 
-而这一切都是由于OC的Runtime机制，它只会对类名符号进行链接，而所有的method都是`non-external`的，只是保存在`method_list`中，通过`msg_send`进行调用。
+分类并不是类，他没有特有的类符号，所以即使import了Category， 并调用了其中的方法，也不会导致编译不过，因为他没有一个符号是外部可见的。
+
+而这一切都是由于OC的Runtime机制，它只会对类名符号进行链接，而所有的method都是`non-external`的，只是保存在`method_list`中，通过`msg_send`进行调用。因此即使没有对方法进行定义，或者是分类没有参与编译都不会导致链接失败，只是数据段的method_list缺失相应的方法而导致运行时崩溃。
 
 关于编译出的Mach-O文件具体代表什么，可以参考这边[文章](https://satanwoo.github.io/2017/06/29/Macho-2/)。
 
