@@ -184,7 +184,7 @@ $ ls -al main.o main.bc main_bitcode.o.bc
 -rw-r--r--  1 joey.cao  staff  3168 11 19 12:41 main_bitcode.o.bc
 ```
 
-可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多。
+可以看到导出的bitcode和直接编出的bitcode并不完全一致，所以这个section并没有完全包含bitcode的信息。
 
 `__cmdline`section存储了一些用于bitcode重建object文件是的clang编译选项，只有会影响代码生成和没有存在bitcode section的属性才会存在这里。
 
