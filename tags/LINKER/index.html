@@ -7,20 +7,16 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>深入理解Bitcode | Joey&#39;s House</title>
+  <title>Tag: LINKER | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
-<meta name="keywords" content="Bitcode,LLVM">
-<meta property="og:type" content="article">
-<meta property="og:title" content="深入理解Bitcode">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;11&#x2F;21&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode&#x2F;index.html">
+  <meta name="description" content="人菜就要多读书。。。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Joey&#39;s House">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;tags&#x2F;LINKER&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
+<meta property="og:description" content="人菜就要多读书。。。">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
-<meta property="og:updated_time" content="2019-11-25T02:18:19.737Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -161,199 +157,52 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-深入理解Bitcode" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      深入理解Bitcode
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2019" class="archive-year">2019</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2019/11/23/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/" class="archive-article-date">
+  	<time datetime="2019-11-23T09:29:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-23</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2019/11/23/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/">谈谈iOS的链接问题</a>
     </h1>
   
 
-        <!--显示阅读次数-->
-        
-          <br/>
-          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
-          <span class="icon-sort"></span>
-          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
-                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
-          </span>
-          </a>
-        
-        <!--显示阅读次数完毕-->
-        
-        <a href="/2019/11/21/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode/" class="archive-article-date">
-  	<time datetime="2019-11-21T01:51:15.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-21</time>
-</a>
-        
-      </header>
-    
-    <!-- 目录内容 -->
-    
-        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
-            <span class="btn-bg"></span>
-            <span class="btn-text">文章导航</span>
-        </p>
-        <div id="toc-article" class="toc-article">
-        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
-        <strong class="toc-title">文章目录</strong>
-         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bitcode可以做什么"><span class="toc-number">2.</span> <span class="toc-text">bitcode可以做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode是什么："><span class="toc-number">3.</span> <span class="toc-text">Bitcode是什么：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的优化"><span class="toc-number">3.1.</span> <span class="toc-text">Bitcode的优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的结构"><span class="toc-number">3.2.</span> <span class="toc-text">Bitcode的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小结"><span class="toc-number">3.3.</span> <span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode使用"><span class="toc-number">4.</span> <span class="toc-text">Bitcode使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#通过Bitcode文件生成Mach-O文件"><span class="toc-number">4.0.1.</span> <span class="toc-text">通过Bitcode文件生成Mach-O文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#脚本构建带有Bitcode的Maco-O文件"><span class="toc-number">4.0.2.</span> <span class="toc-text">脚本构建带有Bitcode的Maco-O文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Bitcode应用上架"><span class="toc-number">4.0.3.</span> <span class="toc-text">Bitcode应用上架</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
-       </div>
-      <script type="text/javascript">
-      function showToc(){
-          var toc_article = document.getElementById("toc-article");
-          var show_toc_btn = document.getElementById("show-toc-btn");
-          toc_article.setAttribute("style","display:block");
-          show_toc_btn.setAttribute("style","display:none");
-      };
-      function showBtn(){
-          var toc_article = document.getElementById("toc-article");
-          var show_toc_btn = document.getElementById("show-toc-btn");
-          toc_article.setAttribute("style","display:none");
-          show_toc_btn.setAttribute("style","display:block");
-      };
-    </script>
-    
-    <!-- 目录内容结束 -->
-    <div class="article-entry" itemprop="articleBody">         
-            
-              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？</p>
-<p>我们知道编译器前端可以把不同的高级语言转换为中间代码（IR），再由编译器后端将中间代码转换成指定平台的目标代码，再通过链接器把目标代码和依赖的库文件link到一起即可变成可执行文件。因此理论上只需要中间代码即可生成任一平台的目标代码（只要编译器后端支持），因为中间代码已经包含了源程序所所要表达的全部意思。</p>
-<p>再看下LLVM官方文档的描述：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The LLVM code representation is designed to be used in three different forms: as an in-memory compiler IR, as an on-disk bitcode representation (suitable for fast loading by a Just-In-Time compiler), and as a human readable assembly language representation.This allows LLVM to provide a powerful intermediate representation for efficient compiler transformations and analysis, while providing a natural means to debug and visualize the transformations. The three different forms of LLVM are all equivalent.</span><br></pre></td></tr></table></figure>
-
-<p>重点是三种代码表现形式：编译过程中的中间代码IR；编译出的bitcode；可读的汇编代码。其实都是对源代码的一种描述，只是面向了不同的对象时的表现形态。由此可知bitcode其实只是IR的另一种表现形式。</p>
-<a id="more"></a>
-
-<h2 id="bitcode可以做什么"><a href="#bitcode可以做什么" class="headerlink" title="bitcode可以做什么"></a>bitcode可以做什么</h2><p>1.首先我们写一个小demo:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hello\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>2.把源文件转换为LLVM的中间表示bitcode文件：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> clang -emit-llvm -c hello.c -o hello.bc</span></span><br></pre></td></tr></table></figure>
-
-<p>可以看到hello.bc文件格式如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> file hello.bc</span></span><br><span class="line">hello.bc: LLVM bitcode, wrapper x86_64</span><br></pre></td></tr></table></figure>
-
-<p>3.然后把bitcode转换成目标文件,输出为Mach-O文件：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> clang -c hello.bc -o hello.bc.o</span></span><br><span class="line">file hello.bc.o</span><br><span class="line">hello.bc.o: Mach-O 64-bit object x86_64</span><br></pre></td></tr></table></figure>
-
-<p>4.直接把源代码编译成目标文件并和由bitcode生成目标文件进行对比：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> clang -c hello.c -o hello.o</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> md5 hello.o hello.bc.o</span></span><br><span class="line">MD5 (hello.o) = 92311036e62f4b3e4468b3c93c314960</span><br><span class="line">MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960</span><br></pre></td></tr></table></figure>
-
-<p>可以发现通过bitcode获取和直接编译出来的目标代码是一模一样的。因此只需要得到bicode文件就可以编译出一样的目标文件。</p>
-<h2 id="Bitcode是什么："><a href="#Bitcode是什么：" class="headerlink" title="Bitcode是什么："></a>Bitcode是什么：</h2><p>通过LLVM官方对bitcode的描述，可以知道bitcode是一种以位为单位存取的二进制文件，它可以存在于包装结构中，如上一节中看到<code>LLVM bitcode, wrapper x86_64</code> ,也可以存在于<code>Object</code>文件中，例如<code>Mach-O</code>文件等。<strong>对于<code>Mach-O</code>文件并且必定存在于名为<code>__LLVM</code>或者<code>__bitcode</code>的section中，因此我们可以根据这两个字段来判断生成的Mach-O文件是否包含bitcode.</strong></p>
-<h3 id="Bitcode的优化"><a href="#Bitcode的优化" class="headerlink" title="Bitcode的优化"></a>Bitcode的优化</h3><p>1.首部</p>
-<p>Bitcode利用首部简单明了的描述了Bitcode文件的信息。通过该首部编译器可以快速确定该如何编当前的Bitcode文件。</p>
-<p>采用前4个字节是固定的<code>magic number</code>来标识，就我这个clang 10.15编出来的是<code>FEEDFACF</code>。当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。</p>
-<p>然后4个字节描述了CPU架构，实际是为了表示Bitcode文件的字节序，以便编译器可以正确读取。</p>
-<p>之后描述了<code>Load command</code>，文件类型信息等。</p>
-<p>2.整形长度</p>
-<p>bitcode为了减少体积，充分利用了按位存取的特定，根据数据类型更精确的分配数据长度，例如<code>boolean</code>只需要一个<code>bit</code>即可。而且利用变长整形来encode数据来减少表示值很小数时的内存浪费，它按4个bit这样为一个feild来表示数据，最高位表示是否连续（即和后面的数据是否是组合的），后面的3个bit表示0-7的数，对于连续的数字，后面的接的feiled通过移位<code>&lt;&lt;3</code>后和前面的feild的数据组合到一起。</p>
-<p>例如数字27在bitcode中表示为<code>1011 0011</code>,前一个feild值为3，由于最高位1表示连续，则后一个feild的<code>011</code>需要左移3个bit即24，而后一个feild最高位为0表示不再连续。则数据为：<code>24+3 = 27</code>.</p>
-<p>咋一看浪费了两个bit来表示是否连续，但是首先它只占用了一个字节，，而且对于比<code>1111 0111</code>略大一点的数时，只需要在连续一个feild即4个bit即可，而整形恰好又是最基本的数据。可见这里的可以减少非常多的内存空间。</p>
-<p>3.6个bit的字符</p>
-<p>在bitcode中，只用6个bit来表示字符。因为它只需要<code>a-z</code>,<code>A-Z</code>，<code>0-9</code>和<code>.-</code>共64个字符。所以所谓优化，最重要的就是把不需要的东西都去掉。。。</p>
-<p>上面我们知道bitcode文件是一种LLVM bitcode文件，实际是一些字节因此无法阅读，不过llvm-dis是一个可以可以把bitcode文件转换为LLVM表示的反汇编的可视化的汇编语言(注意与Clang下的表示不一致):</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> llvm-dis &lt; hello.bc</span></span><br></pre></td></tr></table></figure>
-
-<p>同样的-S选项可以把源文件转换为LLVM表示的汇编语言(注意与Clang下的表示不一致):</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> clang -emit-llvm -S hello.c -o hello.ll</span></span><br></pre></td></tr></table></figure>
-
-<p>打开hello.ll可以看到如下，我加了一些comment来简单的描述：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;---描述bitcode文件的基本信息,数据对其---&gt;</span><br><span class="line">; ModuleID = &apos;hello.c&apos;</span><br><span class="line">source_filename = &quot;hello.c&quot;</span><br><span class="line">target datalayout = &quot;e-m:o-i64:64-f80:128-n8:16:32:64-S128&quot;</span><br><span class="line">target triple = &quot;x86_64-apple-macosx10.14.0&quot;</span><br><span class="line">&lt;---程序中输出的全局常量，由于是字符串，一字节对齐---&gt;</span><br><span class="line">@.str = private unnamed_addr constant [7 x i8] c&quot;hello\0A\00&quot;, align 1</span><br><span class="line"></span><br><span class="line">; Function Attrs: noinline nounwind optnone ssp uwtable</span><br><span class="line">&lt;---定义函数主体部分，int已经转换成了内部的表现i32，同事对该函数进行下面的attribute0的编译描述---&gt;</span><br><span class="line">define i32 @main() #0 &#123;</span><br><span class="line">&lt;---分配一个局部int变量并赋值为0，不过貌似没有用到，应该会在编译优化时被干掉---&gt;</span><br><span class="line">  %1 = alloca i32, align 4</span><br><span class="line">  store i32 0, i32* %1, align 4</span><br><span class="line">  &lt;---调用prinrt函数，并把上面str传入,此处会由汇编器生成跳转指令---&gt;</span><br><span class="line">  %2 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str, i32 0, i32 0))</span><br><span class="line">  &lt;---函数返回---&gt;</span><br><span class="line">  ret i32 0</span><br><span class="line">&#125;</span><br><span class="line">&lt;---声明了printf函数，同时对该函数进行下面的attribute1的编译描述---&gt;</span><br><span class="line">declare i32 @printf(i8*, ...) #1</span><br><span class="line"></span><br><span class="line">attributes #0 = &#123; noinline nounwind optnone ssp uwtable &quot;correctly-rounded-divide-sqrt-fp-math&quot;=&quot;false&quot; &quot;disable-tail-calls&quot;=&quot;false&quot; &quot;less-precise-fpmad&quot;=&quot;false&quot; &quot;min-legal-vector-width&quot;=&quot;0&quot; &quot;no-frame-pointer-elim&quot;=&quot;true&quot; &quot;no-frame-pointer-elim-non-leaf&quot; &quot;no-infs-fp-math&quot;=&quot;false&quot; &quot;no-jump-tables&quot;=&quot;false&quot; &quot;no-nans-fp-math&quot;=&quot;false&quot; &quot;no-signed-zeros-fp-math&quot;=&quot;false&quot; &quot;no-trapping-math&quot;=&quot;false&quot; &quot;stack-protector-buffer-size&quot;=&quot;8&quot; &quot;target-cpu&quot;=&quot;penryn&quot; &quot;target-features&quot;=&quot;+cx16,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87&quot; &quot;unsafe-fp-math&quot;=&quot;false&quot; &quot;use-soft-float&quot;=&quot;false&quot; &#125;</span><br><span class="line">attributes #1 = &#123; &quot;correctly-rounded-divide-sqrt-fp-math&quot;=&quot;false&quot; &quot;disable-tail-calls&quot;=&quot;false&quot; &quot;less-precise-fpmad&quot;=&quot;false&quot; &quot;no-frame-pointer-elim&quot;=&quot;true&quot; &quot;no-frame-pointer-elim-non-leaf&quot; &quot;no-infs-fp-math&quot;=&quot;false&quot; &quot;no-nans-fp-math&quot;=&quot;false&quot; &quot;no-signed-zeros-fp-math&quot;=&quot;false&quot; &quot;no-trapping-math&quot;=&quot;false&quot; &quot;stack-protector-buffer-size&quot;=&quot;8&quot; &quot;target-cpu&quot;=&quot;penryn&quot; &quot;target-features&quot;=&quot;+cx16,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87&quot; &quot;unsafe-fp-math&quot;=&quot;false&quot; &quot;use-soft-float&quot;=&quot;false&quot; &#125;</span><br><span class="line">&lt;---记录产生bitcode文件的编译器的版本等信息，用于指定编译器进行后续转换---&gt;</span><br><span class="line">!llvm.module.flags = !&#123;!0, !1, !2&#125;</span><br><span class="line">!llvm.ident = !&#123;!3&#125;</span><br><span class="line"></span><br><span class="line">!0 = !&#123;i32 2, !&quot;SDK Version&quot;, [2 x i32] [i32 10, i32 15]&#125;</span><br><span class="line">!1 = !&#123;i32 1, !&quot;wchar_size&quot;, i32 4&#125;</span><br><span class="line">!2 = !&#123;i32 7, !&quot;PIC Level&quot;, i32 2&#125;</span><br><span class="line">!3 = !&#123;!&quot;Apple clang version 11.0.0 (clang-1100.0.33.8)&quot;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>大概可以了解到bitcode文件记录了源文件的一些基本信息如ModuleID(参考XXXX)，文件名，ABI。然后包含源代码的解析。最后保留了构建bitcode文件的编译器的版本。</p>
-<h3 id="Bitcode的结构"><a href="#Bitcode的结构" class="headerlink" title="Bitcode的结构"></a>Bitcode的结构</h3><p>我们分别编译一个不带bitcode的Object文件和一个带有bitcode的object文件，然后进行对比：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> otool -l main_bitcode.o &gt;&gt; main_bitcode.o.txt</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> otool -l main.o &gt;&gt; main.o.txt</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vimdiff main.o.txt main_bitcode.o.txt</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/bitcode_bundle.png?raw=true" alt="image-20191119111851211"></p>
-<p>可以看到开启bitcode后几乎每个section都会变大，并且多了名为<code>__bitcode</code>的section和名为<code>__cmdline</code>的section。</p>
-<p>通过<code>segedit</code>可以提取出指定section.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> segedit -extract __LLVM __bitcode main_bitcode.o.bc \</span></span><br><span class="line">-extract __LLVM __cmdline main_bitcode.o.cmdline \</span><br><span class="line">main_bitcode.o</span><br></pre></td></tr></table></figure>
-
-<p>对提取出的bitcode和直接编译出的bitcode文件进行MD5校验：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> md5 main.bc main_bitcode.o.bc</span></span><br><span class="line">MD5 (main.bc) = e9e80622c4830574dc2a6ed209bb662c</span><br><span class="line">MD5 (main_bitcode.o.bc) = 2dee4301533eef0be4d91670d5de3187</span><br></pre></td></tr></table></figure>
-
-<p>并且查看文件大小可以看到:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ls -al main.o main.bc main_bitcode.o.bc</span></span><br><span class="line">-rw-r--r--  1 joey.cao  staff  3184 11 19 12:47 main.bc</span><br><span class="line">-rw-r--r--  1 joey.cao  staff   896 11 19 12:41 main.o</span><br><span class="line">-rw-r--r--  1 joey.cao  staff  3168 11 19 12:41 main_bitcode.o.bc</span><br></pre></td></tr></table></figure>
-
-<p>可以看到导出的bitcode和直接编出的bitcode并不完全一致，提取出的bitcode比直接编译出的bc文件大很多，因为。</p>
-<p><code>s__cmdline</code>section存储了一些用于bitcode重建object文件是的clang编译选项，只有会影响代码生成和没有存在bitcode section的属性才会存在这里。</p>
-<p>链接时，链接器把Object文件链接到一起生成Mach-O文件，把不同的object文件中的<code>__bitcode</code>section中的数据取出来并放到不同的文件中，这里文件会连同<code>__cmdline</code>中的编译选项整合为<a href="https://en.wikipedia.org/wiki/Xar_%28archiver%29" target="_blank" rel="noopener">xar-archive</a>，这是macOS上的一种归档格式，类似我们archive出来的文件。产生的archive文件会保存在<code>__LLVM</code>segment中的<code>__bundle</code>section中。</p>
-<p>直接查看含有bitcode的可执行文件中的<code>__LLVM</code>segment下的<code>__bundle</code>section如下, otool -v可以打印出可视化的符号:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> otool -v -s __LLVM __bundle a.out</span></span><br><span class="line">a.out:</span><br><span class="line">Contents of (__LLVM,__bundle) section</span><br><span class="line">For (__LLVM,__bundle) section: xar table of contents:</span><br><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line">&lt;xar&gt;</span><br><span class="line"> &lt;subdoc subdoc_name="Ld"&gt;</span><br><span class="line">  &lt;version&gt;1.0&lt;/version&gt;</span><br><span class="line">  &lt;architecture&gt;x86_64&lt;/architecture&gt;</span><br><span class="line">  &lt;platform&gt;macOS&lt;/platform&gt;</span><br><span class="line">  &lt;sdkversion&gt;10.14.0&lt;/sdkversion&gt;</span><br><span class="line">  &lt;dylibs&gt;</span><br><span class="line">   &lt;lib&gt;&#123;SDKPATH&#125;/usr/lib/libSystem.B.dylib&lt;/lib&gt;</span><br><span class="line">  &lt;/dylibs&gt;</span><br><span class="line">  &lt;link-options&gt;</span><br><span class="line">   &lt;option&gt;-execute&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;-platform_version&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;macOS&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;10.14.0&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;10.14.0&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;-e&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;_main&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;-executable_path&lt;/option&gt;</span><br><span class="line">   &lt;option&gt;a.out&lt;/option&gt;</span><br><span class="line">  &lt;/link-options&gt;</span><br><span class="line"> &lt;/subdoc&gt;</span><br><span class="line"> &lt;toc&gt;</span><br><span class="line">  &lt;checksum style="sha1"&gt;</span><br><span class="line">   &lt;size&gt;20&lt;/size&gt;</span><br><span class="line">   &lt;offset&gt;0&lt;/offset&gt;</span><br><span class="line">  &lt;/checksum&gt;</span><br><span class="line">  &lt;creation-time&gt;2019-11-19T05:00:11&lt;/creation-time&gt;</span><br><span class="line">  &lt;file id="1"&gt;</span><br><span class="line">   &lt;name&gt;1&lt;/name&gt;</span><br><span class="line">   &lt;type&gt;file&lt;/type&gt;</span><br><span class="line">   &lt;data&gt;</span><br><span class="line">    &lt;archived-checksum style="sha1"&gt;a16348f7b5300db507ec381a097348633c443272&lt;/archived-checksum&gt;</span><br><span class="line">    &lt;extracted-checksum style="sha1"&gt;a16348f7b5300db507ec381a097348633c443272&lt;/extracted-checksum&gt;</span><br><span class="line">    &lt;size&gt;3168&lt;/size&gt;</span><br><span class="line">    &lt;offset&gt;20&lt;/offset&gt;</span><br><span class="line">    &lt;encoding style="application/octet-stream"/&gt;</span><br><span class="line">    &lt;length&gt;3168&lt;/length&gt;</span><br><span class="line">   &lt;/data&gt;</span><br><span class="line">   &lt;file-type&gt;Bitcode&lt;/file-type&gt;</span><br><span class="line">   &lt;clang&gt;</span><br><span class="line">    &lt;cmd&gt;-triple&lt;/cmd&gt;</span><br><span class="line">    &lt;cmd&gt;x86_64-apple-macosx10.14.0&lt;/cmd&gt;</span><br><span class="line">    &lt;cmd&gt;-emit-obj&lt;/cmd&gt;</span><br><span class="line">    &lt;cmd&gt;-disable-llvm-passes&lt;/cmd&gt;</span><br><span class="line">   &lt;/clang&gt;</span><br><span class="line">  &lt;/file&gt;</span><br><span class="line"> &lt;/toc&gt;</span><br><span class="line">&lt;/xar&gt;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，里面<code>__bundule</code>section就是一个xml配置文件，包含了link选项配置，数据长度，和通过<code>__cmdline</code>重建object文件的clang选项等等。因此通过它就可以创建可执行文件。</p>
-<p>我们尝试从中提取出bitcode文件:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//1.提取出bitcode相关的bundle</span><br><span class="line"><span class="meta">$</span><span class="bash"> segedit -extract __LLVM __bundle bundle main_bitcode.out</span></span><br><span class="line">//2.解压出头文件</span><br><span class="line"><span class="meta">$</span><span class="bash"> xar -d toc.xml -f bundle</span></span><br></pre></td></tr></table></figure>
-
-<p>我们对比bundle描述头文件和通过otool打印出的bundle描述文件一模一样。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//1.加压出bitcode文件，自动生成在当前文件夹下名为1</span><br><span class="line"><span class="meta">$</span><span class="bash"> xar -x -f bundle</span></span><br><span class="line">//2.比较提取出的bitcode文件和编译出的bitcode文件</span><br><span class="line"><span class="meta">$</span><span class="bash"> md5 main_bitcode.o.bc 1</span></span><br><span class="line">MD5 (main_bitcode.o.bc) = 5d6b72f817fb8fb92550cc9aae6340ab</span><br><span class="line">MD5 (1) = 5d6b72f817fb8fb92550cc9aae6340ab</span><br></pre></td></tr></table></figure>
-
-<p>比较从<code>__bitcode</code>section和 链接后从<code>__bundle</code>中提取出的bitcode文件发现是完全一致的，说明链接时只是单纯的对bitcode进行拷贝。</p>
-<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>经过本章的分析，对Bitcode文件是什么，所做的优化，文件结构，以及怎么使用有了比较深的认识。其中可以学习到的是Bitcode优化的部分，其中的思想其实也可以应用再我们的业务中。同时再次遇到Bitcode时也不在会是一脸懵逼。同时还更熟悉了一些系统工具的使用，可以有效的帮助我们在遇到一些难解问题时进行分析。</p>
-<h2 id="Bitcode使用"><a href="#Bitcode使用" class="headerlink" title="Bitcode使用"></a>Bitcode使用</h2><h4 id="通过Bitcode文件生成Mach-O文件"><a href="#通过Bitcode文件生成Mach-O文件" class="headerlink" title="通过Bitcode文件生成Mach-O文件"></a>通过Bitcode文件生成Mach-O文件</h4><p>通过Clang的<code>-fembed-bitcode</code>描述是生成的Object文件内嵌bitcode:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> clang -fembed-bitcode -c main.cc -o main.o</span></span><br></pre></td></tr></table></figure>
-
-<p>利用objdump或者otool工具可以查看Object文件，根据官方文档说明，内嵌bitcode文件后，会出现__LLVM字段，因此可以依据此来判断bitcode是否生效：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> otool -l main.o | grep __LLVM</span></span><br></pre></td></tr></table></figure>
-
-<p>或是：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> objdump -all-headers mian_bitcode.out | grep __LLVM</span></span><br></pre></td></tr></table></figure>
-
-<p>需要注意的一点是，如果单纯在buildSetting中<code>Enable Bitcode</code>编出来的products是不带bitcode。例如，现在需要编译一个动态库，设置<code>Enable Bitcode</code>为YES。 然后选择模拟器，编译一个<code>x86_64</code>版本的动态库。通过查找<code>__LLVM</code>section发现并没有bitcode。</p>
-<p>我们查看一下编译输出：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -target x86_64-apple-ios9.0-simulator -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu11 -fobjc-arc -fobjc-weak -fmodules -gmodules -fmodules-cache-path=/Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/DerivedData/ModuleCache.noindex -fmodules-prune-interval=86400 -fmodules-prune-after=345600 </span><br><span class="line">...</span><br><span class="line">-c /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/DJINetworkRTKHelper/DJINRTKManager.m -o /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/DerivedData/DJINetworkRTKHelper/Build/Intermediates.noindex/DJINetworkRTKHelper.build/Release-iphonesimulator/DJINetworkRTKHelper.build/Objects-normal/x86_64/DJINRTKManager.o</span><br></pre></td></tr></table></figure>
-
-<p>为了好看，把中间的option选项省略了，可以看到其实就是利用clang，然后把build setting里的编译配置作为option来编译出了一个Object文件到build文件夹下面。 但是build option中并没有bitcode，所以编出来的产物自然不带bitcode。</p>
-<h4 id="脚本构建带有Bitcode的Maco-O文件"><a href="#脚本构建带有Bitcode的Maco-O文件" class="headerlink" title="脚本构建带有Bitcode的Maco-O文件"></a>脚本构建带有Bitcode的Maco-O文件</h4><p>因此我们应该利用脚本主动调用<code>-fembed-bitcode</code>来生成带有bitcode的产物。正好，我们编出的动态库还需要同时支持多个架构，如果完全依赖xcode，我们得真机下编一次，模拟器编一次，再手动合并成<code>fat file</code>。而这都可以通过脚本来处理：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">xcodebuild -project "$&#123;SRCROOT&#125;/$&#123;PROJECT_NAME&#125;.xcodeproj" -configuration "$&#123;CONFIGURATION&#125;" -scheme "$&#123;PROJECT_NAME&#125;" -sdk iphoneos VALID_ARCHS="x86_64 arm64 arm64e" -derivedDataPath "$&#123;SRCROOT&#125;" clean</span><br><span class="line">xcodebuild -project "$&#123;SRCROOT&#125;/$&#123;PROJECT_NAME&#125;.xcodeproj" -configuration "$&#123;CONFIGURATION&#125;" -scheme "$&#123;PROJECT_NAME&#125;" -sdk iphonesimulator VALID_ARCHS="x86_64 arm64 arm64e" -derivedDataPath "$&#123;SRCROOT&#125;" clean</span><br><span class="line"></span><br><span class="line">xcodebuild OTHER_CFLAGS="-fembed-bitcode" -project "$&#123;SRCROOT&#125;/$&#123;PROJECT_NAME&#125;.xcodeproj" -configuration "$&#123;CONFIGURATION&#125;" -scheme "$&#123;PROJECT_NAME&#125;" -sdk iphoneos VALID_ARCHS="x86_64 arm64 arm64e" -derivedDataPath "$&#123;SRCROOT&#125;"</span><br><span class="line">xcodebuild OTHER_CFLAGS="-fembed-bitcode" -project "$&#123;SRCROOT&#125;/$&#123;PROJECT_NAME&#125;.xcodeproj" -configuration "$&#123;CONFIGURATION&#125;" -scheme "$&#123;PROJECT_NAME&#125;" -sdk iphonesimulator VALID_ARCHS="x86_64 arm64 arm64e" -derivedDataPath "$&#123;SRCROOT&#125;"</span><br><span class="line"></span><br><span class="line">MT_DEVICE_DIR=iphoneos</span><br><span class="line">MT_SIMUL_DIR=iphonesimulator</span><br><span class="line">MT_OUTPUT_DIR="$&#123;PROJECT_DIR&#125;/Output/"</span><br><span class="line">echo "&#123;SRCROOT&#125;/build/Products/$&#123;CONFIGURATION&#125;-$&#123;MT_DEVICE_DIR&#125;/$&#123;PROJECT_NAME&#125;.framework"</span><br><span class="line">rm -rf "$&#123;MT_OUTPUT_DIR&#125;"</span><br><span class="line">mkdir -p "$&#123;MT_OUTPUT_DIR&#125;"</span><br><span class="line">cp -a -f "$&#123;SRCROOT&#125;/Build/Products/$&#123;CONFIGURATION&#125;-$&#123;MT_DEVICE_DIR&#125;/$&#123;PROJECT_NAME&#125;.framework" "$&#123;MT_OUTPUT_DIR&#125;"</span><br><span class="line">cp -a -f "$&#123;SRCROOT&#125;/Build/Products/$&#123;CONFIGURATION&#125;-$&#123;MT_DEVICE_DIR&#125;/$&#123;PROJECT_NAME&#125;.framework.dSYM" "$&#123;MT_OUTPUT_DIR&#125;"</span><br><span class="line">lipo -create "$&#123;SRCROOT&#125;/Build/Products/$&#123;CONFIGURATION&#125;-$&#123;MT_SIMUL_DIR&#125;/$&#123;PROJECT_NAME&#125;.framework/$&#123;PROJECT_NAME&#125;" "$&#123;MT_OUTPUT_DIR&#125;/$&#123;PROJECT_NAME&#125;.framework/$&#123;PROJECT_NAME&#125;" -output "$&#123;MT_OUTPUT_DIR&#125;/$&#123;PROJECT_NAME&#125;.framework/$&#123;PROJECT_NAME&#125;"</span><br></pre></td></tr></table></figure>
-
-<p>我们利用xcodebuild传入<code>OTHER_CFLAGS</code>，<code>OTHER_CFLAGS</code>的选项会直接传递给编译器，因此clang就具有了<code>-fembed-bitcode</code>选项：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch x86_64 -fmessage-length=0  </span><br><span class="line">-fembed-bitcode </span><br><span class="line">-c </span><br><span class="line">/Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/DJINetworkRTKHelper/DJINRTKManager.m </span><br><span class="line">-o </span><br><span class="line">/Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/Build/Intermediates.noindex/DJINetworkRTKHelper.build/Release-iphonesimulator/DJINetworkRTKHelper.build/Objects-normal/x86_64/DJINRTKManager.o</span><br></pre></td></tr></table></figure>
-
-<p>通过刚才的测试可以看到如果没有<code>-fembed-bitcode</code>编译的产物是不包含<code>__LLVM</code>和<code>__bitcode</code>字段的，对编出来的<code>fat file</code>进行检查如下，可以看到已经包含了bitcode文件：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> otool -arch arm64 -l /Users/joey.cao/Desktop/DJINetwork/djinetworkrtkhelper/DJINetworkRTKHelper/Output/DJINetworkRTKHelper.framework/DJINetworkRTKHelper | grep __LLVM</span></span><br><span class="line">  segname __LLVM</span><br><span class="line">   segname __LLVM</span><br></pre></td></tr></table></figure>
-
-<h4 id="Bitcode应用上架"><a href="#Bitcode应用上架" class="headerlink" title="Bitcode应用上架"></a>Bitcode应用上架</h4><p>使用bitcode嘛最终目的还是为了应用的上架，但是比较坑爹是所有依赖的库文件必须支持bitcode。否则构建的mach-O文件就不能支持bitcode。假设我们目前所有依赖的库文件都已经支持bitcode了，我们使用一个MSDK预上架的工程archive一个支持bitcode的和一个不支持bitcode。可以看到以下区别</p>
-<p>1.惊人发现开启bitcode之前归档出的文件只有118.5MB,而开启bitcode之后直接增加到254MB。这下是不是要超过Apple的文件大小限制了啊。根据前面的测试我们知道bitcode放在<code>__LLVM</code>section，而苹果二进制文件大小限制只是针对<code>__Text</code>段，即代码段的，因此bitcode文件并不会影响苹果的限制。</p>
-<p>2.当我们需要上传App时，若果开启了bitcode的App会提示选择是否上传bitcode内容。如果勾选了bitcode，则同时会上传bitcode到苹果服务器，并且用户下载的ipa是苹果针对bitcode再次编译出来的。而如果不勾选，则用户下载的是我们上传的ipa，并且会剔除bitcode。 如果选择的Development发布方式，则会出现选择<code>Rebuild from bitcode</code>，此时如果勾选则会发现会利用<code>bitcode-build-tool</code>来构建ipa文件，而不是直接利用归档出的ipa。这样就跟苹果在服务器归档后发布给用户的ipa一致了：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> /Applications/Xcode.app/Contents/Developer/usr/bin/bitcode-build-tool -v -t /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin --sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS13.2.sdk -o /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-out/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview --generate-dsym /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-out/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview.dSYM --strip-swift-symbols /var/folders/64/2_nlwt_s6kq250l7_t5mfdzwrh9_pg/T/ipatool20191119-81739-om7ou4/thinned-in/arm64/Payload/DJI\ MSDK\ Preview.app/DJI\ MSDK\ Preview</span></span><br></pre></td></tr></table></figure>
-
-<p>3.开启bitcode的归档文件下面多了个<code>BCSymbolMaps</code>的文件夹。这也可以作为一个判定开启bitcode成功的标志。<code>BCSymbolMaps</code>是一个类似dSYM的文件，可以辅助定位crash，因为我们知道苹果会根据bitcode再次构建ipa，那么原有的dSYM已经不能用了。因此当出现crash，必须通过App Store Connect下载新的dSYM来进行定位。</p>
-<p>4.Cocoapods也是支持bitcode的，可以通过配置podfile快速为所有target设置:</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">post_install <span class="keyword">do</span> <span class="params">|installer|</span></span><br><span class="line">    installer.pods_project.targets.each <span class="keyword">do</span> <span class="params">|target|</span></span><br><span class="line">        target.build_configurations.each <span class="keyword">do</span> <span class="params">|config|</span></span><br><span class="line">            config.build_settings[<span class="string">'ENABLE_BITCODE'</span>] = <span class="string">'YES'</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
-<li><a href="http://llvm.org/docs/BitCodeFormat.html#metadata-attachment" target="_blank" rel="noopener">http://llvm.org/docs/BitCodeFormat.html#metadata-attachment</a></li>
-<li><a href="https://jonasdevlieghere.com/embedded-bitcode/" target="_blank" rel="noopener">https://jonasdevlieghere.com/embedded-bitcode/</a></li>
-<li><a href="https://blog.csdn.net/sinat_31177681/article/details/87355711" target="_blank" rel="noopener">https://blog.csdn.net/sinat_31177681/article/details/87355711</a></li>
-</ol>
-
-            
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">LINKER</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -366,150 +215,17 @@
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2019/11/21/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
+  
+  
+    </div></section>
+  
 
-  
-<nav id="article-nav">
-  
-    <a href="/2019/11/23/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          谈谈iOS的链接问题
-        
-      </div>
-    </a>
-  
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-        <div class="toc-container tooltip-left">
-            <i class="icon-font icon-category"></i>
-            <div class="tooltip tooltip-east">
-                <span class="tooltip-item">
-                </span>
-                <span class="tooltip-content">
-                    <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bitcode可以做什么"><span class="toc-number">2.</span> <span class="toc-text">bitcode可以做什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode是什么："><span class="toc-number">3.</span> <span class="toc-text">Bitcode是什么：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的优化"><span class="toc-number">3.1.</span> <span class="toc-text">Bitcode的优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bitcode的结构"><span class="toc-number">3.2.</span> <span class="toc-text">Bitcode的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小结"><span class="toc-number">3.3.</span> <span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitcode使用"><span class="toc-number">4.</span> <span class="toc-text">Bitcode使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#通过Bitcode文件生成Mach-O文件"><span class="toc-number">4.0.1.</span> <span class="toc-text">通过Bitcode文件生成Mach-O文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#脚本构建带有Bitcode的Maco-O文件"><span class="toc-number">4.0.2.</span> <span class="toc-text">脚本构建带有Bitcode的Maco-O文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Bitcode应用上架"><span class="toc-number">4.0.3.</span> <span class="toc-text">Bitcode应用上架</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
-                    </div>
-                </span>
-            </div>
-        </div>
-        
-    </div>
-</aside>
-
-
-
-  
-  
-  
-    <section id="comments" class="comments">
-      <style>
-        .comments{margin:30px;padding:10px;background:#fff}
-        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
-      </style>
-      <div class="valine_comment"></div>
-<!--载入js，在</body>之前插入即可-->
-<!--Leancloud 操作库:-->
-<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
-<!--Valine 的核心代码库-->
-<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
-<script>
-  var notify = 'false' == true ? true : false;
-  var verify = 'false' == true ? true : false;
-  new Valine({
-      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
-      av: AV,
-      el: '.valine_comment',
-      emoticon_url: 'https://cloud.panjunwen.com/alu',
-      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
-      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
-      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
-      placeholder: '老铁，唠个嗑呗'
-    });
-</script>
-      </section>
     
-
-  
-
-  
-
-  
-
-  
 
 
           </div>
@@ -532,9 +248,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

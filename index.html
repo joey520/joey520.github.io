@@ -64,7 +64,7 @@
 			</ul>
 		</nav>
 		<nav>
-			总文章数 1
+			总文章数 2
 		</nav>
 		<nav class="header-smart-menu">
     		
@@ -159,6 +159,109 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-谈谈iOS的编译链接" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/23/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/">谈谈iOS的链接问题</a>
+    </h1>
+  
+
+        <!--显示阅读次数-->
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2019/11/23/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/" class="archive-article-date">
+  	<time datetime="2019-11-23T09:29:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-23</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先抛出几个个问题：</p>
+<p>1.什么是<code>header serach path</code>,什么又是<code>framework search path</code>？<a href="#answer1">答案</a></p>
+<p>2.<code>#import</code>,<code>#include</code>, <code>@class</code>和<code>@import</code>的区别是什么。循环<code>#import</code>一定会导致编译失败吗？<a href="#answer1">答案</a></p>
+<p>3.可以同时通过<code>#import &lt;&gt;</code>和使用header seach path来<code>#import &quot;&quot;</code>动态库里的文件吗？<a href="#answer3">答案</a></p>
+<p>4.如果编译时主工程（注意不是来自外部link的库）中有个Class的.m文件没有被加入到指定的target的complie files里会导致什么问题，如果是一个Category的文件呢？<a href="#answer4">答案</a></p>
+<p>5.如果一个类里的方法只有声明没有定义，则编译时会出现<code>undefinde symbol</code>吗, 为什么？<a href="#answer4">答案</a></p>
+<p>6.如果一个静态库里面有两个相同的类会出现<code>duplictate symbols</code>错误吗？如果是动态库呢，如果是可执行文件呢？<a href="#answer6">答案</a></p>
+<p>7.如果主项目和连接的静态库有相同的类和相同的符号时会出现什么问题？动态库也会这样吗？<a href="#answer7">答案</a></p>
+<p>8.动态库和静态能呈现多层的链式链接关系吗？在链式链接的关系中能否跨层级直接调用到链接链中任意库文件中的方法吗？可以从链接链后面的库文件直接调用前面的库文件中的方法吗？<a href="#answer8">答案</a></p>
+<p>9.什么<code>Other Link Flag</code>,什么是<code>_all-load</code>, 什么是<code>-Objc</code>, 什么是<code>-force-load</code>，什么是<code>-dead_strip</code>?<a href="#answer9">答案</a></p>
+              
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">LINKER</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/11/23/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-深入理解Bitcode" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -203,11 +306,11 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
         		</li>
       		
 		</ul>
@@ -355,11 +458,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
               </li>
             
             <div class="clearfix"></div>
