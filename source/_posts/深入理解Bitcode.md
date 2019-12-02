@@ -76,7 +76,7 @@ MD5 (hello.bc.o) = 92311036e62f4b3e4468b3c93c314960
 
 Bitcode利用首部简单明了的描述了Bitcode文件的信息。通过该首部编译器可以快速确定该如何编当前的Bitcode文件。
 
-采用前4个字节是固定的``magic number``来标识，就我这个clang 10.15编出来的是`FEEDFACF`。当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。
+采用前4个字节是固定的``magic number``来标识，就我这个`Apple clang version 11.0.0 (clang-1100.0.33.12)`编出来的是`FEEDFACF`。当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。
 
 然后4个字节描述了CPU架构，实际是为了表示Bitcode文件的字节序，以便编译器可以正确读取。
 

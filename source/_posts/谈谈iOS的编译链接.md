@@ -356,7 +356,7 @@ Referenced from: /Users/joey.cao/Library/Developer/CoreSimulator/Devices/235EABB
 
 结果编译会出错，重复定义了Method1这个类，为了避免因为`Function1.h`是`Umbrella header`的原因，我们改成另一个header，发现依然还是一样的问题：
 
-![image-20191201230650759](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191201230650759.png)
+![image-20191201230650759](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image4.png?raw=true)
 
 首先这种引用方式当然是不合理的，<b>建议要么都用 "", 要么都用<></b>。但是奇怪的是如果我们把`#import Method1.h`这一句放在上面就不会报错，这里我们首先要理解在`#import`的时候Clang做了什么，由于Function1是一个动态库，所以在构建时创建了Modules。当我们通过`import <Function1/xxx.h>`方式import时就会直接把module引入。而在`#import "Method1.h"`只是添加hmap并查找这个符号。作为证据我们删除掉DerviedData，并删掉`import <Function1/xxx.h>`这一句。重新编译，可以看到ModuleCache里已经没有Function1了。
 
