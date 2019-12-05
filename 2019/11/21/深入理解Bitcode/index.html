@@ -18,7 +18,7 @@
 <meta property="og:description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
-<meta property="og:updated_time" content="2019-12-05T07:44:27.141Z">
+<meta property="og:updated_time" content="2019-12-05T07:52:47.310Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;bitcode_bundle.png?raw=true">
   
@@ -246,7 +246,7 @@
 <h2 id="Bitcode是什么："><a href="#Bitcode是什么：" class="headerlink" title="Bitcode是什么："></a>Bitcode是什么：</h2><p>通过LLVM官方对bitcode的描述，可以知道bitcode是一种以位为单位存取的二进制文件，它可以存在于包装结构中，如上一节中看到<code>LLVM bitcode, wrapper x86_64</code> ,也可以存在于<code>Object</code>文件中，例如<code>Mach-O</code>文件等。<strong>对于<code>Mach-O</code>文件并且必定存在于名为<code>__LLVM</code>或者<code>__bitcode</code>的section中，因此我们可以根据这两个字段来判断生成的Mach-O文件是否包含bitcode.</strong></p>
 <h3 id="Bitcode的优化"><a href="#Bitcode的优化" class="headerlink" title="Bitcode的优化"></a>Bitcode的优化</h3><p>1.首部</p>
 <p>Bitcode利用首部简单明了的描述了Bitcode文件的信息。通过该首部编译器可以快速确定该如何编当前的Bitcode文件。</p>
-<p>采用前4个字节是固定的<code>magic number</code>来标识支持的系统，就我这个<code>Apple clang version 11.0.0 (clang-1100.0.33.12)</code>在64位系统上编出来的是<code>FEEDFACF</code>，即64位系统。首先会根据它判断是否支持识别这个字节流。但是不能仅仅依据它就判断不支持字节流文件，因为新的数据格式仍在开发中，也说明了架构是在不断变化的，LLVM编译器必须能够拥有足够的扩展性。</p>
+<p>采用前4个字节是固定的<code>magic number</code>来标识是，目前一直是<code>0x0B17C0DE</code>。当然bitcode文件格式仍然还在变化，这并不能作为唯一识别bitcode文件的依据。</p>
 <p>然后4个字节描述了CPU架构，实际是为了表示Bitcode文件的字节序，以便编译器可以正确读取。</p>
 <p>之后描述了<code>Load command</code>，文件类型信息等。</p>
 <p>2.整形长度</p>
