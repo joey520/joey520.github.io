@@ -492,7 +492,7 @@ FD_SET(server_socket, &read_sets);
 
 断开连接的4次握手，主要是为了保证两端都能close。需要注意的是被动close的一方进入`CLOSE_WAIT`状态等待`LAST_ACK`，当收到`LAST_ACK`就会完全close掉。而主动close一方进入`TIME_WAIT`状态以确保最后的数据能收发干净，并且不影响新的连接。由于此时被动close方已经完全关闭了，因此主动连接方只能等待一段时间自己关闭，而这个时间一般为2*MSL，[MSL](https://en.wikipedia.org/wiki/Maximum_segment_lifetime)指的是TCP数据段在网络系统中存活最大时间，一般为2分钟。
 
-![image-20191215160911678](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191215160911678.png)
+![image-20191215160911678](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Socket/image1.png?raw=true)
 
 由于`TIME_WAIT`的存在，导致在`close`之后系统资源并不能立即释放，如果存在大量连接，可能导致系统资源持续的高占用。并且由于timeout的存在导致服务端不能实时重启。 同样的服务端主动close也会导致大量客户端进入`CLOSE_WAIT`状态。
 
@@ -559,9 +559,9 @@ setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(int));
 
 一下两张图都摘自:https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Connection_termination。 图侵删。
 
-![image-20191215171134752](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191215171134752.png)
+![image-20191215171134752](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Socket/image2.png?raw=true)
 
-![image-20191215171222496](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191215171222496.png)
+![image-20191215171222496](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Socket/image3.png?raw=true)
 
 在IPV4，每一个包头要站32个字节，IPV6中每一个包头要占将近60个字节。 对于早期互联网网速并不发达时，这个带宽消耗还是不小的，因此诞生了这个算法。
 
@@ -715,7 +715,7 @@ setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &value, sizeof(int));
 
 对于服务端则工作流程为:
 
-![image-20191215211849500](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191215211849500.png)
+![image-20191215211849500](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Socket/image4.png?raw=true)
 
 由于我们使用的是`accept`函数会阻塞当前线程，它会阻塞线程直到连接事件发生。因此不能在主线程中处理`accept`,同样为了不阻塞已连接线程的数据传输，应该单独为其启用一个线程进行数据的传输。所以当客户端较多时，多线程带来的性能损耗非常大。
 
@@ -914,7 +914,7 @@ setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &value, sizeof(int));
 
 客户端与服务端很相似，也是需要需要初始化一个套接字，然后连接的指定的地址，然后进行数据传输。
 
-![image-20191223170020709](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191223170020709.png)
+![image-20191223170020709](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Socket/image5.png?raw=true)
 
 #### 初始化
 
@@ -1149,7 +1149,7 @@ setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &value, sizeof(int));
 
 所以最终呈现出来的效果如下，一个服务端对接3个客户端:
 
-![image-20191223004712991](/Users/joey.cao/Library/Application Support/typora-user-images/image-20191223004712991.png)
+![image-20191223004712991](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Socket/image6.png?raw=true)
 
 
 
