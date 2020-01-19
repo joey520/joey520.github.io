@@ -444,7 +444,7 @@ void FD_SET(int fd, fd_set *fdset);     /* 把socket中的文件描述符导入f
 void FD_CLR(int fd, fd_set *fdset);     /* 把socket中的文件描述符从fdset中清除 */
 void FD_ISSET(int fd, fd_set *fdset);   /* 判断某一个文件描述符集是否有变化*/
 ```
-<b>文件描述符最大总字节数为1024。也就是说最多数组中最多只有32个数，但是并不表示只有32个文件描述符</b>。
+<b>文件描述符最大总~~字节数~~(bit数，因为`__DARWIN_NFDBITS`乘了8)为1024。也就是说最多数组中最多只有32个数，但是并不表示只有32个文件描述符</b>。
 可以看到`FD_ISSET`的实现为:
 
 ```c
