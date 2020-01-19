@@ -1,14 +1,16 @@
 ---
 toc: true
 title: 深入理解Unix信号机制
-date: 2020-01-07 19:21:25
+date: 2019-12-27 19:21:25
 categories: iOS
-tags: [signals]
+tags: [signals,Unix]
 ---
 
 ## 前言
 
 最近为了复现一个1%概率左右的跨平台层的崩溃，在MSDK的TestApp中集成了一个`CrashHandler`来进行压力测试。借着解决问题的机会深入学习一下`Unix`的信号机制。并在本文讲述了如何实现一个[`CrashHandlerDemo`](https://github.com/joey520/Blogs/tree/master/TestSignal)。
+
+<!--more-->
 
 ## 什么是信号
 
@@ -130,7 +132,7 @@ Pending set is 00000004.
 Pending set is 00000036.
 SIGQUIT was came.
 SIGABRT was came.
-2020-01-08 23:51:00.548057+0800 TestSignal[86096:15391848] code run here
+2020-12-29 23:51:00.548057+0800 TestSignal[86096:15391848] code run here
 ```
 
 `sigpending`成功捕获了未决的信号，如果我们把代码中注释的`sigprocmask`释放掉(`SIG_UNBLOCK`)会怎么样呢:
@@ -145,7 +147,7 @@ Pending set is 00000038.
 
 程序运行到这里直接崩溃了，因为阻塞的信号被释放了，进程收到了`SIGINT`信号，并且进程被干掉了所以后面就没有执行了。通过查看奔溃的`frame`可以看到，崩在了`sigpromask`之后，那么看一下它到底做了什么：
 
-![image-20200118192925723](/Users/joey.cao/Library/Application Support/typora-user-images/image-20200118192925723.png)
+![image-20200118192925723](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Signal/1.png?raw=true)
 
 要看懂这一段代码我们需要找到`systemcall.h`，路径为： 
 
@@ -275,7 +277,7 @@ union __sigaction_u {
 
 在支持`sigaction`的系统中，`sigaction`兼容`signal`函数，具体的实现可以参考`UNIX环境搞基编程`这本书，一句话说就是把上面`union`里的`__sa_handler`指向对应的`signalHandler`。由于这里仅仅只是一个`union`两种处理函数是不能共存的，所以切记不要冲突了。
 
-## ## 实现一个`CrashHandler`
+## 实现一个`CrashHandler`
 
 ### 异常的捕获
 
@@ -346,7 +348,7 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 
 虽然已经做了很多考虑，但是仍然不能确保其它用户是否规范的使用`signal`，只能自求多福吧。。。
 
-### Bugly
+### Bugly的实现
 
 [Bugly](https://bugly.qq.com/v2/)是腾讯出的一款用户崩溃统计等功能的第三方SDK，可以捕获到非常全的崩溃，尤其是崩溃日志非常详细，此次我们主要为了追踪一个已知但是偶现的bug所以还不需要那么齐全的堆栈。不过查看下`Bugly`的实现总是好的，首先查看下符号，大致就能推测出一些功能的实现逻辑。
 
@@ -381,11 +383,11 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 
 为了更详细确认一下它的实现，我们使用了一个非常好用的逆向工具[Hopper DIsassembler](https://www.hopperapp.com)。我们只关注一些实现例如上一次的action的通知:
 
-![image-20200119104256813](/Users/joey.cao/Library/Application Support/typora-user-images/image-20200119104256813.png)
+![image-20200119104256813](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Signal/2.png?raw=true)
 
-先分析一下这一段代码，把`_g_BLYPreviousSignalHandlers`保存到`rax`寄存器，通过前面可以看到Bugly的是在分类load的时候就开始注册捕获信号了，这是一个非常早的时机。此时把信号对应的处理函数保存到了`_g_BLYPreviousSignalHandlers`这个静态数组中，然后`r12`这里是以信号值`rcx`按4字节对齐来偏移寻找到信号对应的处理函数。然后调用该处理函数，并把三个参数传入。思路和我们是一样的。
+先分析一下这一段代码，把`_g_BLYPreviousSignalHandlers`保存到`rax`寄存器，通过其它的代码可以看到Bugly的是在`UIVIewController`分类`+ (void)load`的时候就开始注册捕获信号了，这是一个非常早的时机。此时把信号对应的处理函数保存到了`_g_BLYPreviousSignalHandlers`这个静态数组中，然后`r12`这里是以信号值`rcx`按4字节对齐来偏移寻找到信号对应的处理函数。然后调用该函数，并把三个参数传入。思路和我们是一样的。
 
-其它大多数符号可以看到和日志搜集以及堆栈信息，日志持久化与上传等等有关。所以基本类`Unix`系统的崩溃捕获都是大同小异。不过对于堆栈捕获还需要在再后面再深入学习一下。
+
 
 ## 参考资料
 
