@@ -7,13 +7,13 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>iOS程序员必备的Socket知识 | Joey&#39;s House</title>
+  <title>深入学习Socket网络通信 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="前言最近工作和socket打了不少交道，对于socket也是一知半解，导致遇到不少问题，于是抽时间好好学习了一下socket相关的知识。本文主要对socket关键字进行详细分析，深入理解了不同关键字在不同情况下的行为表现，一些相关的工作原理，最后以一个简易的一对多客户端和服务端通信Demo来实地分析和学习socket工作原理。">
 <meta name="keywords" content="socket">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS程序员必备的Socket知识">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%20%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1&#x2F;index.html">
+<meta property="og:title" content="深入学习Socket网络通信">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
 <meta property="og:description" content="前言最近工作和socket打了不少交道，对于socket也是一知半解，导致遇到不少问题，于是抽时间好好学习了一下socket相关的知识。本文主要对socket关键字进行详细分析，深入理解了不同关键字在不同情况下的行为表现，一些相关的工作原理，最后以一个简易的一对多客户端和服务端通信Demo来实地分析和学习socket工作原理。">
 <meta property="og:locale" content="en">
@@ -23,7 +23,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Socket&#x2F;image4.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Socket&#x2F;image5.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Socket&#x2F;image6.png?raw=true">
-<meta property="og:updated_time" content="2020-01-19T04:37:16.579Z">
+<meta property="og:updated_time" content="2020-01-19T05:21:37.163Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Socket&#x2F;image1.png?raw=true">
   
@@ -166,14 +166,14 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-深入学习Socket 网络通信" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-深入学习Socket网络通信" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      iOS程序员必备的Socket知识
+      深入学习Socket网络通信
     </h1>
   
 
@@ -189,7 +189,7 @@
         
         <!--显示阅读次数完毕-->
         
-        <a href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%20%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" class="archive-article-date">
+        <a href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" class="archive-article-date">
   	<time datetime="2019-12-12T09:04:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-12</time>
 </a>
         
@@ -602,7 +602,7 @@
     <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%20%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -803,15 +803,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
               </li>
              
               <li class="article-tag-list-item">
