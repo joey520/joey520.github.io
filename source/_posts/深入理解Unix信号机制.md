@@ -30,8 +30,6 @@ Triggered by Thread:  1
 
 可以看到崩溃的类型`SIGKILL`其实就当前进程在请求蓝牙权限时由于没有描述文件，内核发送一个[`SIGKILL`](https://en.wikipedia.org/wiki/Signal_(IPC))信号给当前进程。
 
-### 用户态与内核态
-
 ### 信号集
 
 `Unix`系统中利用`sigset_t`（信号集）来表示多个信号，在`darwin`系统中由于信号只有31种，因此采用一个`uint32_t`来表示`sigset_t`，说白了就是利用其不同的`bit`位来判断是否包含这个值的信号，系统也提供了一下几个函数进行信号集的处理：
