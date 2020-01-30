@@ -19,7 +19,7 @@
 <meta property="og:locale" content="en">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Signal&#x2F;1.png?raw=true">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Signal&#x2F;2.png?raw=true">
-<meta property="og:updated_time" content="2020-01-28T07:44:29.465Z">
+<meta property="og:updated_time" content="2020-01-30T07:00:35.410Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;Signal&#x2F;1.png?raw=true">
   
@@ -280,7 +280,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* union for signal handlers */</span></span><br><span class="line"><span class="keyword">union</span> __sigaction_u &#123;</span><br><span class="line">	<span class="keyword">void</span>    (*__sa_handler)(<span class="keyword">int</span>);</span><br><span class="line">	<span class="keyword">void</span>    (*__sa_sigaction)(<span class="keyword">int</span>, struct __siginfo *,</span><br><span class="line">	    <span class="keyword">void</span> *);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>在支持<code>sigaction</code>的系统中，<code>sigaction</code>兼容<code>signal</code>函数，具体的实现可以参考<code>UNIX环境搞基编程</code>这本书，一句话说就是把上面<code>union</code>里的<code>__sa_handler</code>指向对应的<code>signalHandler</code>。由于这里仅仅只是一个<code>union</code>两种处理函数是不能共存的，所以切记不要冲突了。</p>
-<h2 id="实现一个CrashHandler"><a href="#实现一个CrashHandler" class="headerlink" title="实现一个CrashHandler"></a>实现一个<code>CrashHandler</code></h2><h3 id="异常的捕获"><a href="#异常的捕获" class="headerlink" title="异常的捕获"></a>异常的捕获</h3><p>异常和信号比相似，不同的是异常是指软件层一种错误处理手段。例如OC中的<code>NSException，不仅在系统代码会产生异常，开发者也可以在开发者产生异常来在出错时获取到错误信息。异常触发实质上是调用</code>NSAssertionHandler`:</p>
+<h2 id="实现一个CrashHandler"><a href="#实现一个CrashHandler" class="headerlink" title="实现一个CrashHandler"></a>实现一个<code>CrashHandler</code></h2><h3 id="异常的捕获"><a href="#异常的捕获" class="headerlink" title="异常的捕获"></a>异常的捕获</h3><p>异常和信号比相似，不同的是异常是指软件层一种错误处理手段。例如OC中的<code>NSException</code>，不仅在系统代码会产生异常，开发者也可以在开发者产生异常来在出错时获取到错误信息。异常触发实质上是调用<code>NSAssertionHandler</code>:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (void)handleFailureInMethod:(SEL)selector object:(id)object file:(NSString *)fileName lineNumber:(NSInteger)line description:(nullable NSString *)format,... NS_FORMAT_FUNCTION(5,6);</span><br></pre></td></tr></table></figure>
 
 <p>比较可惜<code>Fundation</code>并没有开源</p>
@@ -290,7 +290,7 @@
 <p>特别注意的是，有可能在你注册<code>handler</code>之前已经有人注册了，所以需要先调用<code>NSGetUncaughtExceptionHandler</code>来判断是否已经有注册了，如果有则保存下来，等<code>exception</code>触发时再通知到先签注册的<code>handler</code>。如果每一个新注册的人都能这样进行异常的传递，那么所有的<code>exception handler</code>才能都被触发。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (NSGetUncaughtExceptionHandler()) &#123;</span><br><span class="line">    preExceptionHandler = NSGetUncaughtExceptionHandler();</span><br><span class="line">&#125;</span><br><span class="line">NSSetUncaughtExceptionHandler(ExceptionHandler);</span><br></pre></td></tr></table></figure>
 
-<h3 id="信号的捕获"><a href="#信号的捕获" class="headerlink" title="信号的捕获"></a>信号的捕获</h3><p>信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的<code>sa_sigaction</code>，但是想做的够保险，除了判断<code>sa_sigaction</code>还需要考虑<code>sa_handler</code>,也许之前某个用户已经通过<code>signal</code>函数注册了一个<code>sa_handler</code>进来。 还有一点需要注意的是需要为每个<code>signal</code>保存不同的<code>sa_sigaction或</code>sa_handler<code>，因为你也不知道是不是不同的</code>signal<code>被其他一个用户不同处理，或者多个用户进行了不同处理。所以最保险的方法就是存储下每个</code>signal`对应的处理函数:</p>
+<h3 id="信号的捕获"><a href="#信号的捕获" class="headerlink" title="信号的捕获"></a>信号的捕获</h3><p>信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的<code>sa_sigaction</code>，但是想做的够保险，除了判断<code>sa_sigaction</code>还需要考虑<code>sa_handler</code>,也许之前某个用户已经通过<code>signal</code>函数注册了一个<code>sa_handler</code>进来。 还有一点需要注意的是需要为每个<code>signal</code>保存不同的<code>sa_sigaction</code>或<code>sa_handler</code>，因为你也不知道是不是不同的<code>signal</code>被其他一个用户不同处理，或者多个用户进行了不同处理。所以最保险的方法就是存储下每个<code>signal</code>对应的处理函数:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">   for (NSNumber *signalValue in needCatchedSignals) &#123;</span><br><span class="line">        int signo = signalValue.intValue;</span><br><span class="line">        //首先获取old_action</span><br><span class="line">        struct sigaction old_action;</span><br><span class="line">        bzero(&amp;old_action, sizeof(sigaction));</span><br><span class="line">        //获取旧的action</span><br><span class="line">        int ret = sigaction(signo, NULL, &amp;old_action);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            printf(&quot;sigaction old action failed: %s\n&quot;, strerror(errno));</span><br><span class="line">        &#125;</span><br><span class="line">#if DEBUGLOG</span><br><span class="line">        printf(&quot;old_action sa_mask: %8.8d\n&quot;, old_action.sa_mask);</span><br><span class="line">        printf(&quot;old_action sa_flags: %8.8d\n&quot;, old_action.sa_flags);</span><br><span class="line">#endif</span><br><span class="line">        //如果已经有注册的sigaction</span><br><span class="line">        if (old_action.sa_flags &amp; SA_SIGINFO) &#123;</span><br><span class="line">            //把已有的处理函数指针保存下来</span><br><span class="line">            preSignalActions[signo] = old_action.sa_sigaction;</span><br><span class="line">        &#125;</span><br><span class="line">        //注意sa_handler和sa_sigaction是不能共存的</span><br><span class="line">        else if (old_action.sa_handler) &#123;</span><br><span class="line">            preSignalHandlers[signo] = old_action.sa_handler;</span><br><span class="line">        &#125;</span><br><span class="line">        //注册新的action</span><br><span class="line">        struct sigaction new_action;</span><br><span class="line">        bzero(&amp;new_action, sizeof(sigaction));</span><br><span class="line">        sigemptyset(&amp;new_action.sa_mask);</span><br><span class="line">        new_action.sa_sigaction = SignalAction;</span><br><span class="line">        //设置SA_SIGINFO标记位</span><br><span class="line">        new_action.sa_flags = SA_NODEFER | SA_SIGINFO;</span><br><span class="line">        ret = sigaction(SIGALRM, &amp;new_action, NULL);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            printf(&quot;sigaction new action failed: %s\n&quot;, strerror(errno));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
 <p>虽然已经做了很多考虑，但是仍然不能确保其它用户是否规范的使用<code>signal</code>，只能自求多福吧。。。</p>
@@ -584,6 +584,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
               </li>
              
@@ -592,19 +600,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
               </li>
             
             <div class="clearfix"></div>
