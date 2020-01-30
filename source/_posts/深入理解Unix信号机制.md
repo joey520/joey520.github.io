@@ -279,7 +279,7 @@ union __sigaction_u {
 
 ### 异常的捕获
 
-异常和信号比相似，不同的是异常是指软件层一种错误处理手段。例如OC中的`NSException，不仅在系统代码会产生异常，开发者也可以在开发者产生异常来在出错时获取到错误信息。异常触发实质上是调用`NSAssertionHandler`:
+异常和信号比相似，不同的是异常是指软件层一种错误处理手段。例如OC中的`NSException`，不仅在系统代码会产生异常，开发者也可以在开发者产生异常来在出错时获取到错误信息。异常触发实质上是调用`NSAssertionHandler`:
 
 ```objective-c
 - (void)handleFailureInMethod:(SEL)selector object:(id)object file:(NSString *)fileName lineNumber:(NSInteger)line description:(nullable NSString *)format,... NS_FORMAT_FUNCTION(5,6);
@@ -304,7 +304,7 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 
 ### 信号的捕获
 
-信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的`sa_sigaction`，但是想做的够保险，除了判断`sa_sigaction`还需要考虑`sa_handler`,也许之前某个用户已经通过`signal`函数注册了一个`sa_handler`进来。 还有一点需要注意的是需要为每个`signal`保存不同的`sa_sigaction或`sa_handler`，因为你也不知道是不是不同的`signal`被其他一个用户不同处理，或者多个用户进行了不同处理。所以最保险的方法就是存储下每个`signal`对应的处理函数:
+信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的`sa_sigaction`，但是想做的够保险，除了判断`sa_sigaction`还需要考虑`sa_handler`,也许之前某个用户已经通过`signal`函数注册了一个`sa_handler`进来。 还有一点需要注意的是需要为每个`signal`保存不同的`sa_sigaction`或`sa_handler`，因为你也不知道是不是不同的`signal`被其他一个用户不同处理，或者多个用户进行了不同处理。所以最保险的方法就是存储下每个`signal`对应的处理函数:
 
 ```objective-c
    for (NSNumber *signalValue in needCatchedSignals) {
