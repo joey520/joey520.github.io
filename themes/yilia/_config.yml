@@ -125,7 +125,7 @@ friends:
   Vince.Zheng: https://jsonseng.github.io
 
 
-aboutme: 'iOS程序员，爱好C++, python <br><br>PS4粉， 减肥党'
+aboutme: '越来越胖了。。。'
 
 valine:
   enable: true
@@ -133,7 +133,7 @@ valine:
   appkey:  '6aqkifq4vKMCSsLExEGzL0Wl'
   notify: false # mail notifier , https://github.com/xCss/Valine/wiki
   verify: false # Verification code
-  placeholder: "老铁，唠个嗑呗" # comment box placeholder//留言框占位提示文字
+  placeholder: "" # comment box placeholder//留言框占位提示文字
   avatar: monsterid # gravatar style
   guest_info: nick,mail,link # custom comment header
   pageSize: 10 # pagination size
