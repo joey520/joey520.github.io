@@ -43,7 +43,7 @@ int	sigemptyset(sigset_t *);
 int	sigfillset(sigset_t *);
 ```
 
-<b>这里值得学习的一点是C语言的逗号运算符，`(*(set) = 0, 0)`第一个0是把指针指向`uint32_t`置为0，第二个0表示的是返回值。这种语法糖还是蛮有趣的。
+<b>这里值得学习的一点是C语言的逗号运算符，`(*(set) = 0, 0)`第一个0是把指针指向`uint32_t`置为0，第二个0表示的是返回值。这种语法糖还是蛮有趣的。</b>
 
 还有以下几个函数来进行信号集的增删改查:
 
@@ -147,7 +147,7 @@ Pending set is 00000038.
 
 程序运行到这里直接崩溃了，因为阻塞的信号被释放了，进程收到了`SIGINT`信号，并且进程被干掉了所以后面就没有执行了。通过查看奔溃的`frame`可以看到，崩在了`sigpromask`之后，那么看一下它到底做了什么：
 
-![image-20200118192925723](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Signal/1.png?raw=true)
+![image-20200118192925723](../../post_images/signal/1.png)
 
 要看懂这一段代码我们需要找到`systemcall.h`，路径为： 
 
@@ -381,7 +381,7 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 
 为了进一步确认它的实现，我们使用了一个非常好用的逆向工具[Hopper DIsassembler](https://www.hopperapp.com)。只关注一些实现例如上一次的action的通知的逻辑:
 
-![image-20200119104256813](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Signal/2.png?raw=true)
+![image-20200119104256813](../../post_images/signal/2.png)
 
 先分析一下这一段代码，把`_g_BLYPreviousSignalHandlers`保存到`rax`寄存器，通过其它的代码可以看到Bugly的是在`UIVIewController`分类`+ (void)load`的时候就开始注册捕获信号了，这是一个非常早的时机。此时把信号对应的处理函数保存到了`_g_BLYPreviousSignalHandlers`这个静态数组中，然后`r12`这里是以信号值`rcx`按4字节对齐来偏移寻找到信号对应的处理函数。然后调用该函数，并把三个参数传入。可以看到思路和我们基本是一样的。
 
