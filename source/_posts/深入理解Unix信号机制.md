@@ -16,9 +16,9 @@ tags: [signals,Unix]
 
 ### 信号的定义
 
-在上一次[讲Socket编程]()提到`SIGPIPE`时简单了解了一下`signal`函数，我们知道可以向进程注册一个指定的信号处理函数，以使进程在收到指定函数时触发该函数。那么信号到底是什么呢，UNIX环境高级编程中定义：<b>信号是软件中断，提供了一种处理异步事件的方法</b>。为什么说是软件的中断，因为信号触发的软件层进程执行的中断。即进程在执行时，收到信号时中断程序的运行执行中断处理函数（如果没有忽略该信号），然后再返回程序继续运行。为什么说是处理异步事件，因为信号是随机出现，进程是无法确定，只能告诉内核在出现该信号时该如何处理，进程不会阻塞以等待信号，而是正常执行，直到信号发送过来。
+在上一次[讲Socket编程]()提到`SIGPIPE`时简单了解了一下`signal`函数，我们知道可以向进程注册一个指定的信号处理函数，以使进程在收到指定函数时触发该函数。那么信号到底是什么呢，UNIX环境高级编程中定义：<b>信号是软件中断，提供了一种处理异步事件的方法</b>。为什么说是软件的中断，因为信号触发的软件层进程执行的中断。即进程在执行时，收到信号时中断程序的运行执行中断处理函数（如果没有忽略该信号），然后再返回程序继续运行。为什么说是处理异步事件，因为信号是随机出现，进程是无法确定什么时候接收到信号，只能告诉内核在出现该信号时该如何处理，进程不会阻塞以等待信号，而是正常执行，直到信号发送过来。
 
-所以可以理解信号就是一种进程通信手段用于通知进程发生了某个事件。举一个例子，比如在iOS13上不加蓝牙权限描述时打开App请求蓝牙权限就会崩溃的，查看log可以看到：
+所以可以理解信号就是一种进程通信手段用于通知进程发生了某个事件。举一个例子，在iOS13上不加蓝牙权限描述时打开App请求蓝牙权限就会崩溃，查看`crash log`可以看到：
 
 ```c
 xception Type:  EXC_CRASH (SIGKILL)
@@ -43,7 +43,7 @@ int	sigemptyset(sigset_t *);
 int	sigfillset(sigset_t *);
 ```
 
-<b>这里值得学习的一点是C语言的逗号运算符，`(*(set) = 0, 0)`第一个0是把指针指向`uint32_t`置为0，第二个0表示的是返回值。这种语法很奇妙非常有Python内味儿~</b>。
+<b>这里值得学习的一点是C语言的逗号运算符，`(*(set) = 0, 0)`第一个0是把指针指向`uint32_t`置为0，第二个0表示的是返回值。这种语法糖还是蛮有趣的。
 
 还有以下几个函数来进行信号集的增删改查:
 
@@ -62,6 +62,8 @@ __sigbits(int __signo)
 #define __DARWIN_NSIG   32      /* counting 0; could be 33 (mask is 1-32) */
 ```
 
+其实都是一些位域运算的封装，在系统源码中包括Runtime的源码中随处可见位运算的使用，作为源码必定需要足够高的性能，采用位域运算可以大大减少内存占用和处理效率。
+
 ### 信号传递控制
 
 可以利用`sigprocmask`控制进程信号屏蔽集：
@@ -78,7 +80,7 @@ int	sigprocmask(int how, const sigset_t * new_set, sigset_t * old_set);
 
 被`sigprocmsk`阻塞的信号，无论发生多少次都会保存下来，可以通过`old_set`获取。但是设置为`SIG_UNBLOCK`时就会释放这些阻塞的信号。由于`sigset_t`只能通过每个bit保存一种信号的状态，所以无论接收到信号多少次，再次方法只会被传递一次。
 
-`sigprocmask`一般只用于单线程的进程，因为它直接修改的进程的公共信号屏蔽集，所以对于多线程中使用需要在使用前进行声明和初始化，以保证数据的安全。<b>在系统源码中包括Runtime的源码中随处可见位运算的使用，作为源码必定需要足够高的性能，采用位域运算可以大大减少内存占用和处理效率。</b>
+`sigprocmask`一般只用于单线程的进程，因为它直接修改的进程的公共信号屏蔽集，所以对于多线程中使用需要在使用前进行声明和初始化，以保证数据的安全。
 
 当系统阻塞了一些信号时，这些信号在触发之后就变成了未决的信号, 如何获取当前进程中未决的信号集呢，可以通过`sigpending`，我们用以下例子来实践一下信号的控制与未决信号的捕获：
 
@@ -153,7 +155,7 @@ Pending set is 00000038.
 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys
 ```
 
-`systemcall.h`列举了所有系统调用的参数表，可以看到所有的系统调用接口全部用了一个数字来表示，根据苹果的注释可以知道该文件是由`xnu`源码中的`systemcalls.master`生成的。因此我们下载一下[`xnu`内核源码](https://github.com/apple/darwin-xnu)。利用`cat`工具打开`systemcalls.master`文件可以看到，这里只截取部分需要的信息如下：
+`systemcall.h`列举了所有系统调用的参数表，可以看到所有的系统调用接口全部用了一个数字来表示，根据苹果的注释可以知道该文件是由`xnu`源码中的`systemcalls.master`生成的。因此我们下载一下[xnu内核源码](https://github.com/apple/darwin-xnu)。利用`cat`工具打开`systemcalls.master`文件可以看到，这里只截取部分需要的信息如下：
 
 ```c
 cat /Users/joey.cao/Desktop/Learning/LLVM/darwin-xnu-master/bsd/kern/syscalls.master
@@ -173,14 +175,14 @@ cat /Users/joey.cao/Desktop/Learning/LLVM/darwin-xnu-master/bsd/kern/syscalls.ma
 48	AUE_SIGPROCMASK	ALL	{ int sigprocmask(int how, user_addr_t mask, user_addr_t omask); }
 ```
 
-所以我们再回到上图`sigpromask`的堆栈，首先把`0x2000030`赋值给`eax`寄存器。由于`BSD`层在`Mach`层之上，`mach`层占用了前`0x2000000`。所以`BSD`层的系统调用需要从逻辑地址`0x2000000`开始。所以这里实际表明调用的系统调用参数为48（注意这里是16进制），即正好就是`SYS_sigpromask`：
+所以我们分析下上图`sigpromask`的堆栈，首先把`0x2000030`赋值给`eax`寄存器。由于`BSD`层在`Mach`层之上，`mach`层占用了前`0x2000000`。所以`BSD`层的系统调用需要从逻辑地址`0x2000000`开始。所以这里实际表明调用的系统调用参数为48（注意这里是16进制），即正好就是`SYS_sigpromask`，它的函数原型如下:
 
 ```c
 #define	SYS_sigprocmask    48
 48	AUE_SIGPROCMASK	ALL	{ int sigprocmask(int how, user_addr_t mask, user_addr_t omask); }
 ```
 
-此时把参数`rcx`寄存器的值传入`r10`寄存器，作为调用函数的`syscall`的入参。然后可以看到是一个`jae`判断函数，判断的是`0x7fff51b5a2a0`下面`jmp`的返回值，
+此时把参数`rcx`寄存器的值传入`r10`寄存器，作为调用函数的`syscall`的入参。然后可以看到是一个`jae`判断函数，判断的是`0x7fff51b5a2a0`下面`jmp`的返回值，我们查看`0x7fff51b5a2a0`这段函数地址，到底做了什么：
 
 ```shell
 (lldb) image lookup --address 0x7fff51b54457
@@ -188,7 +190,7 @@ cat /Users/joey.cao/Desktop/Learning/LLVM/darwin-xnu-master/bsd/kern/syscalls.ma
       Summary: libsystem_kernel.dylib`cerror_nocancel
 ```
 
-正如注解所示，这里`jmp`的是`cerror_nocancel`。在`errno.c`中可以找到：
+正如注解所示，这里`jmp`的是`cerror_nocancel`。在`xnu`源码的`errno.c`中可以找到：
 
 ```c
 //可以看到errno保存在一个全局变量里，所以永远只会保存最新的一次systemcall的结果
@@ -217,13 +219,13 @@ __attribute__((noinline)) cerror_return_t cerror_nocancel(int err)
 
 ## 信号处理
 
-我们知道在早期的POSIX系统中提供了不可靠的信号机制，而为了向后兼容需要这些旧的信号语义的程序，提供了`signal`函数，但是正如我们再那篇文章中推测的`signal`的简易实现来看，有一个非常大的问题就是`signal`函数只能传递一个函数指针，那么如果有多个地方调用了`signal`函数只有最后一次传入的函数指针才会被保存。
+在早期的`POSIX`系统中提供了不可靠的信号机制，而为了向后兼容需要这些旧的信号语义的程序，提供了`signal`函数，但是正如之前分析过的`signal`的实现来看，有一个非常大的问题就是`signal`函数只能传递一个函数指针，那么如果有多个地方调用了`signal`函数只有最后一次传入的函数指针才会被保存:
 
 ```c
 void(*signal(int, void (*)(int)))(int);
 ```
 
-不过在`4.4BSD`之后，以及`MACOS`和`FreeBSD`上其实现遵循了`sigaction`的函数定义，在苹果的[main page](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/sigaction.2.html)上也可以找到相应的描述，这个是可靠的，因此可以认为在我们开发使用时`signal`函数对信号捕获是可靠的，`sigaction`方法提供了设置和检测信号的能力，并且能获取对信号已经设置的`action`因此可以保全所有对信号的捕获：
+不过在`4.4BSD`之后，以及`MACOS`和`FreeBSD`上其实现遵循了`sigaction`的函数定义，在苹果的[main page](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/sigaction.2.html)上也可以找到相应的描述，这个是可靠的，因此可以认为在我们开发使用时`signal`函数对信号捕获是可靠的。`sigaction`方法提供了设置和检测信号的能力，并且能获取对信号已经设置的`action`，因此可以保全其它用户对信号捕获的处理：
 
 ```c
 //signo表示需要检测或者修改的信号
@@ -232,7 +234,7 @@ void(*signal(int, void (*)(int)))(int);
 int	sigaction(int signo, const struct sigaction * new_action, struct sigaction * old_action);
 ```
 
-`sigaction`的定义也是很复杂的，它不仅有一个内部有一个`__sigaction_u`来保持信号处理函数指针，还利用`sa_mask`来设置屏蔽字，`sa_flags`来设置需要捕获的信号：
+`sigaction`的定义也是很复杂的，它不仅内部有一个`__sigaction_u`来保持信号处理函数指针，还利用`sa_mask`来设置屏蔽字，`sa_flags`来设置需要捕获的信号：
 
 ```c
 struct  sigaction {
@@ -262,7 +264,7 @@ typedef struct __siginfo {
 } siginfo_t;
 ```
 
-可以看到`__sigaction_u`是一个`union`，其实就是为了想去兼容旧的`signal`的处理函数。
+可以看到`__sigaction_u`是一个`union`，其实就是为了兼容旧的`signal`的处理函数：
 
 ```c
 /* union for signal handlers */
@@ -279,13 +281,11 @@ union __sigaction_u {
 
 ### 异常的捕获
 
-异常和信号比相似，不同的是异常是指软件层一种错误处理手段。例如OC中的`NSException`，不仅在系统代码会产生异常，开发者也可以在开发者产生异常来在出错时获取到错误信息。异常触发实质上是调用`NSAssertionHandler`:
+异常也是一种常见的处理机制，例如OC中的`NSException`，不仅在系统代码会产生异常，开发者也可以在出错时主动产生异常来获取到错误信息。异常触发实质上是调用`NSAssertionHandler`:
 
 ```objective-c
 - (void)handleFailureInMethod:(SEL)selector object:(id)object file:(NSString *)fileName lineNumber:(NSInteger)line description:(nullable NSString *)format,... NS_FORMAT_FUNCTION(5,6);
 ```
-
-比较可惜`Fundation`并没有开源
 
 对于异常的捕获很简单，系统已经封装的很完美了，只需要调用`NSSetUncaughtExceptionHandler`传入一个按下面模板的函数指针即可：
 
@@ -293,7 +293,7 @@ union __sigaction_u {
 typedef void NSUncaughtExceptionHandler(NSException *exception);
 ```
 
-特别注意的是，有可能在你注册`handler`之前已经有人注册了，所以需要先调用`NSGetUncaughtExceptionHandler`来判断是否已经有注册了，如果有则保存下来，等`exception`触发时再通知到先签注册的`handler`。如果每一个新注册的人都能这样进行异常的传递，那么所有的`exception handler`才能都被触发。
+特别注意的是，有可能在你注册`handler`之前已经有人注册了，所以需要先调用`NSGetUncaughtExceptionHandler`来判断是否已经有注册了，如果有则保存下来，等`exception`触发时再通知到先前注册的`handler`。如果每一个新注册的人都能这样进行异常的传递，那么所有的`exception handler`才能都被触发。
 
 ```objective-c
     if (NSGetUncaughtExceptionHandler()) {
@@ -304,7 +304,9 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 
 ### 信号的捕获
 
-信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的`sa_sigaction`，但是想做的够保险，除了判断`sa_sigaction`还需要考虑`sa_handler`,也许之前某个用户已经通过`signal`函数注册了一个`sa_handler`进来。 还有一点需要注意的是需要为每个`signal`保存不同的`sa_sigaction`或`sa_handler`，因为你也不知道是不是不同的`signal`被其他一个用户不同处理，或者多个用户进行了不同处理。所以最保险的方法就是存储下每个`signal`对应的处理函数:
+信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的`sa_sigaction`，虽然`sa_action`已经做到了向前兼容`sa_handler`，但是想做的够保险，还是需要根据`sa_flag`来判断，以及自己在注册`sa_action`时注意更新`sa_flag`。
+
+ 还有一点需要注意的是应该为每个`signal`保存不同的`sa_sigaction`或`sa_handler`，因为你也不知道之前调用者对不同的`signal`采用了不同的处理，或者多个用户各自监听了不同的信号。所以最保险的方法就是存储下每个`signal`对应的处理函数：
 
 ```objective-c
    for (NSNumber *signalValue in needCatchedSignals) {
@@ -348,9 +350,7 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 
 ### Bugly的实现
 
-[Bugly](https://bugly.qq.com/v2/)是腾讯出的一款用户崩溃统计等功能的第三方SDK，可以捕获到非常全的崩溃，尤其是崩溃日志非常详细，此次我们主要为了追踪一个已知但是偶现的bug所以还不需要那么齐全的堆栈。不过查看下`Bugly`的实现总是好的，首先查看下符号，大致就能推测出一些功能的实现逻辑。
-
-关于`Signal`
+[Bugly](https://bugly.qq.com/v2/)是腾讯出的一款用于统计用户崩溃等功能的第三方SDK，可以捕获到非常全的崩溃信息，尤其是崩溃日志非常详细，此次我们主要为了追踪一个已知但是偶现的bug所以还不需要那么齐全的堆栈。不过查看下`Bugly`的实现总是好的，首先查看下符号，大致就能推测出一些功能的实现逻辑，对于`Signal`进行了捕获处理:
 
 ```c
 //可以知道有一个BLYCrashSignalHandler的OC类
@@ -364,9 +364,9 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 0000000000085da0 (__DATA,__bss) non-external _gSignalHandlerForward
 ```
 
-对于`exception`如下:
+对于`exception`也进行了捕获处理:
 
-```objective-c
+```c
 //封装了一个exception类
 0000000000084340 (__DATA,__objc_data) external _OBJC_CLASS_$_BLYCrashUserException
 0000000000084368 (__DATA,__objc_data) external _OBJC_METACLASS_$_BLYCrashUserException
@@ -379,11 +379,11 @@ typedef void NSUncaughtExceptionHandler(NSException *exception);
 0000000000085dc8 (__DATA,__bss) non-external _gUncaughtExceptionHandlerForward
 ```
 
-为了更详细确认一下它的实现，我们使用了一个非常好用的逆向工具[Hopper DIsassembler](https://www.hopperapp.com)。我们只关注一些实现例如上一次的action的通知:
+为了进一步确认它的实现，我们使用了一个非常好用的逆向工具[Hopper DIsassembler](https://www.hopperapp.com)。只关注一些实现例如上一次的action的通知的逻辑:
 
 ![image-20200119104256813](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/Signal/2.png?raw=true)
 
-先分析一下这一段代码，把`_g_BLYPreviousSignalHandlers`保存到`rax`寄存器，通过其它的代码可以看到Bugly的是在`UIVIewController`分类`+ (void)load`的时候就开始注册捕获信号了，这是一个非常早的时机。此时把信号对应的处理函数保存到了`_g_BLYPreviousSignalHandlers`这个静态数组中，然后`r12`这里是以信号值`rcx`按4字节对齐来偏移寻找到信号对应的处理函数。然后调用该函数，并把三个参数传入。思路和我们是一样的。
+先分析一下这一段代码，把`_g_BLYPreviousSignalHandlers`保存到`rax`寄存器，通过其它的代码可以看到Bugly的是在`UIVIewController`分类`+ (void)load`的时候就开始注册捕获信号了，这是一个非常早的时机。此时把信号对应的处理函数保存到了`_g_BLYPreviousSignalHandlers`这个静态数组中，然后`r12`这里是以信号值`rcx`按4字节对齐来偏移寻找到信号对应的处理函数。然后调用该函数，并把三个参数传入。可以看到思路和我们基本是一样的。
 
 
 
