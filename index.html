@@ -64,7 +64,7 @@
 			</ul>
 		</nav>
 		<nav>
-			总文章数 4
+			总文章数 5
 		</nav>
 		<nav class="header-smart-menu">
     		
@@ -158,6 +158,96 @@
           </div>
           <div id="js-content" class="content-ll">
             
+  
+    <article id="post-深入理解MachO结构" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/">深入理解MachO结构</a>
+    </h1>
+  
+
+        <!--显示阅读次数-->
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/" class="archive-article-date">
+  	<time datetime="2020-01-30T09:36:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-01-30</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>趁着这个假期好好补一下基础知识，之前虽然在学习<code>Bitcode</code>时了解了<code>Mach-O</code>的知识，但是还是模棱两可，这一次借助<a href="https://github.com/gdbinit/MachOView" target="_blank" rel="noopener">mach-o view源码</a>一步步学习。但是这个开源库已经近5年没有更新了,不仅下下来各种无法编译，并且很多<code>mach-o</code>信息也无法解析，于是我对它进行一些修改，可以直接拿我fork过来的<a href="https://github.com/joey520/MachOView" target="_blank" rel="noopener">工程</a> ，已经修复了一些问题并兼容了苹果最新的<code>mach-o</code>结构。</p>
+              
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">Mach-O</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
   
     <article id="post-深入理解Unix信号机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -589,6 +679,16 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>
+# 若是after-footer.ejs，在最后添加
+
+  <script src='https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js'></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+
+
 
     
 <div class="tools-col" q-class="show:isShow,hide:isShow|isFalse" q-on="click:stop(e)">
@@ -642,6 +742,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">Mach-O</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
               </li>
              
@@ -650,15 +754,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Unix</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -725,7 +829,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
     
     	<section class="tools-section tools-section-me" q-show="aboutme">
   	  	
-  	  		<div class="aboutme-wrap" id="js-aboutme">iOS程序员，爱好C++, python &lt;br&gt;&lt;br&gt;PS4粉， 减肥党</div>
+  	  		<div class="aboutme-wrap" id="js-aboutme">越来越胖了。。。</div>
   	  	
     	</section>
     
