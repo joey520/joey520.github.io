@@ -17,18 +17,18 @@
 <meta property="og:site_name" content="Joey&#39;s House">
 <meta property="og:description" content="前言首先抛出几个个问题： 1.什么是header serach path,什么又是framework search path？答案 2.#import,#include, @class和@import的区别是什么。循环#import一定会导致编译失败吗？答案 3.可以同时通过#import &amp;lt;&amp;gt;和使用header seach path来#import &amp;quot;&amp;quot;动态库里的">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image1.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image2.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image3.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image4.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image5.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image6.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image7.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image8.png?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image9.png?raw=true">
-<meta property="og:updated_time" content="2019-12-02T05:46:08.793Z">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image2.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image3.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image4.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image5.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image6.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image7.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image8.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image9.png?raw=true">
+<meta property="og:updated_time" content="2020-02-08T12:24:42.187Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;joey520&#x2F;joey520.github.io&#x2F;blob&#x2F;hexo&#x2F;post_images&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image1.png?raw=true">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;02&#x2F;%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5&#x2F;image1.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -288,7 +288,7 @@
 <h2 id="iOS的编译"><a href="#iOS的编译" class="headerlink" title="iOS的编译"></a>iOS的编译</h2><h4 id="头文件引用"><a href="#头文件引用" class="headerlink" title="头文件引用"></a>头文件引用</h4><p><span id="answer1">clang在进行预处理时会把import的头文件引入并展开，这样就可以在当前文件中使用这些声明的方法了。而import的时候只是传入了一个字符串，编译器是如何找到对应的头文件的呢，那就得依靠搜索路径。</span></p>
 <p>Clang编译器具有和GCC相同<a href="http://gcc.gnu.org/onlinedocs/cpp/Search-Path.html" target="_blank" rel="noopener">搜索指令</a>。对于<code>#include &quot;&quot;</code>修饰首先在当前文件夹内查找，然后在自定义的路径中进行搜索。对于<code>#include &lt;&gt;</code>修饰的首先在系统标准库中进行搜索，然后是自定义的路径。</p>
 <p>但是在使用iOS工程时我们发现只要是在工程的根目录文件下的文件都可以直接通过<code>#include &quot;&quot;</code>到，而不需要像C，C++里面一下指定详细的相对路径。这是因为<b>hmap</b>这个东西。默认Xcode的<code>build setting</code>里有一个选项是<code>Uses Headers Map</code>打开的。我们build一下当前的工程并导出编译log可以看到:</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image1.png?raw=true" alt="image-20191127111720240"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image1.png" alt="image-20191127111720240"></p>
 <p>在编译源文件之前，先会创建一些列hmap文件到derivedData中，我们先关注这个<code>工程名+-project-headers.hmap</code>的文件中。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> hexdump -C Build/Intermediates.noindex/TestLink.build/Debug-iphonesimulator/TestLink.build/TestLink-project-headers.hmap</span></span><br></pre></td></tr></table></figure>
 
@@ -307,7 +307,7 @@
 <hr>
 <p>@import Framework</p>
 <p>还有一种比较少见的引用方式为<code>@import framework</code>。首先可以首先可以看下<code>Build Setting</code>里有个<code>LinkFrameworks Automatically</code>默认是Yes的，这也是为啥我们把一个framework导入工程时会自动在<code>Build Phases</code>中进行Link，而<code>Enable Modules</code>选项可以允许我们通过@import来引入framework。</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image2.png?raw=true" alt="image-20191127200736984"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image2.png?raw=true" alt="image-20191127200736984"></p>
 <p>根据<a href="https://developer.apple.com/videos/wwdc2013/" target="_blank" rel="noopener">WWDC2013</a>的描述，利用这种比<code>#import</code>更加安全效率更高，因为对于import仍然还是简单的递归的拷贝头文件，而<code>@import</code>使用把framework作为modules的方式进行自动链接，仅仅在代码中真正使用了对应的<code>framework</code>中的文件时才会进行import。而且对于第三方也可以通过这种方式进行引入，当前仅仅引入才会触发自动动态链接。</p>
 <p>关于Modules是什么可以通过<a href="https://samsymons.com/blog/understanding-objective-c-modules/" target="_blank" rel="noopener">这篇文章</a>进行了解。我们可以在动态库的build文件夹中找到<code>module.modulemap</code>。在通过Xcode构建动态库时会自动打开<code>Defines Module</code>,自动生成modulemap文件，描述动态库的结构和一个<code>umbrella header</code>,只需要在<code>umbrella header</code>中import其他公开头文件即可，并且如果有遗漏的，编译器还会提示warning。可见苹果推荐的还是在<code>umbrella header</code>。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/Build/Intermediates.noindex/Function1.build/Debug-iphonesimulator/Function1.build/module.modulemap</span></span><br><span class="line">framework module Function1 &#123;</span><br><span class="line">  umbrella header "Function1.h"</span><br><span class="line"></span><br><span class="line">  export *</span><br><span class="line">  module * &#123; export * &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -328,18 +328,18 @@
 <p><span id="answer3">现在回到问题3：</span></p>
 <p>如果同时使用<code>#import &lt;XXXFramework/AAA.h&gt;</code>和<code>#import BBB.h</code>会导致问题吗？答案是，会导致重复定义。</p>
 <p>样例如下，Function1和Method1都是Function1这个framework下的文件，通过直接拉头文件引用来<code>#import Method1.h</code>,通过库引用得到方式来引用Function1:</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image3.png?raw=true" alt="image-20191201230430748"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image3.png?raw=true" alt="image-20191201230430748"></p>
 <p>结果编译会出错，重复定义了Method1这个类，为了避免因为<code>Function1.h</code>是<code>Umbrella header</code>的原因，我们改成另一个header，发现依然还是一样的问题：</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image4.png?raw=true" alt="image-20191201230650759"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image4.png?raw=true" alt="image-20191201230650759"></p>
 <p>首先这种引用方式当然是不合理的，<b>建议要么都用 “”, 要么都用&lt;&gt;</b>。但是奇怪的是如果我们把<code>#import Method1.h</code>这一句放在上面就不会报错，这里我们首先要理解在<code>#import</code>的时候Clang做了什么，由于Function1是一个动态库，所以在构建时创建了Modules。当我们通过<code>import &lt;Function1/xxx.h&gt;</code>方式import时就会直接把module引入。而在<code>#import &quot;Method1.h&quot;</code>只是添加hmap并查找这个符号。作为证据我们删除掉DerviedData，并删掉<code>import &lt;Function1/xxx.h&gt;</code>这一句。重新编译，可以看到ModuleCache里已经没有Function1了。</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image5.png?raw=true" alt="image-20191201234223020"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image5.png?raw=true" alt="image-20191201234223020"></p>
 <p>而当我们把<code>import &lt;Function1/xxx.h&gt;</code>加上时在编译：</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image6.png?raw=true" alt="image-20191201234346827"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image6.png?raw=true" alt="image-20191201234346827"></p>
 <p>可见只有<code>#import &lt;&gt;</code>的方式才会产生modulecache。因此当再次<code>import &quot;&quot;</code>时，由于modulecache中已经把Framework的二进制文件缓存起来了，因此提示重复定义。而为什么<code>import &quot;&quot;</code>放在前面时不会提示这个错误，这个我目前还不知道，只能猜测ModuleCache在链入时跟静态库链接一样，出现重复强符号，只采用首个出现的。</p>
 <p>经过分析其实是ModuleCache导致的，所以把<code>Defines Modules</code>关掉就可以解决，但是这并不是真正的解决之道。</p>
 <p>这一切得原因都是import方式不规范导致，只要规范下import方式即可解决。</p>
 <h3 id="iOS的链接"><a href="#iOS的链接" class="headerlink" title="iOS的链接"></a>iOS的链接</h3><h4 id="库文件的编译"><a href="#库文件的编译" class="headerlink" title="库文件的编译"></a>库文件的编译</h4><p>当一个静态库有两个相同命名的类是，是不会出现<code>duplicate symbol</code>的，我们创建一个<code>Method3</code>文件和一个<code>Method3_Copy</code>文件，两者内容是一模一样的，看一下静态库文件编译过程，如下，可以发现它只是通过<code>libtool</code>把<code>Link file list</code>中的文件进行了拷贝进行了生成.a文件：</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image7.png?raw=true" alt="image-20191201150831370"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image7.png?raw=true" alt="image-20191201150831370"></p>
 <p>我们通过ar工具查看生成的静态库的成员:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ar -v -t /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/Build/Products/Debug-iphonesimulator/libFunction3.a</span></span><br><span class="line">rw-r--r--       0/0           208 Jan  1 08:00 1970 __.SYMDEF</span><br><span class="line">rw-r--r--       0/0          5064 Jan  1 08:00 1970 Method3.o</span><br><span class="line">rw-r--r--       0/0          5072 Jan  1 08:00 1970 Method3_Copy.o</span><br><span class="line">rw-r--r--       0/0          5112 Jan  1 08:00 1970 Function3.o</span><br></pre></td></tr></table></figure>
 
@@ -348,7 +348,7 @@
 
 <p>可以看到符号表也是分开的，即没有进行链接操作，所以不会提示<code>duplicate symbols</code>问题。当它被link到一个项目时，会重新拷贝内部这些目标文件并进行链接，可以理解把它再内嵌到目标项目中的。所以一旦静态库发生改变，目标项目也必须重新进行编译。同样的由于静态库不会进行链接，所以引用一些标准库等时还需要主项目手动添加这些库的连接，否则会导致<code>undefined symbols</code>。</p>
 <p>而动态库的编译过程如下,可以看到它确实对所有目标文件进行了链接，在符号表重组时，直接发现了<code>duplicate symbols</code>的问题:</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image8.png?raw=true" alt="image-20191201151150923"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image8.png?raw=true" alt="image-20191201151150923"></p>
 <p>所以动态库其实是对内部的目标文件进行了链接，形成了一个整体在运行时通过动态连接器链接到目标项目中的，因此动态库重新编译并不会导致目标项目重新编译。</p>
 <p>那么当我们把静态库链接到可执行文件中时会出现<code>duplicate symbols</code>错误码，答案仍然是不会。并且发现我们再调用<code>Mehtod3</code>的方法时，执行的是<code>Method3</code>这个类里实现的方法。但是当我们调整一下<code>Function3</code>这个静态库里编译文件的顺序，把<code>Method3_Copy</code>放到前面时，可以看到执行的变成了<code>Method3_Copy</code>里的方法。此时我们查看一下<code>Function3</code>这个镜头库的构成:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> nm -nm /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/Build/Products/Debug-iphonesimulator/libFunction3.a</span></span><br><span class="line"></span><br><span class="line">/Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/Build/Products/Debug-iphonesimulator/libFunction3.a(Method3_Copy.o):</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">/Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/Build/Products/Debug-iphonesimulator/libFunction3.a(Method3.o):</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">/Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/Build/Products/Debug-iphonesimulator/libFunction3.a(Function3.o):</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
@@ -372,7 +372,7 @@
 <p>上面在中文log之前，是在主工程依次按层级调用到了四层Link的库。之后是在第一层的动态库直接调用第3层的动态库。</p>
 <p><b>所以无论link多少层静态库，本质上都是在运行时把所有的目标文件的符号整合到一起，通过符号找到对应的机器指令，因此只要符号找得到就能调用到。</b></p>
 <p>但是问题又来了，能否从层级3或者4调用到层级2中方法？其实是不可以的，因为这样会导致互相依赖。</p>
-<p><img src="https://github.com/joey520/joey520.github.io/blob/hexo/post_images/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image9.png?raw=true" alt="image-20191201205329591"></p>
+<p><img src="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/image9.png?raw=true" alt="image-20191201205329591"></p>
 <h4 id="链接选项"><a href="#链接选项" class="headerlink" title="链接选项"></a>链接选项</h4><p><span id="answer9">回到问题9：</span></p>
 <p>在<code>Build Setting</code>中有一个选项为<code>Other Link Flag</code>,很多人碰到过引用第三方库中有Category时发生<code>Unrecongnized Selector</code>崩溃，都知道可以通过添加<code>-Objc</code>来进行解决，那么这里到底是干了什么呢？</p>
 <p>查看编译log可以看到，添加<code>-Objc</code>之后会在为Clang添加<code>-Objc</code>这个编译选项，同理添加<code>-all_load</code>, <code>-force_load</code>都只是链接器添加一个选项而已。因为编译器为了避免生成的可执行文件太大，默认只连接Class，c, C++相关的目标文件，而Category和一些未使用的文件符号都会被Strip掉。因此第三方库虽然存在Category的符号，但是链接时被Strip掉了，因此会出现<code>Unrecongnized Selector</code>。而<code>-all_load</code>则是把库文件所有的目标文件以及所有依赖的第三方库全部链接，比较常见的场景是使用静态库时，发现找不到符号，需要添加一些第三方库，网上有些回答添加<code>-all_load</code>。当然这样可以解决，但是带来的问题也很明显，它会导致所有的库文件都执行这样的操作，会导致可执行文件的增大，并且如果两个静态库中的目标文件有相同的符号就会导致重复符号错误。另一种解决方法就是<code>-force_load</code>，指定某一个第三方库进行all_load。 <b>这里还有一个重要的应用场景是， 动态库会丢弃内部没有使用的其它静态库文件或者是静态库文件的Object对象，可能会导致运行时崩溃，为了解决就得使其all_load。</b></p>
@@ -697,6 +697,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Unix</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
               </li>
              
@@ -706,14 +714,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Unix</a>
               </li>
              
               <li class="article-tag-list-item">
