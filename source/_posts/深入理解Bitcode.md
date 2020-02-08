@@ -155,7 +155,7 @@ $ otool -l main.o >> main.o.txt
 $ vimdiff main.o.txt main_bitcode.o.txt
 ```
 
-![image-20191119111851211](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/深入理解Bitcode/bitcode_bundle.png?raw=true)
+![image-20191119111851211](深入理解Bitcode/bitcode_bundle.png)
 
 可以看到开启bitcode后几乎每个section都会变大，并且多了名为`__bitcode`的section和名为`__cmdline`的section。
 

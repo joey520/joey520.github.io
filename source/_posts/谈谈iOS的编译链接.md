@@ -229,7 +229,7 @@ Clang编译器具有和GCC相同[搜索指令](http://gcc.gnu.org/onlinedocs/cpp
 
 但是在使用iOS工程时我们发现只要是在工程的根目录文件下的文件都可以直接通过`#include ""`到，而不需要像C，C++里面一下指定详细的相对路径。这是因为<b>hmap</b>这个东西。默认Xcode的`build setting`里有一个选项是`Uses Headers Map`打开的。我们build一下当前的工程并导出编译log可以看到:
 
-![image-20191127111720240](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image1.png?raw=true)
+![image-20191127111720240](谈谈iOS的编译链接/image1.png)
 
 在编译源文件之前，先会创建一些列hmap文件到derivedData中，我们先关注这个`工程名+-project-headers.hmap`的文件中。
 
@@ -287,7 +287,7 @@ $ hexdump -C Build/Intermediates.noindex/TestLink.build/Debug-iphonesimulator/Te
 
 还有一种比较少见的引用方式为`@import framework`。首先可以首先可以看下`Build Setting`里有个`LinkFrameworks Automatically `默认是Yes的，这也是为啥我们把一个framework导入工程时会自动在`Build Phases`中进行Link，而`Enable Modules`选项可以允许我们通过@import来引入framework。
 
-![image-20191127200736984](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image2.png?raw=true)
+![image-20191127200736984](谈谈iOS的编译链接/image2.png?raw=true)
 
 根据[WWDC2013](https://developer.apple.com/videos/wwdc2013/)的描述，利用这种比`#import`更加安全效率更高，因为对于import仍然还是简单的递归的拷贝头文件，而`@import`使用把framework作为modules的方式进行自动链接，仅仅在代码中真正使用了对应的`framework`中的文件时才会进行import。而且对于第三方也可以通过这种方式进行引入，当前仅仅引入才会触发自动动态链接。
 
@@ -352,19 +352,19 @@ Referenced from: /Users/joey.cao/Library/Developer/CoreSimulator/Devices/235EABB
 
 样例如下，Function1和Method1都是Function1这个framework下的文件，通过直接拉头文件引用来`#import Method1.h `,通过库引用得到方式来引用Function1:
 
-![image-20191201230430748](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image3.png?raw=true)
+![image-20191201230430748](谈谈iOS的编译链接/image3.png?raw=true)
 
 结果编译会出错，重复定义了Method1这个类，为了避免因为`Function1.h`是`Umbrella header`的原因，我们改成另一个header，发现依然还是一样的问题：
 
-![image-20191201230650759](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image4.png?raw=true)
+![image-20191201230650759](谈谈iOS的编译链接/image4.png?raw=true)
 
 首先这种引用方式当然是不合理的，<b>建议要么都用 "", 要么都用<></b>。但是奇怪的是如果我们把`#import Method1.h`这一句放在上面就不会报错，这里我们首先要理解在`#import`的时候Clang做了什么，由于Function1是一个动态库，所以在构建时创建了Modules。当我们通过`import <Function1/xxx.h>`方式import时就会直接把module引入。而在`#import "Method1.h"`只是添加hmap并查找这个符号。作为证据我们删除掉DerviedData，并删掉`import <Function1/xxx.h>`这一句。重新编译，可以看到ModuleCache里已经没有Function1了。
 
-![image-20191201234223020](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image5.png?raw=true)
+![image-20191201234223020](谈谈iOS的编译链接/image5.png?raw=true)
 
 而当我们把`import <Function1/xxx.h>`加上时在编译：
 
-![image-20191201234346827](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image6.png?raw=true)
+![image-20191201234346827](谈谈iOS的编译链接/image6.png?raw=true)
 
 可见只有`#import <>`的方式才会产生modulecache。因此当再次`import ""`时，由于modulecache中已经把Framework的二进制文件缓存起来了，因此提示重复定义。而为什么`import ""`放在前面时不会提示这个错误，这个我目前还不知道，只能猜测ModuleCache在链入时跟静态库链接一样，出现重复强符号，只采用首个出现的。
 
@@ -378,7 +378,7 @@ Referenced from: /Users/joey.cao/Library/Developer/CoreSimulator/Devices/235EABB
 
 当一个静态库有两个相同命名的类是，是不会出现`duplicate symbol`的，我们创建一个`Method3`文件和一个`Method3_Copy`文件，两者内容是一模一样的，看一下静态库文件编译过程，如下，可以发现它只是通过`libtool`把`Link file list`中的文件进行了拷贝进行了生成.a文件：
 
-![image-20191201150831370](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image7.png?raw=true)
+![image-20191201150831370](谈谈iOS的编译链接/image7.png?raw=true)
 
 我们通过ar工具查看生成的静态库的成员:
 
@@ -439,7 +439,7 @@ nm -nm /Users/joey.cao/Desktop/Learning/LLVM/dyld/Demo2/DerivedData/MainProject/
 
 而动态库的编译过程如下,可以看到它确实对所有目标文件进行了链接，在符号表重组时，直接发现了`duplicate symbols`的问题:
 
-![image-20191201151150923](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image8.png?raw=true)
+![image-20191201151150923](谈谈iOS的编译链接/image8.png?raw=true)
 
 所以动态库其实是对内部的目标文件进行了链接，形成了一个整体在运行时通过动态连接器链接到目标项目中的，因此动态库重新编译并不会导致目标项目重新编译。
 
@@ -509,7 +509,7 @@ objc[9953]: Class Method1 is implemented in both /Users/joey.cao/Desktop/Learnin
 
 但是问题又来了，能否从层级3或者4调用到层级2中方法？其实是不可以的，因为这样会导致互相依赖。
 
-![image-20191201205329591](https://github.com/joey520/joey520.github.io/blob/hexo/post_images/谈谈iOS的编译链接/image9.png?raw=true)
+![image-20191201205329591](谈谈iOS的编译链接/image9.png?raw=true)
 
 #### 链接选项
 
