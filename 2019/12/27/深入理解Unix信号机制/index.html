@@ -223,7 +223,7 @@
               <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近为了复现一个1%概率左右的跨平台层的崩溃，在MSDK的TestApp中集成了一个<code>CrashHandler</code>来进行压力测试。借着解决问题的机会深入学习一下<code>Unix</code>的信号机制。并在本文讲述了如何实现一个<a href="https://github.com/joey520/Blogs/tree/master/TestSignal" target="_blank" rel="noopener"><code>CrashHandlerDemo</code></a>。</p>
 <a id="more"></a>
 
-<h2 id="什么是信号"><a href="#什么是信号" class="headerlink" title="什么是信号"></a>什么是信号</h2><h3 id="信号的定义"><a href="#信号的定义" class="headerlink" title="信号的定义"></a>信号的定义</h3><p>在上一次<a href="">讲Socket编程</a>提到<code>SIGPIPE</code>时简单了解了一下<code>signal</code>函数，我们知道可以向进程注册一个指定的信号处理函数，以使进程在收到指定函数时触发该函数。那么信号到底是什么呢，UNIX环境高级编程中定义：<b>信号是软件中断，提供了一种处理异步事件的方法</b>。为什么说是软件的中断，因为信号触发的软件层进程执行的中断。即进程在执行时，收到信号时中断程序的运行执行中断处理函数（如果没有忽略该信号），然后再返回程序继续运行。为什么说是处理异步事件，因为信号是随机出现，进程是无法确定什么时候接收到信号，只能告诉内核在出现该信号时该如何处理，进程不会阻塞以等待信号，而是正常执行，直到信号发送过来。</p>
+<h2 id="什么是信号"><a href="#什么是信号" class="headerlink" title="什么是信号"></a>什么是信号</h2><h3 id="信号的定义"><a href="#信号的定义" class="headerlink" title="信号的定义"></a>信号的定义</h3><p>在上一次<a href>讲Socket编程</a>提到<code>SIGPIPE</code>时简单了解了一下<code>signal</code>函数，我们知道可以向进程注册一个指定的信号处理函数，以使进程在收到指定函数时触发该函数。那么信号到底是什么呢，UNIX环境高级编程中定义：<b>信号是软件中断，提供了一种处理异步事件的方法</b>。为什么说是软件的中断，因为信号触发的软件层进程执行的中断。即进程在执行时，收到信号时中断程序的运行执行中断处理函数（如果没有忽略该信号），然后再返回程序继续运行。为什么说是处理异步事件，因为信号是随机出现，进程是无法确定什么时候接收到信号，只能告诉内核在出现该信号时该如何处理，进程不会阻塞以等待信号，而是正常执行，直到信号发送过来。</p>
 <p>所以可以理解信号就是一种进程通信手段用于通知进程发生了某个事件。举一个例子，在iOS13上不加蓝牙权限描述时打开App请求蓝牙权限就会崩溃，查看<code>crash log</code>可以看到：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">xception Type:  EXC_CRASH (SIGKILL)</span><br><span class="line">Exception Codes: <span class="number">0x0000000000000000</span>, <span class="number">0x0000000000000000</span></span><br><span class="line">Exception Note:  EXC_CORPSE_NOTIFY</span><br><span class="line">Termination Reason: TCC, This app has crashed because it attempted to access privacy-sensitive data without a usage description. The app<span class="number">'</span>s Info.plist must contain an NSBluetoothAlwaysUsageDescription key with a <span class="built_in">string</span> value explaining to the user how the app uses <span class="keyword">this</span> data.</span><br><span class="line">Triggered by Thread:  <span class="number">1</span></span><br></pre></td></tr></table></figure>
 
@@ -615,6 +615,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
               </li>
              
@@ -624,10 +628,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
               </li>
             
             <div class="clearfix"></div>
