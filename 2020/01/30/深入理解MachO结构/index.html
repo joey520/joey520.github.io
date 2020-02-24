@@ -43,7 +43,7 @@
 <meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;01&#x2F;30&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84&#x2F;image-20200224003039178.png">
 <meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;01&#x2F;30&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84&#x2F;image-20200205064823851.png">
 <meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;01&#x2F;30&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84&#x2F;image-20200205070518048.png">
-<meta property="og:updated_time" content="2020-02-23T19:15:39.047Z">
+<meta property="og:updated_time" content="2020-02-24T11:36:34.389Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;01&#x2F;30&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84&#x2F;image-20200204214019787.png">
   
@@ -418,7 +418,7 @@ D --> E[LINKEDIT]</pre>
 <p><code>ro</code>文件中有4个字段与实例相关:</p>
 <p><code>Instance start</code>在64位系统上永远都是8，因为要第一个字节指向的一定是<code>ISA</code>。</p>
 <p><code>Instance Size</code>描述了这个类实例的大小，即成员变量在经过字节对齐之后的内存和+8。</p>
-<p><code>Ivar layout</code>描述了内存布局。<code>Ivars</code>指向了实例变量链表：</p>
+<p><code>Ivar layout</code>描述了内存布局。</p>
 <p><code>instance variables</code>指向了实例变量结构地址。</p>
 <p><img src="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/image-20200223174426150-2475023.png" alt="image-20200223174426150"></p>
 <p>类在进行实例化是即使通过<code>runtime</code>中存储的类的信息进行的，根据类再编译时获取的实例大小来开辟内存空间：</p>
@@ -433,7 +433,7 @@ D --> E[LINKEDIT]</pre>
 
 <p>前8字节为<code>ivar_list</code>的数据，前4个字节描述了<code>ivar</code>结构体块大小为<code>0x20</code>即32个字节，就是64为系统下<code>ivar_t</code>的结构体大小。后4个字节描述了<code>ivar</code>数量为1。</p>
 <p>后面跟随的则是每个<code>ivar</code>的信息。根据上图可知：</p>
-<p>1.偏移为<code>0x10000DEE4</code>执行的数据。可以在<code>__objc_ivar</code>段找到，即0x08：</p>
+<p>1.前8个字节<code>0x10000DEE4</code>指向的的数据为偏移。可以在<code>__objc_ivar</code>段找到，即0x08：</p>
 <img src="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/image-20200223180656763-2475023.png" alt="image-20200223180656763" style="zoom:50%;">
 
 <p>2.<code>name</code>为<code>0x10000655A</code>指向字符串。竟然也是放在<code>__objc_methname</code>段，可见这个段处理<code>OC</code>的方法名，还是存放了实例变量名，这也就是成员变量为啥是<code>_</code>修饰的：</p>
@@ -496,9 +496,7 @@ D --> E[LINKEDIT]</pre>
 <p>所以在<code>runtime</code>里可以看到<code>SideTables()[self]</code>这种方式来找到<code>sidetable</code>，所有的对象都根据地址影视到<code>SideTable</code>数组中的某一个，即某一个表中。</p>
 <p><b>至于为什么要这么做，1.是为了防止单个<code>SideTable</code>过大维护不方便，查找不易。2是由于每一次操作或者查询引用计数都需要对表进行上锁，如果全部在一个表锁住，会非常影响性能</b>。</p>
 <p>引用计数的记录也是通过位运算来实现的，并且有几个特殊的为用于表示信息:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The order of these bits is important.</span></span><br><span class="line"><span class="comment">//bit0 记录当前对象是否在存在弱引用</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_WEAKLY_REFERENCED (1UL&lt;&lt;0)</span></span><br><span class="line"><span class="comment">//bit1记录是否处于deallocing状态</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_DEALLOCATING      (1UL&lt;&lt;1)  <span class="comment">// MSB-ward of weak bit</span></span></span><br><span class="line"><span class="comment">//所以真正计数是从bit2开始的</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_RC_ONE            (1UL&lt;&lt;2)  <span class="comment">// MSB-ward of deallocating bit</span></span></span><br><span class="line"><span class="comment">//表示所能记录的最大值</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_RC_PINNED         (1UL&lt;&lt;(WORD_BITS-1))</span></span><br><span class="line"><span class="comment">//将isa中的数值转换为sidetable，因为前两个bit用于表示别的了，所以要移位2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_RC_SHIFT 2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_FLAG_MASK (SIDE_TABLE_RC_ONE-1)</span></span><br></pre></td></tr></table></figure>
-
-
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The order of these bits is important.</span></span><br><span class="line"><span class="comment">//bit0 记录当前对象是否在存在弱引用</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_WEAKLY_REFERENCED (1UL&lt;&lt;0)</span></span><br><span class="line"><span class="comment">//bit1记录是否处于deallocing状态</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_DEALLOCATING      (1UL&lt;&lt;1)  <span class="comment">// MSB-ward of weak bit</span></span></span><br><span class="line"><span class="comment">//所以真正计数是从bit2开始的。每次增加实际为1 &lt;&lt; 2即4</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_RC_ONE            (1UL&lt;&lt;2)  <span class="comment">// MSB-ward of deallocating bit</span></span></span><br><span class="line"><span class="comment">//表示所能记录的最大值。当到到最大值时则不再增加引用计数了</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_RC_PINNED         (1UL&lt;&lt;(WORD_BITS-1))</span></span><br><span class="line"><span class="comment">//将isa中的数值转换为sidetable，因为前两个bit用于表示别的了，所以要移位2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_RC_SHIFT 2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIDE_TABLE_FLAG_MASK (SIDE_TABLE_RC_ONE-1)</span></span><br></pre></td></tr></table></figure>
 
 <p>此时再回过头看一下查询引用技术表的实现:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">size_t</span> objc_object::sidetable_getExtraRC_nolock()</span><br><span class="line">&#123;</span><br><span class="line">    assert(isa.nonpointer);</span><br><span class="line">  <span class="comment">//找到self所在的引用计数表</span></span><br><span class="line">    SideTable&amp; table = SideTables()[<span class="keyword">this</span>];</span><br><span class="line">  <span class="comment">//然后查找refncts，key为实例的地址</span></span><br><span class="line">  <span class="comment">//由于运行时系统没有使用STL，这里是自己实现的哈希表。</span></span><br><span class="line">    RefcountMap::iterator it = table.refcnts.<span class="built_in">find</span>(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">if</span> (it == table.refcnts.<span class="built_in">end</span>()) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  <span class="comment">//如果找到返回引用计数</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> it-&gt;second &gt;&gt; SIDE_TABLE_RC_SHIFT;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -885,15 +883,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Unix</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
               </li>
              
               <li class="article-tag-list-item">
