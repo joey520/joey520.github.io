@@ -1067,16 +1067,14 @@ class StripedMap {
 #define SIDE_TABLE_WEAKLY_REFERENCED (1UL<<0)
 //bit1记录是否处于deallocing状态
 #define SIDE_TABLE_DEALLOCATING      (1UL<<1)  // MSB-ward of weak bit
-//所以真正计数是从bit2开始的
+//所以真正计数是从bit2开始的。每次增加实际为1 << 2即4
 #define SIDE_TABLE_RC_ONE            (1UL<<2)  // MSB-ward of deallocating bit
-//表示所能记录的最大值
+//表示所能记录的最大值。当到到最大值时则不再增加引用计数了
 #define SIDE_TABLE_RC_PINNED         (1UL<<(WORD_BITS-1))
 //将isa中的数值转换为sidetable，因为前两个bit用于表示别的了，所以要移位2
 #define SIDE_TABLE_RC_SHIFT 2
 #define SIDE_TABLE_FLAG_MASK (SIDE_TABLE_RC_ONE-1)
 ```
-
-
 
 此时再回过头看一下查询引用技术表的实现:
 
