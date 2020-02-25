@@ -977,7 +977,7 @@ inline uintptr_t objc_object::rootRetainCount()
     isa_t bits = LoadExclusive(&isa.bits);
     ClearExclusive(&isa.bits);
     if (bits.nonpointer) {
-      //先获取isa中保存的引用计数
+      //先获取isa中保存的引用计数。
         uintptr_t rc = 1 + bits.extra_rc;
       //如果已经满了，则加上引用计数表中的计数
         if (bits.has_sidetable_rc) {
