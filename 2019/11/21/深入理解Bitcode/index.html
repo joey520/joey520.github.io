@@ -10,7 +10,7 @@
   <title>深入理解Bitcode | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="前言在最近的版本中，MSDK要支持bitcode了。于是开始对这个2015WWDC就提出老概念进行了新的学习。很多开发者都知道开启bitcode可以在archive时生成一份中间代码以提交给苹果，让其根据不同的架构生成不同的ipa，以减少安装包体积与应对未来出现新架构不兼容问题。也几乎都碰到过引用第三方库因其不支持bitcode而编译不过。但是Bitcode到底是什么呢？ 我们知道编译器前端可以把">
-<meta name="keywords" content="Bitcode,LLVM">
+<meta name="keywords" content="LLVM,Bitcode">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解Bitcode">
 <meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;11&#x2F;21&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode&#x2F;index.html">
@@ -68,7 +68,7 @@
 			</ul>
 		</nav>
 		<nav>
-			总文章数 5
+			总文章数 6
 		</nav>
 		<nav class="header-smart-menu">
     		
@@ -343,11 +343,11 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
         		</li>
       		
 		</ul>
@@ -616,7 +616,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">memcpy</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -624,7 +628,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
               </li>
              
               <li class="article-tag-list-item">

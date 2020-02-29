@@ -64,7 +64,7 @@
 			</ul>
 		</nav>
 		<nav>
-			总文章数 5
+			总文章数 6
 		</nav>
 		<nav class="header-smart-menu">
     		
@@ -158,6 +158,95 @@
           </div>
           <div id="js-content" class="content-ll">
             
+  
+    <article id="post-从一次Memcpy说开" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/">从一次memcpy说开来</a>
+    </h1>
+  
+
+        <!--显示阅读次数-->
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" class="archive-article-date">
+  	<time datetime="2020-02-28T06:05:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-28</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天被一位北美的同事的<code>comment</code>了一个<code>memcpy</code>使用的代码，大致如下，在解析数据时把数据段的2个字节的数据长度<code>memcpy</code>到<code>NSInteger *</code>上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (void)updateData:(NSInteger *)dataLength data:(uint8_t *)data &#123;</span><br><span class="line">    memcpy(dataLength, data, sizeof(uint16_t));</span><br><span class="line">  	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这位同事的<code>comment</code>如下:</p>
+<img src="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/image-20200229161615825.png" alt="image-20200229161615825" style="zoom:50%;">
+
+<p>大意是这样使用<code>memcpy</code>不安全并且性能不好，应该采用他建议的方式，那么这里到底有什么门道呢？</p>
+              
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">memcpy</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
   
     <article id="post-深入理解MachO结构" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
@@ -580,11 +669,11 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
         		</li>
       		
 		</ul>
@@ -742,7 +831,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">memcpy</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -750,7 +843,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">LLVM</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
               </li>
              
               <li class="article-tag-list-item">

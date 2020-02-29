@@ -7,16 +7,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>Tag: Unix | Joey&#39;s House</title>
+  <title>从一次memcpy说开来 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="人菜就要多读书。。。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Joey&#39;s House">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;tags&#x2F;Unix&#x2F;index.html">
+  <meta name="description" content="前言今天被一位北美的同事的comment了一个memcpy使用的代码，大致如下，在解析数据时把数据段的2个字节的数据长度memcpy到NSInteger *上: 1234- (void)updateData:(NSInteger *)dataLength data:(uint8_t *)data &amp;#123;    memcpy(dataLength, data, sizeof(uint16_t)">
+<meta name="keywords" content="LLVM,memcpy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从一次memcpy说开来">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;28&#x2F;%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="人菜就要多读书。。。">
+<meta property="og:description" content="前言今天被一位北美的同事的comment了一个memcpy使用的代码，大致如下，在解析数据时把数据段的2个字节的数据长度memcpy到NSInteger *上: 1234- (void)updateData:(NSInteger *)dataLength data:(uint8_t *)data &amp;#123;    memcpy(dataLength, data, sizeof(uint16_t)">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;28&#x2F;%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80&#x2F;image-20200229161615825.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;28&#x2F;%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80&#x2F;image-20200229162447535.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;28&#x2F;%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80&#x2F;image-20200229173530399.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;28&#x2F;%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80&#x2F;image-20200229212353168.png">
+<meta property="og:updated_time" content="2020-02-29T14:31:09.681Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;28&#x2F;%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80&#x2F;image-20200229161615825.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -157,75 +164,294 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-从一次Memcpy说开" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2019-12-27T11:21:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-27</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/">深入理解Unix信号机制</a>
+    <h1 class="article-title" itemprop="name">
+      从一次memcpy说开来
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" class="archive-article-date">
+  	<time datetime="2020-02-28T06:05:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-28</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#memcpy"><span class="toc-number">2.</span> <span class="toc-text">memcpy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#两种实现的区别"><span class="toc-number">3.</span> <span class="toc-text">两种实现的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译器做的优化"><span class="toc-number">4.</span> <span class="toc-text">编译器做的优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>今天被一位北美的同事的<code>comment</code>了一个<code>memcpy</code>使用的代码，大致如下，在解析数据时把数据段的2个字节的数据长度<code>memcpy</code>到<code>NSInteger *</code>上:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (void)updateData:(NSInteger *)dataLength data:(uint8_t *)data &#123;</span><br><span class="line">    memcpy(dataLength, data, sizeof(uint16_t));</span><br><span class="line">  	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这位同事的<code>comment</code>如下:</p>
+<img src="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/image-20200229161615825.png" alt="image-20200229161615825" style="zoom:50%;">
+
+<p>大意是这样使用<code>memcpy</code>不安全并且性能不好，应该采用他建议的方式，那么这里到底有什么门道呢？</p>
+<a id="more"></a>
+
+<h2 id="memcpy"><a href="#memcpy" class="headerlink" title="memcpy"></a>memcpy</h2><p><code>memcpy</code>是<code>string.h</code>中的声明的一个<code>Libc</code>库函数，作用是把第二个参数的内存，按第三个参数的长度拷贝到第一个参数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>	*<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> *__dst, <span class="keyword">const</span> <span class="keyword">void</span> *__src, <span class="keyword">size_t</span> __n)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>drawin</code>系统中，则是采用了一个编译器内置函数<code>__builtin___memcpy_chk</code>来替换掉了<code>memcpy</code>:</p>
+<img src="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/image-20200229162447535.png" alt="image-20200229162447535" style="zoom:50%;">
+
+<p>首先可以学习一点的是这种用宏命令文本替换非常实用，举个例子，假如不希望工程的<code>NSLog</code>或者<code>printf</code>打印信息除了符号替换还可以通过宏命令替换的方式干掉:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> RELEASE</span></span><br><span class="line"><span class="comment">//避免redefined</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> NSLog</span></span><br><span class="line"><span class="comment">//直接干掉</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">define</span> NSLog(format, ...)</span></span><br><span class="line"><span class="comment">//替换成自己的打印</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">define</span> NSLog MyLOG</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>总之可以知道是把<code>memcpy</code>替换成了内置的<code>__builtin___memcpy_chk</code>，那么这个编译器内置函数是干什么呢？</p>
+<p><code>gcc</code>和<code>clang</code>等等编译器都有一些<code>builtin</code>函数，类似宏命令，会在编译时把原来的函数替换掉，以到达优化。宏命令通常是文本替换，而内置函数通常是指令级别的替换，能够做很多优化以及避免函数调用的开销等等。</p>
+<p><code>clang</code>所有的内置函数可以在<code>Builtins.def</code>中找到。首先下载<a href="https://github.com/llvm-mirror/clang" target="_blank" rel="noopener">clang源码</a>，先看看<code>Builtins.def</code>中的声明，这里只关注<code>__memcpy_chk</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BUILTIN(__builtin___memcpy_chk, <span class="string">"v*v*vC*zz"</span>, <span class="string">"nF"</span>)</span><br></pre></td></tr></table></figure>
+
+<p><code>Builtins.def</code>中声明了所有的内置函数，这个<code>BUILTIN</code>宏的第一个参数是一个枚举值，会对应到一个函数名，第二个参数为函数的返回值与参数类型，第三个参数为函数的描述，<code>nF</code>表示这是一个<code>Libc/libm</code>的函数，并且没有<code>throw</code>。更多信息感兴趣的话可以细看一下。</p>
+<p>打开<code>bstring.h</code>，可以看到对<code>memcpy</code>更多的描述。而且非常巧<code>clang</code>正好就拿<code>memcpy</code>来作为内置函数的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> VARIANT</span></span><br><span class="line"><span class="comment">//声明__memcpy_chk函数</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __memcpy_chk BUILTIN(__memcpy_chk)</span></span><br><span class="line"><span class="keyword">void</span> *__memcpy_chk(<span class="keyword">void</span> *<span class="keyword">restrict</span> s1, <span class="keyword">const</span> <span class="keyword">void</span> *<span class="keyword">restrict</span> s2, <span class="keyword">size_t</span> n,</span><br><span class="line">                   <span class="keyword">size_t</span> destlen);</span><br><span class="line"><span class="comment">//把memcpy替换成buildin___memcpy_chk</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> memcpy(a,b,c) __memcpy_chk(a,b,c,(size_t)-1)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span> <span class="comment">/* VARIANT */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> memcpy BUILTIN(memcpy)</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> *<span class="keyword">restrict</span> s1, <span class="keyword">const</span> <span class="keyword">void</span> *<span class="keyword">restrict</span> s2, <span class="keyword">size_t</span> n)</span></span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">/* VARIANT */</span></span></span><br></pre></td></tr></table></figure>
+
+<p>通过反汇编可以看到确实在运行时call的是<code>__memcpy_chk</code>这个函数（此时编译器优化并没有开启）：</p>
+<img src="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/image-20200229173530399.png" alt="image-20200229173530399" style="zoom:50%;">
+
+<p>那么为啥要替换成<code>__memcpy_chk</code>呢？</p>
+<p>因为memcpy实际是一个很不安全的函数，可能导致踩内存和<code>overlap</code>等问题，因此<code>LLVM</code>（<code>GCC</code>）采用了内置函数<code>__memcpy_chk</code>来包装这个方法，会在编译时进行一些检查，编译器前端会在<code>IDE</code>上通过警告的方式提示用户使用有误，在<code>bstring.h</code>这个例子中可以看到很多使用它的情况，并且会产生的各种各样警告信息。所以内置函数除了提高性能，也可能是是做一些安全保护。</p>
+<h2 id="两种实现的区别"><a href="#两种实现的区别" class="headerlink" title="两种实现的区别"></a>两种实现的区别</h2><p>先思考一个问题，程序在运行时CPU是如何知道变量长度的，怎么知道如何取值的？</p>
+<p>这个问题其实很傻。。因为CPU是不需要知道变量长度的。对于程序控制器来讲，他就是一个没有感情的无限循环机器。。。根据汇编指令一条条取指令然后执行，然后取下一条指令然后再执行。对于8字节的变量取值时可能就是一个<code>movq</code>，对于1字节的变量可能就是一个<code>movb</code>，2个字节的话就是一个<code>movw</code>。它只是按着指令一条一条执行。</p>
+<p>所谓变量长度只是编译器的魔法，编译器在解析上层语言时会根据变量的类型转换成各种各样的指令，例如按照同事说的写法:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*dataLength = (NSInteger)*(<span class="keyword">uint16_t</span> *)data;</span><br></pre></td></tr></table></figure>
+
+<p>编译器会转换成什么样呢(Debug无优化下):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">  0x10fbb9de4 &lt;+20&gt;: movq   -0x20(%rbp), %rcx //先取出data到rcx（拷贝的是指针8个字节）</span><br><span class="line">  0x10fbb9de8 &lt;+24&gt;: movzwl (%rcx), %eax     //拷贝rcx的两个字节到eax的4个字节上</span><br><span class="line">  0x10fbb9deb &lt;+27&gt;: movl   %eax, %ecx  //把eax的4个字节转移到ecx</span><br><span class="line">  0x10fbb9ded &lt;+29&gt;: movq   -0x18(%rbp), %rdx //dataLength指针转义到rdx上</span><br><span class="line">  0x10fbb9df1 &lt;+33&gt;: movq   %rcx, (%rdx)  //把rcx前面得出的结果转移到dataLength指向的地方</span><br></pre></td></tr></table></figure>
+
+<p>首先可以看到一点，原来的<code>call</code>（甚至第一次可能还需要动态绑定）都没了，完全变成了数据的转移和拷贝，那么<code>faster</code>是必然的。</p>
+<p>并且由于<code>uint16_t *</code>显式类型转换的原因，这里确保只拷贝2个字节，并且由于<code>dataLength</code>的类型修饰为<code>NSInteger</code>所以拷贝到4个字节中（可以理解就是取出两个字节放到一个4个字节的整数中）。所以数据肯定是没问题的。这里的精华就在于这个<code>uint16_t *</code>。</p>
+<p>假如去掉显式的<code>uint16_t *</code>会怎么样，可以看到去掉后实现变成了下面这样:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">0x10836dde4 &lt;+20&gt;: movq   -0x20(%rbp), %rcx</span><br><span class="line">//去掉的话可以看到，默认是只拷贝1个字节到eax的4字节的</span><br><span class="line">//那么当数据长度的值是一个大于1字节的数字时, 这里就会出问题了</span><br><span class="line">0x10836dde8 &lt;+24&gt;: movzbl (%rcx), %eax </span><br><span class="line">0x10836ddeb &lt;+27&gt;: movl   %eax, %ecx</span><br><span class="line">0x10836dded &lt;+29&gt;: movq   -0x18(%rbp), %rdx</span><br><span class="line">0x10836ddf1 &lt;+33&gt;: movq   %rcx, (%rdx)</span><br></pre></td></tr></table></figure>
+
+<p>但是我<code>memcpy</code>也是只拷贝了2个字节啊？为啥我就不安全呢？</p>
+<p>那是因为字节序，同事提出这种方式相当于把2个字节的数值转换成4个字节的数值，无论大小端，会自己适配好内存布局。</p>
+<p>但是<code>memcpy</code>只是从起始字节开始拷贝，假如数据长度为<code>0x10</code>，<code>dataLength</code>初始化为<code>0x00000000</code>，则在小端模式下<code>memcpy</code>之后:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*dataLength内存为: <span class="number">10</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span></span><br><span class="line">*dataLength = <span class="number">0x00000010</span></span><br></pre></td></tr></table></figure>
+
+<p>可见是没有毛病的。但是如果是在大端模式下呢:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*dataLength内存为：<span class="number">10</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span></span><br><span class="line">*dataLength = <span class="number">0x10000000</span></span><br></pre></td></tr></table></figure>
+
+<p>显然数据就有问题了。</p>
+<p>所以他说这里不安全，由于<code>arm</code>和<code>x86</code>都是小端模式，所以这个数字在进行<code>memcpy</code>时会这样并不会出问题，假设是跨平台层的，就可能会导致问题。</p>
+<h2 id="编译器做的优化"><a href="#编译器做的优化" class="headerlink" title="编译器做的优化"></a>编译器做的优化</h2><p>我们都知道LLVM的优化是很牛逼的，前面都是在没开编译器优化的情况下时进行的反汇编，如果把编译器优化设置为<code>-Os</code>呢:</p>
+<img src="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/image-20200229212353168.png" alt="image-20200229212353168" style="zoom:80%;">
+
+<p>牛逼。。。直接把<code>memcpy</code>干没了，直接操作寄存器转移2个字节过去就了事了。。。</p>
+<p>那么是不是意味着同事说的代码没啥意义呢?</p>
+<p>不，默认<code>debug</code>下是不开编译器优化的，更重要的编程习惯与思考。而且至少在打<code>release</code>包时可以编的更快快一点。。。</p>
+<p>而且知道了计算机是如何取内存的，还可以有更多的应用场景，例如当我想计算具有<code>float</code>变量的类的<code>hash</code>时，float变量是无法进行移位的，那么就可以通过取内存的原理，把4个字节的数值都取出来然后转成一个<code>int</code>型变量，就可以做位移操作了。当然啦你也可以采用<code>memcpy</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> floatValue = <span class="number">1.0001</span>;</span><br><span class="line"><span class="keyword">int</span> intValue = *(<span class="keyword">int</span> *)&amp;floatValue</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://github.com/llvm-mirror/clang" target="_blank" rel="noopener">https://github.com/llvm-mirror/clang</a></p>
+<p><a href="https://my.oschina.net/guonaihong/blog/506102" target="_blank" rel="noopener">https://my.oschina.net/guonaihong/blog/506102</a> （mov指令详解）</p>
+
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">signals</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">Unix</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">memcpy</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
+      
 
+      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">深入理解MachO结构与运行时系统</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#memcpy"><span class="toc-number">2.</span> <span class="toc-text">memcpy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#两种实现的区别"><span class="toc-number">3.</span> <span class="toc-text">两种实现的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编译器做的优化"><span class="toc-number">4.</span> <span class="toc-text">编译器做的优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  var notify = 'false' == true ? true : false;
+  var verify = 'false' == true ? true : false;
+  new Valine({
+      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
+      av: AV,
+      el: '.valine_comment',
+      emoticon_url: 'https://cloud.panjunwen.com/alu',
+      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
+      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
+      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
+      placeholder: ''
+    });
+</script>
+      </section>
+    
+
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -248,9 +474,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
