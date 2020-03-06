@@ -7,21 +7,16 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>深入理解Unix信号机制 | Joey&#39;s House</title>
+  <title>Archives: 2019/10 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言最近为了复现一个1%概率左右的跨平台层的崩溃，在MSDK的TestApp中集成了一个CrashHandler来进行压力测试。借着解决问题的机会深入学习一下Unix的信号机制。并在本文讲述了如何实现一个CrashHandlerDemo。">
-<meta name="keywords" content="signals,Unix">
-<meta property="og:type" content="article">
-<meta property="og:title" content="深入理解Unix信号机制">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;27&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6&#x2F;index.html">
+  <meta name="description" content="人菜就要多读书。。。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Joey&#39;s House">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;archives&#x2F;2019&#x2F;10&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="前言最近为了复现一个1%概率左右的跨平台层的崩溃，在MSDK的TestApp中集成了一个CrashHandler来进行压力测试。借着解决问题的机会深入学习一下Unix的信号机制。并在本文讲述了如何实现一个CrashHandlerDemo。">
+<meta property="og:description" content="人菜就要多读书。。。">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;27&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6&#x2F;1.png">
-<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;27&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6&#x2F;2.png">
-<meta property="og:updated_time" content="2020-02-09T06:21:15.908Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2019&#x2F;12&#x2F;27&#x2F;%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6&#x2F;1.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -162,180 +157,48 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-深入理解Unix信号机制" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      深入理解Unix信号机制
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2019" class="archive-year">2019</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2019/10/23/%E8%B0%88%E8%B0%88associateObject/" class="archive-article-date">
+  	<time datetime="2019-10-23T13:06:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-10-23</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2019/10/23/%E8%B0%88%E8%B0%88associateObject/">从一次崩溃谈谈associateObject</a>
     </h1>
   
 
-        <!--显示阅读次数-->
-        
-          <br/>
-          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
-          <span class="icon-sort"></span>
-          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
-                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
-          </span>
-          </a>
-        
-        <!--显示阅读次数完毕-->
-        
-        <a href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2019-12-27T11:21:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-27</time>
-</a>
-        
-      </header>
-    
-    <!-- 目录内容 -->
-    
-        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
-            <span class="btn-bg"></span>
-            <span class="btn-text">文章导航</span>
-        </p>
-        <div id="toc-article" class="toc-article">
-        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
-        <strong class="toc-title">文章目录</strong>
-         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是信号"><span class="toc-number">2.</span> <span class="toc-text">什么是信号</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#信号的定义"><span class="toc-number">2.1.</span> <span class="toc-text">信号的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#信号集"><span class="toc-number">2.2.</span> <span class="toc-text">信号集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#信号传递控制"><span class="toc-number">2.3.</span> <span class="toc-text">信号传递控制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#信号处理"><span class="toc-number">3.</span> <span class="toc-text">信号处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现一个CrashHandler"><span class="toc-number">4.</span> <span class="toc-text">实现一个CrashHandler</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#异常的捕获"><span class="toc-number">4.1.</span> <span class="toc-text">异常的捕获</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#信号的捕获"><span class="toc-number">4.2.</span> <span class="toc-text">信号的捕获</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bugly的实现"><span class="toc-number">4.3.</span> <span class="toc-text">Bugly的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
-       </div>
-      <script type="text/javascript">
-      function showToc(){
-          var toc_article = document.getElementById("toc-article");
-          var show_toc_btn = document.getElementById("show-toc-btn");
-          toc_article.setAttribute("style","display:block");
-          show_toc_btn.setAttribute("style","display:none");
-      };
-      function showBtn(){
-          var toc_article = document.getElementById("toc-article");
-          var show_toc_btn = document.getElementById("show-toc-btn");
-          toc_article.setAttribute("style","display:none");
-          show_toc_btn.setAttribute("style","display:block");
-      };
-    </script>
-    
-    <!-- 目录内容结束 -->
-    <div class="article-entry" itemprop="articleBody">         
-            
-              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近为了复现一个1%概率左右的跨平台层的崩溃，在MSDK的TestApp中集成了一个<code>CrashHandler</code>来进行压力测试。借着解决问题的机会深入学习一下<code>Unix</code>的信号机制。并在本文讲述了如何实现一个<a href="https://github.com/joey520/Blogs/tree/master/TestSignal" target="_blank" rel="noopener"><code>CrashHandlerDemo</code></a>。</p>
-<a id="more"></a>
-
-<h2 id="什么是信号"><a href="#什么是信号" class="headerlink" title="什么是信号"></a>什么是信号</h2><h3 id="信号的定义"><a href="#信号的定义" class="headerlink" title="信号的定义"></a>信号的定义</h3><p>在上一次<a href>讲Socket编程</a>提到<code>SIGPIPE</code>时简单了解了一下<code>signal</code>函数，我们知道可以向进程注册一个指定的信号处理函数，以使进程在收到指定函数时触发该函数。那么信号到底是什么呢，UNIX环境高级编程中定义：<b>信号是软件中断，提供了一种处理异步事件的方法</b>。为什么说是软件的中断，因为信号触发的软件层进程执行的中断。即进程在执行时，收到信号时中断程序的运行执行中断处理函数（如果没有忽略该信号），然后再返回程序继续运行。为什么说是处理异步事件，因为信号是随机出现，进程是无法确定什么时候接收到信号，只能告诉内核在出现该信号时该如何处理，进程不会阻塞以等待信号，而是正常执行，直到信号发送过来。</p>
-<p>所以可以理解信号就是一种进程通信手段用于通知进程发生了某个事件。举一个例子，在iOS13上不加蓝牙权限描述时打开App请求蓝牙权限就会崩溃，查看<code>crash log</code>可以看到：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">xception Type:  EXC_CRASH (SIGKILL)</span><br><span class="line">Exception Codes: <span class="number">0x0000000000000000</span>, <span class="number">0x0000000000000000</span></span><br><span class="line">Exception Note:  EXC_CORPSE_NOTIFY</span><br><span class="line">Termination Reason: TCC, This app has crashed because it attempted to access privacy-sensitive data without a usage description. The app<span class="number">'</span>s Info.plist must contain an NSBluetoothAlwaysUsageDescription key with a <span class="built_in">string</span> value explaining to the user how the app uses <span class="keyword">this</span> data.</span><br><span class="line">Triggered by Thread:  <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<p>可以看到崩溃的类型<code>SIGKILL</code>其实就当前进程在请求蓝牙权限时由于没有描述文件，内核发送一个<a href="https://en.wikipedia.org/wiki/Signal_(IPC)" target="_blank" rel="noopener"><code>SIGKILL</code></a>信号给当前进程。</p>
-<h3 id="信号集"><a href="#信号集" class="headerlink" title="信号集"></a>信号集</h3><p><code>Unix</code>系统中利用<code>sigset_t</code>（信号集）来表示多个信号，在<code>darwin</code>系统中由于信号只有31种，因此采用一个<code>uint32_t</code>来表示<code>sigset_t</code>，说白了就是利用其不同的<code>bit</code>位来判断是否包含这个值的信号，系统也提供了一下几个函数进行信号集的处理：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//sigemptyset用于清空信号集，这个宏命令就可以看到实现的原理了哈，很值得学习</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	sigemptyset(set)	(*(set) = 0, 0)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span>	<span class="title">sigemptyset</span><span class="params">(<span class="keyword">sigset_t</span> *)</span></span>;</span><br><span class="line"><span class="comment">//sigfillset用于把信号集每一位都置为1，实现是按位取反</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	sigfillset(set)		(*(set) = ~(sigset_t)0, 0)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span>	<span class="title">sigfillset</span><span class="params">(<span class="keyword">sigset_t</span> *)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p><b>这里值得学习的一点是C语言的逗号运算符，<code>(*(set) = 0, 0)</code>第一个0是把指针指向<code>uint32_t</code>置为0，第二个0表示的是返回值。这种语法糖还是蛮有趣的。</b></p>
-<p>还有以下几个函数来进行信号集的增删改查:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//sigismember用于判断set中是否包含某个信号</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	sigaddset(set, signo)	(*(set) |= __sigbits(signo), 0)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	sigdelset(set, signo)	(*(set) &amp;= ~__sigbits(signo), 0)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	sigismember(set, signo)	((*(set) &amp; __sigbits(signo)) != 0)</span></span><br><span class="line"></span><br><span class="line">__header_always_inline <span class="keyword">int</span></span><br><span class="line">__sigbits(<span class="keyword">int</span> __signo)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> __signo &gt; __DARWIN_NSIG ? <span class="number">0</span> : (<span class="number">1</span> &lt;&lt; (__signo - <span class="number">1</span>));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//因为Darwin系统中现在只有31个信号！所以在上面做了保护</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __DARWIN_NSIG   32      <span class="comment">/* counting 0; could be 33 (mask is 1-32) */</span></span></span><br></pre></td></tr></table></figure>
-
-<p>其实都是一些位域运算的封装，在系统源码中包括Runtime的源码中随处可见位运算的使用，作为源码必定需要足够高的性能，采用位域运算可以大大减少内存占用和处理效率。</p>
-<h3 id="信号传递控制"><a href="#信号传递控制" class="headerlink" title="信号传递控制"></a>信号传递控制</h3><p>可以利用<code>sigprocmask</code>控制进程信号屏蔽集：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//改变或检测信号屏蔽字,how描述如何处理。old_set用于检测当前进程的信号屏蔽字</span></span><br><span class="line"><span class="comment">//传入SIG_BLOCK表示将new_set指向的信号集&lt;b&gt;添加到&lt;/b&gt;当前进程的信号屏蔽字，即阻塞这些信号</span></span><br><span class="line"><span class="comment">//传入SIG_UNBLOCK表示将new_set指向的信号集从当前进程的信号屏蔽字中移除，即释放这些信号</span></span><br><span class="line"><span class="comment">//传入SIG_SETMASK表示将new_set指向的信号集&lt;b&gt;作为&lt;/b&gt;当前进程的信号屏蔽字（注意与SIG_BLOCK的区别）</span></span><br><span class="line"><span class="comment">//new_set传入的新的信号集</span></span><br><span class="line"><span class="comment">//old_set获取已存在的阻塞的信号集</span></span><br><span class="line"><span class="function"><span class="keyword">int</span>	<span class="title">sigprocmask</span><span class="params">(<span class="keyword">int</span> how, <span class="keyword">const</span> <span class="keyword">sigset_t</span> * new_set, <span class="keyword">sigset_t</span> * old_set)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>被<code>sigprocmsk</code>阻塞的信号，无论发生多少次都会保存下来，可以通过<code>old_set</code>获取。但是设置为<code>SIG_UNBLOCK</code>时就会释放这些阻塞的信号。由于<code>sigset_t</code>只能通过每个bit保存一种信号的状态，所以无论接收到信号多少次，再次方法只会被传递一次。</p>
-<p><code>sigprocmask</code>一般只用于单线程的进程，因为它直接修改的进程的公共信号屏蔽集，所以对于多线程中使用需要在使用前进行声明和初始化，以保证数据的安全。</p>
-<p>当系统阻塞了一些信号时，这些信号在触发之后就变成了未决的信号, 如何获取当前进程中未决的信号集呢，可以通过<code>sigpending</code>，我们用以下例子来实践一下信号的控制与未决信号的捕获：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">sigset_t new_set, old_set, pending_set;</span><br><span class="line">    sigemptyset(&amp;new_set);</span><br><span class="line">    sigemptyset(&amp;old_set);</span><br><span class="line">    sigemptyset(&amp;pending_set);</span><br><span class="line">    //屏蔽这3个信号</span><br><span class="line">    sigaddset(&amp;new_set, SIGINT);</span><br><span class="line">    sigaddset(&amp;new_set, SIGQUIT);</span><br><span class="line">    sigaddset(&amp;new_set, SIGABRT);</span><br><span class="line">    //阻塞new_set信号集</span><br><span class="line">    sigprocmask(SIG_BLOCK, &amp;new_set, &amp;old_set);</span><br><span class="line">    printf(&quot;new set is %8.8d, old set is:%8.8d\n&quot;, new_set, old_set);</span><br><span class="line">    sigpending(&amp;pending_set);</span><br><span class="line">    printf(&quot;Pending set is %8.8d.\n&quot;, pending_set);</span><br><span class="line">	  //Kill函数即像指定的进程发送信号，并且kill -l可以查看到信号集合</span><br><span class="line">    kill(getpid(), SIGINT);</span><br><span class="line">    sigpending(&amp;pending_set);</span><br><span class="line">    printf(&quot;Pending set is %8.8d.\n&quot;, pending_set);</span><br><span class="line">    kill(getpid(), SIGQUIT);</span><br><span class="line">    sigpending(&amp;pending_set);</span><br><span class="line">    printf(&quot;Pending set is %8.8d.\n&quot;, pending_set);</span><br><span class="line">    kill(getpid(), SIGABRT);</span><br><span class="line">    sigpending(&amp;pending_set);</span><br><span class="line">    printf(&quot;Pending set is %8.8d.\n&quot;, pending_set);</span><br><span class="line">    //释放信号</span><br><span class="line">//    sigprocmask( SIG_UNBLOCK, &amp;new_set, &amp;old_set );</span><br><span class="line">    if (sigismember(&amp;pending_set, SIGINT)) &#123;</span><br><span class="line">        printf(&quot;SIGINT was came.\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    if (sigismember(&amp;pending_set, SIGQUIT)) &#123;</span><br><span class="line">        printf(&quot;SIGQUIT was came.\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    if (sigismember(&amp;pending_set, SIGABRT)) &#123;</span><br><span class="line">        printf(&quot;SIGABRT was came.\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    NSLog(@&quot;code run here&quot;);</span><br></pre></td></tr></table></figure>
-
-<p>运行之后结果如下:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">set</span> is <span class="number">00000038</span>, old <span class="built_in">set</span> is:<span class="number">00000000</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000000.</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000000.</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000004.</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000036.</span></span><br><span class="line">SIGQUIT was came.</span><br><span class="line">SIGABRT was came.</span><br><span class="line"><span class="number">2020</span><span class="number">-12</span><span class="number">-29</span> <span class="number">23</span>:<span class="number">51</span>:<span class="number">00.548057</span>+<span class="number">0800</span> TestSignal[<span class="number">86096</span>:<span class="number">15391848</span>] code <span class="built_in">run</span> here</span><br></pre></td></tr></table></figure>
-
-<p><code>sigpending</code>成功捕获了未决的信号，如果我们把代码中注释的<code>sigprocmask</code>释放掉(<code>SIG_UNBLOCK</code>)会怎么样呢:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">set</span> is <span class="number">00000038</span>, old <span class="built_in">set</span> is:<span class="number">00000000</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000000.</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000002.</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000006.</span></span><br><span class="line">Pending <span class="built_in">set</span> is <span class="number">00000038.</span></span><br></pre></td></tr></table></figure>
-
-<p>程序运行到这里直接崩溃了，因为阻塞的信号被释放了，进程收到了<code>SIGINT</code>信号，并且进程被干掉了所以后面就没有执行了。通过查看奔溃的<code>frame</code>可以看到，崩在了<code>sigpromask</code>之后，那么看一下它到底做了什么：</p>
-<p><img src="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/1.png" alt="image-20200118192925723"></p>
-<p>要看懂这一段代码我们需要找到<code>systemcall.h</code>，路径为： </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/sys</span><br></pre></td></tr></table></figure>
-
-<p><code>systemcall.h</code>列举了所有系统调用的参数表，可以看到所有的系统调用接口全部用了一个数字来表示，根据苹果的注释可以知道该文件是由<code>xnu</code>源码中的<code>systemcalls.master</code>生成的。因此我们下载一下<a href="https://github.com/apple/darwin-xnu" target="_blank" rel="noopener">xnu内核源码</a>。利用<code>cat</code>工具打开<code>systemcalls.master</code>文件可以看到，这里只截取部分需要的信息如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">cat /Users/joey.cao/Desktop/Learning/LLVM/darwin-xnu-master/bsd/kern/syscalls.master</span><br><span class="line">;	derived from: FreeBSD @(#)syscalls.master	<span class="number">8.2</span> (Berkeley) <span class="number">1</span>/<span class="number">13</span>/<span class="number">94</span></span><br><span class="line"><span class="comment">//简要的看了眼makesyscalls.sh，它解析这个.master配置文件生成了一下代码</span></span><br><span class="line">;System call name/number master file.</span><br><span class="line">; This is file processed by .../xnu/bsd/kern/makesyscalls.sh <span class="keyword">and</span> creates:</span><br><span class="line">;	.../xnu/bsd/kern/init_sysent.c</span><br><span class="line">;	.../xnu/bsd/kern/syscalls.c</span><br><span class="line">;	.../xnu/bsd/sys/syscall.h</span><br><span class="line">;	.../xnu/bsd/sys/sysproto.h</span><br><span class="line">;	.../xnu/bsd/security/audit_syscalls.c</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//这个文件定义了系统调用参数与函数原型的映射表，每一个调用对应一个函数模型</span></span><br><span class="line"> <span class="number">1</span>	AUE_EXIT	ALL	&#123; <span class="function"><span class="keyword">void</span> <span class="title">exit</span><span class="params">(<span class="keyword">int</span> rval)</span> NO_SYSCALL_STUB</span>; &#125;</span><br><span class="line">...</span><br><span class="line"><span class="number">48</span>	AUE_SIGPROCMASK	ALL	&#123; <span class="function"><span class="keyword">int</span> <span class="title">sigprocmask</span><span class="params">(<span class="keyword">int</span> how, <span class="keyword">user_addr_t</span> mask, <span class="keyword">user_addr_t</span> omask)</span></span>; &#125;</span><br></pre></td></tr></table></figure>
-
-<p>所以我们分析下上图<code>sigpromask</code>的堆栈，首先把<code>0x2000030</code>赋值给<code>eax</code>寄存器。由于<code>BSD</code>层在<code>Mach</code>层之上，<code>mach</code>层占用了前<code>0x2000000</code>。所以<code>BSD</code>层的系统调用需要从逻辑地址<code>0x2000000</code>开始。所以这里实际表明调用的系统调用参数为48（注意这里是16进制），即正好就是<code>SYS_sigpromask</code>，它的函数原型如下:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	SYS_sigprocmask    48</span></span><br><span class="line"><span class="number">48</span>	AUE_SIGPROCMASK	ALL	&#123; <span class="function"><span class="keyword">int</span> <span class="title">sigprocmask</span><span class="params">(<span class="keyword">int</span> how, <span class="keyword">user_addr_t</span> mask, <span class="keyword">user_addr_t</span> omask)</span></span>; &#125;</span><br></pre></td></tr></table></figure>
-
-<p>此时把参数<code>rcx</code>寄存器的值传入<code>r10</code>寄存器，作为调用函数的<code>syscall</code>的入参。然后可以看到是一个<code>jae</code>判断函数，判断的是<code>0x7fff51b5a2a0</code>下面<code>jmp</code>的返回值，我们查看<code>0x7fff51b5a2a0</code>这段函数地址，到底做了什么：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(lldb) image lookup --address 0x7fff51b54457</span><br><span class="line">      Address: libsystem_kernel.dylib[0x00007fff51b54457] (libsystem_kernel.dylib.__TEXT.__text + 1095)</span><br><span class="line">      Summary: libsystem_kernel.dylib`cerror_nocancel</span><br></pre></td></tr></table></figure>
-
-<p>正如注解所示，这里<code>jmp</code>的是<code>cerror_nocancel</code>。在<code>xnu</code>源码的<code>errno.c</code>中可以找到：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可以看到errno保存在一个全局变量里，所以永远只会保存最新的一次systemcall的结果</span></span><br><span class="line"><span class="keyword">int</span> errno;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> * __error(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">void</span> *ptr = _os_tsd_get_direct(__TSD_ERRNO);</span><br><span class="line">	<span class="keyword">if</span> (ptr != <span class="literal">NULL</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> (<span class="keyword">int</span>*)ptr;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;errno;</span><br><span class="line">&#125;</span><br><span class="line">__attribute__((noinline)) <span class="keyword">cerror_return_t</span> cerror_nocancel(<span class="keyword">int</span> err)</span><br><span class="line">&#123;</span><br><span class="line">	errno = err;</span><br><span class="line">	<span class="keyword">int</span> *tsderrno = (<span class="keyword">int</span>*)_os_tsd_get_direct(__TSD_ERRNO);</span><br><span class="line">	<span class="keyword">if</span> (tsderrno) &#123;</span><br><span class="line">		*tsderrno = err;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到，这里<code>cerror_nocancel</code>把传入信号值并通过转换获取到对应的错误码并赋给了<code>errno</code>。这也就是为什么当系统出现错误时可以实时的通过<code>errno</code>获取，然后由于错误进程终止。</p>
-<h2 id="信号处理"><a href="#信号处理" class="headerlink" title="信号处理"></a>信号处理</h2><p>在早期的<code>POSIX</code>系统中提供了不可靠的信号机制，而为了向后兼容需要这些旧的信号语义的程序，提供了<code>signal</code>函数，但是正如之前分析过的<code>signal</code>的实现来看，有一个非常大的问题就是<code>signal</code>函数只能传递一个函数指针，那么如果有多个地方调用了<code>signal</code>函数只有最后一次传入的函数指针才会被保存:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span>(*signal(<span class="keyword">int</span>, <span class="keyword">void</span> (*)(<span class="keyword">int</span>)))(<span class="keyword">int</span>);</span><br></pre></td></tr></table></figure>
-
-<p>不过在<code>4.4BSD</code>之后，以及<code>MACOS</code>和<code>FreeBSD</code>上其实现遵循了<code>sigaction</code>的函数定义，在苹果的<a href="https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/sigaction.2.html" target="_blank" rel="noopener">main page</a>上也可以找到相应的描述，这个是可靠的，因此可以认为在我们开发使用时<code>signal</code>函数对信号捕获是可靠的。<code>sigaction</code>方法提供了设置和检测信号的能力，并且能获取对信号已经设置的<code>action</code>，因此可以保全其它用户对信号捕获的处理：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//signo表示需要检测或者修改的信号</span></span><br><span class="line"><span class="comment">//new_action表示要设置新的信号action</span></span><br><span class="line"><span class="comment">//old_action如果不为空，则会获取已经存在的针对signo的处理action</span></span><br><span class="line"><span class="function"><span class="keyword">int</span>	<span class="title">sigaction</span><span class="params">(<span class="keyword">int</span> signo, <span class="keyword">const</span> struct sigaction * new_action, struct sigaction * old_action)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>sigaction</code>的定义也是很复杂的，它不仅内部有一个<code>__sigaction_u</code>来保持信号处理函数指针，还利用<code>sa_mask</code>来设置屏蔽字，<code>sa_flags</code>来设置需要捕获的信号：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">sigaction</span> &#123;</span></span><br><span class="line">  <span class="comment">//可以看到这里signalHandler是一个union做到了向前兼容旧的signal</span></span><br><span class="line">	<span class="keyword">union</span> __sigaction_u __sigaction_u;  <span class="comment">/* signal handler */</span></span><br><span class="line">	<span class="keyword">sigset_t</span> sa_mask;               <span class="comment">/* signal mask to apply */</span></span><br><span class="line">	<span class="keyword">int</span>     sa_flags;               <span class="comment">/* see signal options below */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">/* Signal vector template for Kernel user boundary */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span>  __<span class="title">sigaction</span> &#123;</span></span><br><span class="line">	<span class="keyword">union</span> __sigaction_u __sigaction_u;  <span class="comment">/* signal handler */</span></span><br><span class="line">	<span class="keyword">void</span>    (*sa_tramp)(<span class="keyword">void</span> *, <span class="keyword">int</span>, <span class="keyword">int</span>, <span class="keyword">siginfo_t</span> *, <span class="keyword">void</span> *);</span><br><span class="line">	<span class="keyword">sigset_t</span> sa_mask;               <span class="comment">/* signal mask to apply */</span></span><br><span class="line">	<span class="keyword">int</span>     sa_flags;               <span class="comment">/* see signal options below */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">siginfo</span> &#123;</span></span><br><span class="line">	<span class="keyword">int</span>     si_signo;               <span class="comment">/* signal number */</span></span><br><span class="line">	<span class="keyword">int</span>     si_errno;               <span class="comment">/* errno association */</span></span><br><span class="line">	<span class="keyword">int</span>     si_code;                <span class="comment">/* signal code */</span></span><br><span class="line">	<span class="keyword">pid_t</span>   si_pid;                 <span class="comment">/* sending process */</span></span><br><span class="line">	<span class="keyword">uid_t</span>   si_uid;                 <span class="comment">/* sender's ruid */</span></span><br><span class="line">	<span class="keyword">int</span>     si_status;              <span class="comment">/* exit value */</span></span><br><span class="line">	<span class="keyword">void</span>    *si_addr;               <span class="comment">/* faulting instruction */</span></span><br><span class="line">	<span class="keyword">union</span> sigval si_value;          <span class="comment">/* signal value */</span></span><br><span class="line">	<span class="keyword">long</span>    si_band;                <span class="comment">/* band event for SIGPOLL */</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span>   __pad[<span class="number">7</span>];       <span class="comment">/* Reserved for Future Use */</span></span><br><span class="line">&#125; <span class="keyword">siginfo_t</span>;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到<code>__sigaction_u</code>是一个<code>union</code>，其实就是为了兼容旧的<code>signal</code>的处理函数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* union for signal handlers */</span></span><br><span class="line"><span class="keyword">union</span> __sigaction_u &#123;</span><br><span class="line">	<span class="keyword">void</span>    (*__sa_handler)(<span class="keyword">int</span>);</span><br><span class="line">	<span class="keyword">void</span>    (*__sa_sigaction)(<span class="keyword">int</span>, struct __siginfo *,</span><br><span class="line">	    <span class="keyword">void</span> *);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>在支持<code>sigaction</code>的系统中，<code>sigaction</code>兼容<code>signal</code>函数，具体的实现可以参考<code>UNIX环境搞基编程</code>这本书，一句话说就是把上面<code>union</code>里的<code>__sa_handler</code>指向对应的<code>signalHandler</code>。由于这里仅仅只是一个<code>union</code>两种处理函数是不能共存的，所以切记不要冲突了。</p>
-<h2 id="实现一个CrashHandler"><a href="#实现一个CrashHandler" class="headerlink" title="实现一个CrashHandler"></a>实现一个<code>CrashHandler</code></h2><h3 id="异常的捕获"><a href="#异常的捕获" class="headerlink" title="异常的捕获"></a>异常的捕获</h3><p>异常也是一种常见的处理机制，例如OC中的<code>NSException</code>，不仅在系统代码会产生异常，开发者也可以在出错时主动产生异常来获取到错误信息。异常触发实质上是调用<code>NSAssertionHandler</code>:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (void)handleFailureInMethod:(SEL)selector object:(id)object file:(NSString *)fileName lineNumber:(NSInteger)line description:(nullable NSString *)format,... NS_FORMAT_FUNCTION(5,6);</span><br></pre></td></tr></table></figure>
-
-<p>对于异常的捕获很简单，系统已经封装的很完美了，只需要调用<code>NSSetUncaughtExceptionHandler</code>传入一个按下面模板的函数指针即可：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef void NSUncaughtExceptionHandler(NSException *exception);</span><br></pre></td></tr></table></figure>
-
-<p>特别注意的是，有可能在你注册<code>handler</code>之前已经有人注册了，所以需要先调用<code>NSGetUncaughtExceptionHandler</code>来判断是否已经有注册了，如果有则保存下来，等<code>exception</code>触发时再通知到先前注册的<code>handler</code>。如果每一个新注册的人都能这样进行异常的传递，那么所有的<code>exception handler</code>才能都被触发。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if (NSGetUncaughtExceptionHandler()) &#123;</span><br><span class="line">    preExceptionHandler = NSGetUncaughtExceptionHandler();</span><br><span class="line">&#125;</span><br><span class="line">NSSetUncaughtExceptionHandler(ExceptionHandler);</span><br></pre></td></tr></table></figure>
-
-<h3 id="信号的捕获"><a href="#信号的捕获" class="headerlink" title="信号的捕获"></a>信号的捕获</h3><p>信号控制已经了解的足够充分了，但是在进行信号捕获时仍然需要注意一些细节。例如保存上一次的<code>sa_sigaction</code>，虽然<code>sa_action</code>已经做到了向前兼容<code>sa_handler</code>，但是想做的够保险，还是需要根据<code>sa_flag</code>来判断，以及自己在注册<code>sa_action</code>时注意更新<code>sa_flag</code>。</p>
-<p> 还有一点需要注意的是应该为每个<code>signal</code>保存不同的<code>sa_sigaction</code>或<code>sa_handler</code>，因为你也不知道之前调用者对不同的<code>signal</code>采用了不同的处理，或者多个用户各自监听了不同的信号。所以最保险的方法就是存储下每个<code>signal</code>对应的处理函数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">   for (NSNumber *signalValue in needCatchedSignals) &#123;</span><br><span class="line">        int signo = signalValue.intValue;</span><br><span class="line">        //首先获取old_action</span><br><span class="line">        struct sigaction old_action;</span><br><span class="line">        bzero(&amp;old_action, sizeof(sigaction));</span><br><span class="line">        //获取旧的action</span><br><span class="line">        int ret = sigaction(signo, NULL, &amp;old_action);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            printf(&quot;sigaction old action failed: %s\n&quot;, strerror(errno));</span><br><span class="line">        &#125;</span><br><span class="line">#if DEBUGLOG</span><br><span class="line">        printf(&quot;old_action sa_mask: %8.8d\n&quot;, old_action.sa_mask);</span><br><span class="line">        printf(&quot;old_action sa_flags: %8.8d\n&quot;, old_action.sa_flags);</span><br><span class="line">#endif</span><br><span class="line">        //如果已经有注册的sigaction</span><br><span class="line">        if (old_action.sa_flags &amp; SA_SIGINFO) &#123;</span><br><span class="line">            //把已有的处理函数指针保存下来</span><br><span class="line">            preSignalActions[signo] = old_action.sa_sigaction;</span><br><span class="line">        &#125;</span><br><span class="line">        //注意sa_handler和sa_sigaction是不能共存的</span><br><span class="line">        else if (old_action.sa_handler) &#123;</span><br><span class="line">            preSignalHandlers[signo] = old_action.sa_handler;</span><br><span class="line">        &#125;</span><br><span class="line">        //注册新的action</span><br><span class="line">        struct sigaction new_action;</span><br><span class="line">        bzero(&amp;new_action, sizeof(sigaction));</span><br><span class="line">        sigemptyset(&amp;new_action.sa_mask);</span><br><span class="line">        new_action.sa_sigaction = SignalAction;</span><br><span class="line">        //设置SA_SIGINFO标记位</span><br><span class="line">        new_action.sa_flags = SA_NODEFER | SA_SIGINFO;</span><br><span class="line">        ret = sigaction(SIGALRM, &amp;new_action, NULL);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            printf(&quot;sigaction new action failed: %s\n&quot;, strerror(errno));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>虽然已经做了很多考虑，但是仍然不能确保其它用户是否规范的使用<code>signal</code>，只能自求多福吧。。。</p>
-<h3 id="Bugly的实现"><a href="#Bugly的实现" class="headerlink" title="Bugly的实现"></a>Bugly的实现</h3><p><a href="https://bugly.qq.com/v2/" target="_blank" rel="noopener">Bugly</a>是腾讯出的一款用于统计用户崩溃等功能的第三方SDK，可以捕获到非常全的崩溃信息，尤其是崩溃日志非常详细，此次我们主要为了追踪一个已知但是偶现的bug所以还不需要那么齐全的堆栈。不过查看下<code>Bugly</code>的实现总是好的，首先查看下符号，大致就能推测出一些功能的实现逻辑，对于<code>Signal</code>进行了捕获处理:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//可以知道有一个BLYCrashSignalHandler的OC类</span></span><br><span class="line"><span class="number">0000000000083f</span>d0 (__DATA,__objc_data) external _OBJC_CLASS_$_BLYCrashSignalHandler</span><br><span class="line"><span class="number">0000000000083f</span>f8 (__DATA,__objc_data) external _OBJC_METACLASS_$_BLYCrashSignalHandler</span><br><span class="line">...</span><br><span class="line"><span class="number">0000000000085</span>d78 (__DATA,__bss) non-external _g_BLYSignalHandlerInstalled</span><br><span class="line"><span class="number">0000000000085</span>d80 (__DATA,__bss) non-external _g_BLYSignalStack</span><br><span class="line"><span class="comment">//果然也保存了了已有的Signalhandlers</span></span><br><span class="line"><span class="number">0000000000085</span>d98 (__DATA,__bss) non-external _g_BLYPreviousSignalHandlers</span><br><span class="line"><span class="number">0000000000085</span>da0 (__DATA,__bss) non-external _gSignalHandlerForward</span><br></pre></td></tr></table></figure>
-
-<p>对于<code>exception</code>也进行了捕获处理:</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//封装了一个exception类</span></span><br><span class="line"><span class="number">0000000000084340</span> (__DATA,__objc_data) external _OBJC_CLASS_$_BLYCrashUserException</span><br><span class="line"><span class="number">0000000000084368</span> (__DATA,__objc_data) external _OBJC_METACLASS_$_BLYCrashUserException</span><br><span class="line">  <span class="comment">//也有一个OC的BLYCrashUncaughtExceptionHandler类</span></span><br><span class="line"><span class="number">0000000000084390</span> (__DATA,__objc_data) external _OBJC_CLASS_$_BLYCrashUserExceptionHandler</span><br><span class="line"><span class="number">00000000000843b</span>8 (__DATA,__objc_data) external _OBJC_METACLASS_$_BLYCrashUserExceptionHandler</span><br><span class="line"><span class="number">0000000000084070</span> (__DATA,__objc_data) external _OBJC_CLASS_$_BLYCrashUncaughtExceptionHandler</span><br><span class="line"><span class="comment">//保存上一次的excptionHandler并传递</span></span><br><span class="line"><span class="number">0000000000085</span>dc0 (__DATA,__bss) non-external _g_BLYPreviousUncaughtExceptionHandler</span><br><span class="line"><span class="number">0000000000085</span>dc8 (__DATA,__bss) non-external _gUncaughtExceptionHandlerForward</span><br></pre></td></tr></table></figure>
-
-<p>为了进一步确认它的实现，我们使用了一个非常好用的逆向工具<a href="https://www.hopperapp.com" target="_blank" rel="noopener">Hopper DIsassembler</a>。只关注一些实现例如上一次的action的通知的逻辑:</p>
-<p><img src="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/2.png" alt="image-20200119104256813"></p>
-<p>先分析一下这一段代码，把<code>_g_BLYPreviousSignalHandlers</code>保存到<code>rax</code>寄存器，通过其它的代码可以看到Bugly的是在<code>UIVIewController</code>分类<code>+ (void)load</code>的时候就开始注册捕获信号了，这是一个非常早的时机。此时把信号对应的处理函数保存到了<code>_g_BLYPreviousSignalHandlers</code>这个静态数组中，然后<code>r12</code>这里是以信号值<code>rcx</code>按4字节对齐来偏移寻找到信号对应的处理函数。然后调用该函数，并把三个参数传入。可以看到思路和我们基本是一样的。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>UNIX环境高级编程（<a href="https://item.jd.com/12720738.html）" target="_blank" rel="noopener">https://item.jd.com/12720738.html）</a></p>
-<p><a href="https://en.wikipedia.org/wiki/Signal_(IPC)" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Signal_(IPC)</a></p>
-<p>进入内核态究竟是什么意思？ - 灵剑的回答 - 知乎 <a href="https://www.zhihu.com/question/306127044/answer/555327651" target="_blank" rel="noopener">https://www.zhihu.com/question/306127044/answer/555327651</a></p>
-<p><a href="https://www.cnblogs.com/bakari/p/5520860.html" target="_blank" rel="noopener">https://www.cnblogs.com/bakari/p/5520860.html</a></p>
-<p><a href="https://github.com/apple/darwin-xnu" target="_blank" rel="noopener">https://github.com/apple/darwin-xnu</a></p>
-<p><a href="https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/syscall.2.html" target="_blank" rel="noopener">https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/syscall.2.html</a></p>
-<p><a href="https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/sigaction.2.html" target="_blank" rel="noopener">https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/sigaction.2.html</a></p>
-<p><a href="https://bugly.qq.com/v2/" target="_blank" rel="noopener">https://bugly.qq.com/v2/</a></p>
-<p><a href="https://www.hopperapp.com" target="_blank" rel="noopener">https://www.hopperapp.com</a></p>
-
-            
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">signals</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">Unix</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">bugs</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -348,155 +211,17 @@
 	</div>
 
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
+  
+  
+    </div></section>
+  
 
-  
-<nav id="article-nav">
-  
-    <a href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          深入理解MachO结构与运行时系统
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">深入学习Socket网络通信</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-        <div class="toc-container tooltip-left">
-            <i class="icon-font icon-category"></i>
-            <div class="tooltip tooltip-east">
-                <span class="tooltip-item">
-                </span>
-                <span class="tooltip-content">
-                    <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是信号"><span class="toc-number">2.</span> <span class="toc-text">什么是信号</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#信号的定义"><span class="toc-number">2.1.</span> <span class="toc-text">信号的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#信号集"><span class="toc-number">2.2.</span> <span class="toc-text">信号集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#信号传递控制"><span class="toc-number">2.3.</span> <span class="toc-text">信号传递控制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#信号处理"><span class="toc-number">3.</span> <span class="toc-text">信号处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现一个CrashHandler"><span class="toc-number">4.</span> <span class="toc-text">实现一个CrashHandler</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#异常的捕获"><span class="toc-number">4.1.</span> <span class="toc-text">异常的捕获</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#信号的捕获"><span class="toc-number">4.2.</span> <span class="toc-text">信号的捕获</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bugly的实现"><span class="toc-number">4.3.</span> <span class="toc-text">Bugly的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
-                    </div>
-                </span>
-            </div>
-        </div>
-        
-    </div>
-</aside>
-
-
-
-  
-  
-  
-    <section id="comments" class="comments">
-      <style>
-        .comments{margin:30px;padding:10px;background:#fff}
-        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
-      </style>
-      <div class="valine_comment"></div>
-<!--载入js，在</body>之前插入即可-->
-<!--Leancloud 操作库:-->
-<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
-<!--Valine 的核心代码库-->
-<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
-<script>
-  var notify = 'false' == true ? true : false;
-  var verify = 'false' == true ? true : false;
-  new Valine({
-      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
-      av: AV,
-      el: '.valine_comment',
-      emoticon_url: 'https://cloud.panjunwen.com/alu',
-      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
-      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
-      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
-      placeholder: ''
-    });
-</script>
-      </section>
     
-
-  
-
-  
-
-  
-
-  
 
 
           </div>
@@ -519,8 +244,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
-		isArchive: false,
+		isPost: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
