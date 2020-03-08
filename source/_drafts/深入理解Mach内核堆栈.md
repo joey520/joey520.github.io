@@ -8,7 +8,7 @@ tags:
 
 ## 前言
 
-在捕获`Crash`时我们通常采用`backtrace`来获取堆栈，但是往往只有少数几个关键调用帧的信息。但是在`LLDB`中通过`backtrace`或者是第三方`crash`统计中总是能获取相当详细的堆栈信息，借着逆向[Bugly]()的机会，深入学习一下`Mach`内核堆栈相关知识。
+在捕获`Crash`时我们通常采用`backtrace`或者`callstackSymbols`来获取堆栈，但是这种方式只能获取当前线程的堆栈，而且往往只有少数几个关键调用帧的信息。但是在`LLDB`中通过`backtrace`或者是第三方`crash`统计中总是能获取相当详细的堆栈信息，为了解答这个问题，本文对`Mach`内核调度进行了深入的学习。
 
 ## 内核
 
@@ -30,14 +30,7 @@ tags:
 
 ### 线程管理
 
-`Mach`的任务调度是基于一个运行的队列控制系统，具有4个优先级:
-
-| Priority Band        | Characteristics                                              |
-| :------------------- | :----------------------------------------------------------- |
-| Normal               | normal application thread priorities                         |
-| System high priority | threads whose priority has been raised above normal threads  |
-| Kernel mode only     | reserved for threads created inside the kernel that need to run at a higher priority than all user space threads (I/O Kit workloops, for example) |
-| Real-time threads    | threads whose priority is based on getting a well-defined fraction of total clock cycles, regardless of other activity (in an audio player application, for example). |
+有一套`POSIX`的线程管理接口`pthread`。以及更底层的`mach`的线程管理。
 
 
 
@@ -48,4 +41,6 @@ https://opensource.apple.com
 https://github.com/apple/darwin-xnu
 
 https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/About/About.html#//apple_ref/doc/uid/TP30000905-CH204-TPXREF101
+
+https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/scheduler/scheduler.html#//apple_ref/doc/uid/TP30000905-CH211-BABCHEEB
 
