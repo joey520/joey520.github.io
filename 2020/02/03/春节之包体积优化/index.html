@@ -7,16 +7,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>Archives: 2019/12 | Joey&#39;s House</title>
+  <title>春节之包体积优化 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="人菜就要多读书。。。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Joey&#39;s House">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;archives&#x2F;2019&#x2F;12&#x2F;index.html">
+  <meta name="description" content="前言这个春节真是有够长，蹭着没事来做一次MSDK包的优化，MSDK包太大已经被吐槽无数次了，前一段时候才做了把一些限飞数据库资源等变成可选项bundle让用户进行下载，甚至把一些功能打包成动态库用于动态加载，则不需要这些功能的用户可以不引入。 但是这还远远不够。当前MSDK编译出来的framework为159.6MB。看看优化后到底能缩小到多少。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="春节之包体积优化">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;03&#x2F;%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="人菜就要多读书。。。">
+<meta property="og:description" content="前言这个春节真是有够长，蹭着没事来做一次MSDK包的优化，MSDK包太大已经被吐槽无数次了，前一段时候才做了把一些限飞数据库资源等变成可选项bundle让用户进行下载，甚至把一些功能打包成动态库用于动态加载，则不需要这些功能的用户可以不引入。 但是这还远远不够。当前MSDK编译出来的framework为159.6MB。看看优化后到底能缩小到多少。">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;03&#x2F;%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96&#x2F;image-20200203225942902.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;03&#x2F;%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96&#x2F;image-20200203223509635.png">
+<meta property="og:updated_time" content="2020-03-08T17:18:13.458Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;03&#x2F;%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96&#x2F;image-20200203225942902.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -157,177 +161,239 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
+            <article id="post-春节之包体积优化" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      春节之包体积优化
+    </h1>
+  
+
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/02/03/%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96/" class="archive-article-date">
+  	<time datetime="2020-02-03T14:20:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-03</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析"><span class="toc-number">2.</span> <span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#去掉无用的类"><span class="toc-number">2.1.</span> <span class="toc-text">去掉无用的类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清理掉无用的framework"><span class="toc-number">2.2.</span> <span class="toc-text">清理掉无用的framework</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
             
-  
-  
-    
-    
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这个春节真是有够长，蹭着没事来做一次MSDK包的优化，MSDK包太大已经被吐槽无数次了，前一段时候才做了把一些限飞数据库资源等变成可选项<code>bundle</code>让用户进行下载，甚至把一些功能打包成动态库用于动态加载，则不需要这些功能的用户可以不引入。</p>
+<p>但是这还远远不够。当前MSDK编译出来的framework为159.6MB。看看优化后到底能缩小到多少。</p>
+<a id="more"></a>
+
+
+
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>先看看<code>DJISDK.Framework</code>有哪些东西吧:</p>
+<img src="/2020/02/03/%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96/image-20200203225942902.png" alt="image-20200203225942902" style="zoom:50%;">
+
+<img src="/2020/02/03/%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96/image-20200203223509635.png" alt="image-20200203223509635" style="zoom:50%;">
+
+<p>可以看到有几个除了动态库<code>DJISDK</code>还有几个<code>bundle</code>存放着一些资源文件。</p>
+<h3 id="去掉无用的类"><a href="#去掉无用的类" class="headerlink" title="去掉无用的类"></a>去掉无用的类</h3><p>要去掉无用的类可以通过静态扫描，也可以同<code>mach-O</code>做检查，后者效率更高，而且具有通用性，因此采用后者，具体实现可以参考<a href>文章</a>。</p>
+<p>经过扫描发现有100多个未使用的类，不过有一些是是特殊的类不能清理，所以需要手动过一遍，然后加入到白名单之中。</p>
+<p>这一步之后最终打出包体积减少：</p>
+<h3 id="清理掉无用的framework"><a href="#清理掉无用的framework" class="headerlink" title="清理掉无用的framework"></a>清理掉无用的framework</h3><p>在DJISDK的代码中有少量的<code>swift</code>代码存在，虽然打出的<code>Framework</code>看不出什么端倪，但是如果是一个纯OC的工程在引入<code>DJISDK</code>之后会被动加载</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://github.com/huanxsd/LinkMap" target="_blank" rel="noopener">https://github.com/huanxsd/LinkMap</a> (一个用于解析linkmap的GUI工具)</p>
+
+            
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2019-12-27T11:21:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/">深入理解Unix信号机制</a>
-    </h1>
-  
+      </div>
+    </span>
+  </div>
+</div>
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">signals</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">Unix</a>
-        		</li>
-      		
-		</ul>
-	</div>
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2020/02/03/%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96/" alt="微信分享二维码">
+    </div>
+</div>
 
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" class="archive-article-date">
-  	<time datetime="2019-12-12T09:04:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-12</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2020/02/04/%E6%A3%80%E9%AA%8Cmach-O%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B1%BB/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          检验mach-O中未使用的类
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">深入理解MachO结构与运行时系统</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/">深入学习Socket网络通信</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">socket</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析"><span class="toc-number">2.</span> <span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#去掉无用的类"><span class="toc-number">2.1.</span> <span class="toc-text">去掉无用的类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清理掉无用的framework"><span class="toc-number">2.2.</span> <span class="toc-text">清理掉无用的framework</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
+  
+  
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  var notify = 'false' == true ? true : false;
+  var verify = 'false' == true ? true : false;
+  new Valine({
+      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
+      av: AV,
+      el: '.valine_comment',
+      emoticon_url: 'https://cloud.panjunwen.com/alu',
+      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
+      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
+      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
+      placeholder: ''
+    });
+</script>
+      </section>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/" class="archive-article-date">
-  	<time datetime="2019-12-02T01:29:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/">谈谈iOS的链接问题</a>
-    </h1>
+
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">LINKER</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -350,8 +416,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

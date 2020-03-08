@@ -7,15 +7,17 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>Archives: 2019/12 | Joey&#39;s House</title>
+  <title>检验mach-O中未使用的类 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="人菜就要多读书。。。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Joey&#39;s House">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;archives&#x2F;2019&#x2F;12&#x2F;index.html">
+  <meta name="description" content="前言查找未使用的类有两种方式，一种是基于代码的静态扫描，但是非常耗时，而且逻辑复杂。而mach-O中通过classlist和classrefs差集可以快速的定位出哪些未在代码中显式被调用的类。而且速度非常快，所以优先采用这种方式实现，具体脚本见github。">
+<meta name="keywords" content="包体积">
+<meta property="og:type" content="article">
+<meta property="og:title" content="检验mach-O中未使用的类">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;04&#x2F;%E6%A3%80%E9%AA%8Cmach-O%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B1%BB&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="人菜就要多读书。。。">
+<meta property="og:description" content="前言查找未使用的类有两种方式，一种是基于代码的静态扫描，但是非常耗时，而且逻辑复杂。而mach-O中通过classlist和classrefs差集可以快速的定位出哪些未在代码中显式被调用的类。而且速度非常快，所以优先采用这种方式实现，具体脚本见github。">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-03-08T17:19:33.091Z">
 <meta name="twitter:card" content="summary">
   
   
@@ -157,52 +159,132 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
+            <article id="post-检验mach-O中未使用的类" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      检验mach-O中未使用的类
+    </h1>
+  
+
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/02/04/%E6%A3%80%E9%AA%8Cmach-O%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B1%BB/" class="archive-article-date">
+  	<time datetime="2020-02-04T06:47:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-04</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ctypes"><span class="toc-number">2.</span> <span class="toc-text">Ctypes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结构体解释脚本"><span class="toc-number">3.</span> <span class="toc-text">结构体解释脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#解析文本"><span class="toc-number">3.1.</span> <span class="toc-text">解析文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析宏命令"><span class="toc-number">3.2.</span> <span class="toc-text">解析宏命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析块域"><span class="toc-number">3.3.</span> <span class="toc-text">解析块域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析数据"><span class="toc-number">3.4.</span> <span class="toc-text">解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mach-O解析"><span class="toc-number">4.</span> <span class="toc-text">mach-O解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
             
-  
-  
-    
-    
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>查找未使用的类有两种方式，一种是基于代码的静态扫描，但是非常耗时，而且逻辑复杂。而<code>mach-O</code>中通过<code>classlist</code>和<code>classrefs</code>差集可以快速的定位出哪些未在代码中显式被调用的类。而且速度非常快，所以优先采用这种方式实现，具体脚本见<a href="https://github.com/joey520/Blogs/tree/master/包体积优化/未使用类检测" target="_blank" rel="noopener">github</a>。</p>
+<a id="more"></a>
+
+
+
+<h2 id="Ctypes"><a href="#Ctypes" class="headerlink" title="Ctypes"></a>Ctypes</h2><p>要在<code>python</code>中解析<code>mach-O</code>文件就依赖大量的结构体，而<code>ctypes</code>提供了一种类似结构体的序列化数据的方式。<code>ctypes</code>的使用并不复杂。只需要定义一个类并继承自<code>structure</code>,并在<code>_fieds_</code>中定义好结构即可。</p>
+<p><code>_fieds_</code>可以理解为就是一个结构体的定义。需要把成员变量名和类型一一对应。这样<code>struct</code>就会根据<code>_fieds_</code>进行内存布局。</p>
+<p><code>ctypes</code>提供的方法<code>string_at</code>可以把当前结构体类数据转化成二进制数据。因此我们对结构体类进行封装，构建了一个基类的<code>encode</code>和<code>decode</code>方法，进行二进制数据的序列化和反序列化：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StructBase</span><span class="params">(Structure)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">encode</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> string_at(addressof(self), sizeof(self))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decode</span><span class="params">(self, data)</span>:</span></span><br><span class="line">        memmove(addressof(self), data, sizeof(self))</span><br><span class="line">        <span class="keyword">return</span> len(data)</span><br></pre></td></tr></table></figure>
+
+<p>下面以一个实例来试验一下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mach_header</span><span class="params">(StructBase)</span>:</span></span><br><span class="line">		_fields_ = [</span><br><span class="line">		(<span class="string">'magic'</span>, c_uint32),</span><br><span class="line">		(<span class="string">'cputype'</span>, c_int32),</span><br><span class="line">		(<span class="string">'cpusubtype'</span>, c_int32),</span><br><span class="line">		(<span class="string">'filetype'</span>, c_uint32),</span><br><span class="line">		(<span class="string">'ncmds'</span>, c_uint32),</span><br><span class="line">		(<span class="string">'sizeofcmds'</span>, c_uint32),</span><br><span class="line">		(<span class="string">'flags'</span>, c_uint32),</span><br><span class="line">	]</span><br></pre></td></tr></table></figure>
+
+<p>这个类是在64位架构下<code>mach-o</code>的头结构体的实现。此时我们已经可以读取<code>mach-o</code>的头部了:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">path = sys.argv[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">with</span> open(path, <span class="string">'rb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        data = f.read()</span><br><span class="line">        header = mach_header()</span><br><span class="line">        header.decode(data)</span><br><span class="line">        print(header.magic, header.cputype, header.filetype, header.ncmds)</span><br><span class="line">        </span><br><span class="line">输出:</span><br><span class="line"><span class="number">4277009103</span> <span class="number">16777223</span> <span class="number">2</span> <span class="number">23</span></span><br></pre></td></tr></table></figure>
+
+<p>但是这里有一个问题是，c结构体转ctypes结构体类很麻烦，必须要手动一个个写。</p>
+<p>而对于<code>mach-o</code>的loader的结构体定义，估计手写完我会疯掉。于是想到写一个脚本来做结构体的解释器，把c结构体转换为ctype的结构体，虽然不能完美转换，但是至少可以省去大部分工作，而且以后还有类似需求可以再拿出来使用。</p>
+<h2 id="结构体解释脚本"><a href="#结构体解释脚本" class="headerlink" title="结构体解释脚本"></a>结构体解释脚本</h2><h3 id="解析文本"><a href="#解析文本" class="headerlink" title="解析文本"></a>解析文本</h3><p>首先读入文本文件，然后为了避免干扰去掉注释的部分，采用正则表达式把注释去掉</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__removeAnnotation</span><span class="params">(self, content)</span>:</span></span><br><span class="line">        blockPattern = <span class="string">"/\\*[\\s\\S]*?\\*/"</span></span><br><span class="line">        linePatter = <span class="string">"//.*?\\n"</span></span><br><span class="line">        ret = re.sub(re.compile(blockPattern, re.S), <span class="string">""</span>, content)</span><br><span class="line">        ret = re.sub(re.compile(linePatter, re.S), <span class="string">""</span>, ret)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure>
+
+<p>为了提高代码复用性。抽象出<code>struct</code>类和<code>union</code>类，它的结构很简单，保存了名字和相应的成员变量，成员变量封装成一个<code>VarPair</code>的类。</p>
+<p>之后开始解析。按行读取文件，按空格将文件分解成tokens流。</p>
+<h3 id="解析宏命令"><a href="#解析宏命令" class="headerlink" title="解析宏命令"></a>解析宏命令</h3><p>宏命令是需要解析的，因为我们需要这些大量的宏定义。因此如果当前行里有<code>#define</code>这个token，表明进入了宏命令，由于C语言宏命令具有多行的特性，灵活性太高，此时只处理单行的简单宏定义，对于多行宏命令，直接打印出warning进行手动适配。</p>
+<h3 id="解析块域"><a href="#解析块域" class="headerlink" title="解析块域"></a>解析块域</h3><p>C语言的定义是按块来的，所以我们可以在遍历中把一个块的数据收集起来，当块结束时再根据类型进行解析。所以我们定义了快类型的枚举:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StructureType</span><span class="params">()</span>:</span></span><br><span class="line">    unkonwn = <span class="number">0</span></span><br><span class="line">    struct = <span class="number">1</span></span><br><span class="line">    union = <span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>通常我们按行进行遍历，碰到一个<code>struct</code>符号，并且此时没有还没有处于一个块域之中，表明进入了<code>stuct</code>的域（需要特别考虑剔除当前处于<code>typedef</code>的情况）。则设置当前的块域类型，并开始搜集数据。此时需要进行花括号的匹配，每次遇到一个左花括号计数加1，遇到一个右花括号计数减1。一旦计数减一之后归零了，表示块域结束了。</p>
+<p>此时根据块域的类型调用不同的解析，对于结构体，依然是把当前块域按行分解，然后解析tokens流，把结构体名放入，然后每匹配到一个成员变量，把名字和类型的<code>pair</code>加入到结构体中。如果碰到内部有结构体或者是<code>union</code>，取出命名和类型加入。</p>
+<p>如果碰到内容不符合规则，直接设置<code>type</code>为<code>UnknowType</code>，并把整行数据保存作为变量名，然后特别打印出来，方便后续手动修改。</p>
+<h3 id="解析数据"><a href="#解析数据" class="headerlink" title="解析数据"></a>解析数据</h3><p>经过前面的处理，最终得到三个数组，宏定义的类数组，<code>union</code>的类数组和<code>struct</code>的类数组。</p>
+<p>优先遍历宏定义数组，把宏的<code>pair</code>转换成<code>python</code>的全局变量</p>
+<p>在遍历<code>unions</code>数组，由于c类型与<code>ctypes</code>类型不一致，需要有一个映射表表把类型进行映射。并且转换成<code>python</code>文本时一定要注意缩进等级。遍历<code>structs</code>数组，同理。</p>
+<p>过程中碰到无法匹配的类型，需要打印出出现的结构体名或者是联合体名，已经不匹配的类型，方便手动进行修改。</p>
+<p>最终将文本文件写入本地文件。</p>
+<p>脚本虽然并不能完美解析，主要是由于import，typedef以及一些宏命令等特定类型导致，最好是解析不了时全部保存，然后打印出来，手动检查修改。</p>
+<p><a href="https://github.com/joey520/Blogs/blob/master/包体积优化/未使用类检测/CStructToCYpes.py" target="_blank" rel="noopener">脚本文件</a>，最终终于把&lt;mach-o/loader.h&gt;中的结构体全部转换成了<a href="https://github.com/joey520/Blogs/blob/master/包体积优化/未使用类检测/MachODefines.py" target="_blank" rel="noopener">ctypes文件</a>。</p>
+<p>最后手动看一下结构有没有问题。以及未能识别的<code>type</code>，需要手动进行下处理。</p>
+<h2 id="mach-O解析"><a href="#mach-O解析" class="headerlink" title="mach-O解析"></a>mach-O解析</h2><p>有了相应的<code>ctypes</code>结构体，就可以开始解析<code>mach-O</code>文件了，由于我们的目的很明确，所以暂时不需要把整个文件都解析了，这样可以提高脚本的执行效率。 只关注<code>classlist</code>和<code>classref</code>:</p>
+<p>1.首先读入文件，解析首部。</p>
+<p>2.依次遍历<code>loadcommand</code>，把符号表，<code>indirect table</code>和所有的<code>LC_SEGMENT_64</code>的<code>section</code>单独保存下来。</p>
+<p>3.通过<code>sectionname</code>找到<code>__objc_classlist</code>和<code>__objc_classrefs</code>。两者保存都是<code>class</code>对象数据段的指针。</p>
+<p>4.取两者差集，然后开始按定义的<code>class</code>的数据结构和<code>class_ro</code>的数据结构解析数据。把转换成封装的<code>class</code>对象保存下来。</p>
+<p><b>5.由于mach-O中没有被显示调用的类，比如superclass这种并不会存在于classrefs，所以需要遍历去掉是superclass的类</b>。</p>
+<p>6.根据类白名单掉白名单中的类。</p>
+<p>由于我们只解析了<code>classlist</code>和<code>classrefs</code>，脚本的运行非常快速，可以随时随意的跑脚本检测。</p>
+<p>由于可执行文件具有<code>PAGEZERO</code>因此它的虚拟地址的其实和动态库等不一样，需要特别在解析时注意。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://docs.python.org/3.8/library/ctypes.html?highlight=ctypes#module-ctypes" target="_blank" rel="noopener">https://docs.python.org/3.8/library/ctypes.html?highlight=ctypes#module-ctypes</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-pythonandc/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-cn-pythonandc/</a></p>
+
+            
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2019-12-27T11:21:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/">深入理解Unix信号机制</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">signals</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">Unix</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color4">包体积</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -215,119 +297,155 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2020/02/04/%E6%A3%80%E9%AA%8Cmach-O%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B1%BB/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" class="archive-article-date">
-  	<time datetime="2019-12-12T09:04:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-12</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          从一次memcpy说开来
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/02/03/%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">春节之包体积优化</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/">深入学习Socket网络通信</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">socket</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ctypes"><span class="toc-number">2.</span> <span class="toc-text">Ctypes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结构体解释脚本"><span class="toc-number">3.</span> <span class="toc-text">结构体解释脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#解析文本"><span class="toc-number">3.1.</span> <span class="toc-text">解析文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析宏命令"><span class="toc-number">3.2.</span> <span class="toc-text">解析宏命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析块域"><span class="toc-number">3.3.</span> <span class="toc-text">解析块域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析数据"><span class="toc-number">3.4.</span> <span class="toc-text">解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mach-O解析"><span class="toc-number">4.</span> <span class="toc-text">mach-O解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
+  
+  
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  var notify = 'false' == true ? true : false;
+  var verify = 'false' == true ? true : false;
+  new Valine({
+      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
+      av: AV,
+      el: '.valine_comment',
+      emoticon_url: 'https://cloud.panjunwen.com/alu',
+      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
+      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
+      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
+      placeholder: ''
+    });
+</script>
+      </section>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/" class="archive-article-date">
-  	<time datetime="2019-12-02T01:29:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/">谈谈iOS的链接问题</a>
-    </h1>
+
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">LINKER</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -350,8 +468,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
