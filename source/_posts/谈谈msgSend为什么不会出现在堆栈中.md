@@ -35,7 +35,7 @@ tags: [Runtime, Mach]
 
 4.由于这里调用了`[super viewDidLoad]`，所以实际还需要产生一个`objc_super`，这个结构体占用16个字节，因此加起来就是栈的的总空间32个字节。先把`-0x8(%rbp)`(self)转移到rsi,再取出rsi(self)转移到`-0x20(%rbp)`(即receiver上)。
 
-再通过当前指令地址ip进行位移找到`class`数据存放的内存转移到`-0x18(%rbp)`即`super_class。
+再通过当前指令地址ip进行位移找到`class`数据存放的内存转移到`-0x18(%rbp)`即`super_class`。
 
 ```c++
 struct objc_super {
@@ -66,12 +66,12 @@ image lookup --address 0x00000001017ff3d8
 // search the cache (objc_super in %a1)
 	movq	class(%a1), %r10	// cls = objc_super->class
 	movq	receiver(%a1), %a1	// load real receiver
-	movq	8(%r10), %r10		// cls = class->superclass //去class的superClass作为参数入参
+	movq	8(%r10), %r10		// cls = class->superclass //取class的superClass作为参数入参
 	CacheLookup NORMAL, CALL	// calls IMP on success
 	...
 ```
 
-可以看到，确实是取的class,然后去后isa后的8个字节即superClass才执行的。也就是`msgSendSuper`实际是在汇编实现时直接从当前对象类的父类开始进行方法查找的。
+可以看到，确实是传入的是class，然后取isa后的8个字节即superClass才执行的。也就是`msgSendSuper`实际是在汇编实现时直接从当前对象类的父类开始进行方法查找的。
 
 6.分别把`objc_super`和`_cmd`转移到寄存器rdi和rsi上作为`msgSendSuper`方法的入参进行调用。
 
@@ -91,7 +91,7 @@ extern kern_return_t host_page_size(host_t, vm_size_t *); //获取host的页大�
 
 ### Mach Host
 
-Host是就是机器内核，通过它可以获取到系统内核的信息:
+Host是机器内核，通过它可以获取到系统内核的信息:
 
 ```c
     //获取Host句柄
@@ -195,7 +195,7 @@ _STRUCT_X86_THREAD_STATE64
 };
 ```
 
-还是以上一个例子:
+还是以上一个例子，查看当前栈的信息:
 
 ![image-20200322180004105](谈谈msgSend为什么不会出现在堆栈中/image-20200322180004105.png)
 
@@ -301,7 +301,7 @@ kern_return_t vm_read_overwrite
 
 前面已经知道如何获取每个调用栈的栈基址，要转换成对应的符号信息还需要通过dladdr在dyld中查找地址对应的符号信息，如此这些地址指针就可以转换可读的函数名了。
 
-dyld的实现是通过传入的地址找到对应的image，然后在image中查找与地址最相近的符号信息。为什么是最相近呢，因为例如一个函数，符号表中之后保存该函数的符号（例如字符串表中的位置。程序段的位置，所属库文件路径等等）。所以假如传入的是函数中的某个地址，不一定存在这样的符号，因此只能找最近的符号。
+dyld的实现是通过传入的地址找到对应的image，然后在image中查找与地址最相近的符号信息。为什么是最相近呢，符号表中保存函数的符号（例如字符串表中的位置。程序段的位置，所属库文件路径等等）只是一个函数入口处。所以假如传入的是函数中的某个地址，并不一定能在符号表中找到地址相同的符号，因此只能找最近的符号。
 
 在dyld的``findClosestSymbol``中可以看的具体的实现
 
@@ -372,7 +372,7 @@ const char* ImageLoaderMachO::findClosestSymbol(const mach_header* mh, const voi
 
 ```
 
-可以发现会优先处理本地符号，再处理外部符号。
+可以发现会优先处理本地符号，再处理外部符号。找到符号只会，就会把符号的信息（符号名，所属image等等）存放到dl_info的结构体中了。
 
 ## MsgSend的堆栈
 
@@ -396,9 +396,9 @@ const char* ImageLoaderMachO::findClosestSymbol(const mach_header* mh, const voi
 
 可以发现仍然是原来的`viewDidLoad`的栈基址，也就是当前还是处于`viewDidLoad`的调用帧里面。
 
-所以msgSend并没有产生新的栈帧，所以在不会出现在backtrace里。
+所以msgSend并没有产生新的栈帧，也就不会出现在backtrace里了。
 
-而OC的方法本质上是C的实现，在编译时通过IMP指针绑定到方法列表中而已。利用clang可以将其转换成Cpp：
+而OC的方法本质上是C的实现，在编译时把指针指针绑定到方法列表中的IMP。利用clang可以将其转换成Cpp：
 
 ```shell
 xcrun -sdk iphonesimulator13.2 clang -rewrite-objc ViewController.m
@@ -419,7 +419,7 @@ static void _I_ViewController_viewDidLoad(ViewController * self, SEL _cmd) {
  }
 ```
 
-而这些方法由于不是系统特定的，无法得知其实现（即使是一些Foundation库自带的方法其实也没必要想msgSend这样来优化不开辟新栈)。所以这些OC方法在在转成汇编实现时必定要先开辟栈空间，所以就可以在backtrace中追溯到实际调用的方法了。
+而这些方法由于不是系统特定的，无法得知其实现（即使是一些Foundation库自带的方法由于没有msgSend这么高频率，没必要做这样的优化了)。所以这些OC方法在在转成汇编实现时必定要先开辟栈空间，所以就可以在backtrace中追溯到实际调用的方法了。
 
 
 
