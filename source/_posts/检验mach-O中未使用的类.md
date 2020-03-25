@@ -12,8 +12,6 @@ tags: [包体积]
 
 <!--more-->
 
-
-
 ## Ctypes
 
 要在`python`中解析`mach-O`文件就依赖大量的结构体，而`ctypes`提供了一种类似结构体的序列化数据的方式。`ctypes`的使用并不复杂。只需要定义一个类并继承自`structure`,并在``_fieds_``中定义好结构即可。
@@ -141,10 +139,41 @@ class StructureType():
 
 由于我们只解析了`classlist`和`classrefs`，脚本的运行非常快速，可以随时随意的跑脚本检测。
 
-由于可执行文件具有`PAGEZERO`因此它的虚拟地址的其实和动态库等不一样，需要特别在解析时注意。
+<b>由于可执行文件具有`PAGEZERO`因此它的虚拟地址的其实和动态库等不一样，需要特别在解析时注意。</b>
+
+##动态检测类是否无用
+
+在上一步中已经可以通过脚本拿到未使用的类，虽然我们过滤了仅仅作为superclass这样情况，但是还有其它的比如是IBuild构建的类等等，通常需要手动过滤一遍。而我再MSDK的工程中直接扫出来100多个，手动过滤是很麻烦的。于是想到利用脚本来实现。一个取巧的办法是把这些类移除buildFile然后编译来判断。相当于删除了，虽然头文件import可能还在，但至少可以帮助结局一大部分情况。
+
+这些重复的事情可以由脚本来完成，脚本的实现需要借助于pbxproj这个python开源库，主要工作有一下两步:
+
+1.遍历未使用的类，遍历buildTarget列表，把相应的buildFile去掉。
+
+2.尝试编译，如果成功则表明该文件确实无用。如果失败，表明还有隐式的使用。
+
+这里有有一点需要注意，类与buildFile的命名不一定一致，应该可能找不到当前类的buildFile。
+
+所以单纯依靠类名来查找文件不是一个好办法，好在`linkmap`在会把变异的符号和文件对应起来：
+
+例如：
+
+```
+[  2] /Users/joey.cao/Desktop/MSDK/ios-objctest/Demo/DJISdkDemo/DerivedData/DJISdkDemo/Build/Intermediates.noindex/DJISdkDemo.build/Debug-iphonesimulator/SDK QA.build/Objects-normal/x86_64/DJIFlyLimitCircle.o
+
+...
+0x100001B80	0x000000F0	[  2] -[DJIFlyLimitCircle description]
+0x100001C70	0x00000040	[  2] -[DJIFlyLimitCircle realCoordinate]
+0x100001CB0	0x00000040	[  2] -[DJIFlyLimitCircle setRealCoordinate:]
+...
+```
+
+那么通过查找linkMap就可以找到某个类对应的buildFile。然后再把该buildFile从target的` compile Files`中移除，然后再进行build就可以知道是不是真的不需要这个类。
+
+当然这一种方式不一定完全可靠，但是可以大大减少了手工检查的消耗。
 
 ## 参考资料
 
 https://docs.python.org/3.8/library/ctypes.html?highlight=ctypes#module-ctypes
 
 https://www.ibm.com/developerworks/cn/linux/l-cn-pythonandc/
+
