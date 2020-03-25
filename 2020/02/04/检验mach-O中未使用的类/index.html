@@ -17,7 +17,7 @@
 <meta property="og:site_name" content="Joey&#39;s House">
 <meta property="og:description" content="前言查找未使用的类有两种方式，一种是基于代码的静态扫描，但是非常耗时，而且逻辑复杂。而mach-O中通过classlist和classrefs差集可以快速的定位出哪些未在代码中显式被调用的类。而且速度非常快，所以优先采用这种方式实现，具体脚本见github。">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-03-08T17:19:33.091Z">
+<meta property="og:updated_time" content="2020-03-25T06:18:45.931Z">
 <meta name="twitter:card" content="summary">
   
   
@@ -66,7 +66,7 @@
 			</ul>
 		</nav>
 		<nav>
-			总文章数 9
+			总文章数 10
 		</nav>
 		<nav class="header-smart-menu">
     		
@@ -220,8 +220,6 @@
               <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>查找未使用的类有两种方式，一种是基于代码的静态扫描，但是非常耗时，而且逻辑复杂。而<code>mach-O</code>中通过<code>classlist</code>和<code>classrefs</code>差集可以快速的定位出哪些未在代码中显式被调用的类。而且速度非常快，所以优先采用这种方式实现，具体脚本见<a href="https://github.com/joey520/Blogs/tree/master/包体积优化/未使用类检测" target="_blank" rel="noopener">github</a>。</p>
 <a id="more"></a>
 
-
-
 <h2 id="Ctypes"><a href="#Ctypes" class="headerlink" title="Ctypes"></a>Ctypes</h2><p>要在<code>python</code>中解析<code>mach-O</code>文件就依赖大量的结构体，而<code>ctypes</code>提供了一种类似结构体的序列化数据的方式。<code>ctypes</code>的使用并不复杂。只需要定义一个类并继承自<code>structure</code>,并在<code>_fieds_</code>中定义好结构即可。</p>
 <p><code>_fieds_</code>可以理解为就是一个结构体的定义。需要把成员变量名和类型一一对应。这样<code>struct</code>就会根据<code>_fieds_</code>进行内存布局。</p>
 <p><code>ctypes</code>提供的方法<code>string_at</code>可以把当前结构体类数据转化成二进制数据。因此我们对结构体类进行封装，构建了一个基类的<code>encode</code>和<code>decode</code>方法，进行二进制数据的序列化和反序列化：</p>
@@ -263,7 +261,19 @@
 <p><b>5.由于mach-O中没有被显示调用的类，比如superclass这种并不会存在于classrefs，所以需要遍历去掉是superclass的类</b>。</p>
 <p>6.根据类白名单掉白名单中的类。</p>
 <p>由于我们只解析了<code>classlist</code>和<code>classrefs</code>，脚本的运行非常快速，可以随时随意的跑脚本检测。</p>
-<p>由于可执行文件具有<code>PAGEZERO</code>因此它的虚拟地址的其实和动态库等不一样，需要特别在解析时注意。</p>
+<p><b>由于可执行文件具有<code>PAGEZERO</code>因此它的虚拟地址的其实和动态库等不一样，需要特别在解析时注意。</b></p>
+<p>##动态检测类是否无用</p>
+<p>在上一步中已经可以通过脚本拿到未使用的类，虽然我们过滤了仅仅作为superclass这样情况，但是还有其它的比如是IBuild构建的类等等，通常需要手动过滤一遍。而我再MSDK的工程中直接扫出来100多个，手动过滤是很麻烦的。于是想到利用脚本来实现。一个取巧的办法是把这些类移除buildFile然后编译来判断。相当于删除了，虽然头文件import可能还在，但至少可以帮助结局一大部分情况。</p>
+<p>这些重复的事情可以由脚本来完成，脚本的实现需要借助于pbxproj这个python开源库，主要工作有一下两步:</p>
+<p>1.遍历未使用的类，遍历buildTarget列表，把相应的buildFile去掉。</p>
+<p>2.尝试编译，如果成功则表明该文件确实无用。如果失败，表明还有隐式的使用。</p>
+<p>这里有有一点需要注意，类与buildFile的命名不一定一致，应该可能找不到当前类的buildFile。</p>
+<p>所以单纯依靠类名来查找文件不是一个好办法，好在<code>linkmap</code>在会把变异的符号和文件对应起来：</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[  2] /Users/joey.cao/Desktop/MSDK/ios-objctest/Demo/DJISdkDemo/DerivedData/DJISdkDemo/Build/Intermediates.noindex/DJISdkDemo.build/Debug-iphonesimulator/SDK QA.build/Objects-normal/x86_64/DJIFlyLimitCircle.o</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">0x100001B80	0x000000F0	[  2] -[DJIFlyLimitCircle description]</span><br><span class="line">0x100001C70	0x00000040	[  2] -[DJIFlyLimitCircle realCoordinate]</span><br><span class="line">0x100001CB0	0x00000040	[  2] -[DJIFlyLimitCircle setRealCoordinate:]</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>那么通过查找linkMap就可以找到某个类对应的buildFile。然后再把该buildFile从target的<code>compile Files</code>中移除，然后再进行build就可以知道是不是真的不需要这个类。</p>
+<p>当然这一种方式不一定完全可靠，但是可以大大减少了手工检查的消耗。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://docs.python.org/3.8/library/ctypes.html?highlight=ctypes#module-ctypes" target="_blank" rel="noopener">https://docs.python.org/3.8/library/ctypes.html?highlight=ctypes#module-ctypes</a></p>
 <p><a href="https://www.ibm.com/developerworks/cn/linux/l-cn-pythonandc/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-cn-pythonandc/</a></p>
 
@@ -359,18 +369,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2020/02/08/%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          从一次memcpy说开来
+          去除工程中未使用代码
         
       </div>
     </a>
   
   
-    <a href="/2020/02/03/%E6%98%A5%E8%8A%82%E4%B9%8B%E5%8C%85%E4%BD%93%E7%A7%AF%E4%BC%98%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">春节之包体积优化</div>
+    <a href="/2020/01/30/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3MachO%E7%BB%93%E6%9E%84/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">深入理解MachO结构与运行时系统</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -572,15 +582,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Runtime</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Mach</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">bugs</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">signals</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Unix</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">bugs</a>
               </li>
              
               <li class="article-tag-list-item">

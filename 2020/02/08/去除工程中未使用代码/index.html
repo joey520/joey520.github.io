@@ -7,16 +7,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>Archives: 2019/11 | Joey&#39;s House</title>
+  <title>去除工程中未使用代码 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="人菜就要多读书。。。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Joey&#39;s House">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;archives&#x2F;2019&#x2F;11&#x2F;index.html">
+  <meta name="description" content="前言OC对象的方法由于运行时系统的存在，不会被Strip掉，而是编译成汇编代码放入程序段，因此找到并去除未使用代码也可以有效的减少包体积。本文对2种查找未使用方法的方案进行了讲解。">
+<meta name="keywords" content="包体积">
+<meta property="og:type" content="article">
+<meta property="og:title" content="去除工程中未使用代码">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;08&#x2F;%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="人菜就要多读书。。。">
+<meta property="og:description" content="前言OC对象的方法由于运行时系统的存在，不会被Strip掉，而是编译成汇编代码放入程序段，因此找到并去除未使用代码也可以有效的减少包体积。本文对2种查找未使用方法的方案进行了讲解。">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;08&#x2F;%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81&#x2F;image-20200317210644737.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;08&#x2F;%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81&#x2F;image-20200318203130220.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;08&#x2F;%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81&#x2F;image-20200319101923316.png">
+<meta property="og:updated_time" content="2020-03-25T06:33:33.104Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;02&#x2F;08&#x2F;%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81&#x2F;image-20200317210644737.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -157,52 +163,200 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-去除工程中未使用代码" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/11/21/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode/" class="archive-article-date">
-  	<time datetime="2019-11-21T01:51:15.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-21</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/11/21/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode/">深入理解Bitcode</a>
+    <h1 class="article-title" itemprop="name">
+      去除工程中未使用代码
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/02/08/%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81/" class="archive-article-date">
+  	<time datetime="2020-02-08T08:57:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-02-08</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方案"><span class="toc-number">2.</span> <span class="toc-text">方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#静态扫描"><span class="toc-number">2.1.</span> <span class="toc-text">静态扫描</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于Clang的插件"><span class="toc-number">2.2.</span> <span class="toc-text">基于Clang的插件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#语法树"><span class="toc-number">2.3.</span> <span class="toc-text">语法树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#全部的方法"><span class="toc-number">2.4.</span> <span class="toc-text">全部的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#显式调用的方法"><span class="toc-number">2.5.</span> <span class="toc-text">显式调用的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#隐式调用的方法"><span class="toc-number">2.6.</span> <span class="toc-text">隐式调用的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据处理"><span class="toc-number">2.7.</span> <span class="toc-text">数据处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>OC对象的方法由于运行时系统的存在，不会被Strip掉，而是编译成汇编代码放入程序段，因此找到并去除未使用代码也可以有效的减少包体积。本文对2种查找未使用方法的方案进行了讲解。</p>
+<a id="more"></a>
+
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><p>一般来说有三种思路：</p>
+<p>1.静态扫描</p>
+<p>此种方案参考了<a href="https://github.com/ming1016/SMCheckProject" target="_blank" rel="noopener">戴铭老师的Demo</a>，由于很久未更新，可能需要修改一些<code>buildSetting</code>,可以直接采用我修改后的<a href>fork版本</a>，已经适配了<code>Swift5</code>并且可以导出文件。这一种思路主要是实现一个简易的语法解释器，分析出工程中所有的OC类及方法。然后在解析出所有存在的方法调用，取差集找出未使用的代码。</p>
+<p>2.基于Clang插件</p>
+<p>此种方案参考了<a href="https://github.com/kangwang1988/XcodeZombieCode" target="_blank" rel="noopener">王康老师的Demo</a>。实现了一个基于Clang的语法解析插件。</p>
+<h3 id="静态扫描"><a href="#静态扫描" class="headerlink" title="静态扫描"></a>静态扫描</h3><p>对工程进行深度优先遍历，然后解析所有的类的方法。其中有一些比较麻烦的点，例如宏命令和动态调用等等。尤其是宏命令，由于我们的工程中采用了大量较为复杂的宏命令，解析比较复杂，需要对编译原理的词法分析语法分析有深刻的认知。记录下所有可能的方法调用。然后取差值找出未使用的方法。静态扫描核心部分在于Tokens流解析后的语义分析，这里需要实现一个简易的解析器。</p>
+<p>静态扫描的时间成本比较高。不过对于时间成本问题，可以考虑每次扫描后在记录每个子工程的commit点。然后每次只扫描diff的问题，这样可以大大减少每次扫描的时间。</p>
+<p>静态扫描的优点是独立于工程，只需要一个文件夹入口即可进行静态扫描，可视化界面使用也比较方便。而且由于记录了未使用代码的位置，还可以利用工具一键注释。</p>
+<p>静态扫描的核心在于：</p>
+<p>1.找到所有的方法:</p>
+<p>找到<code>@interface</code>和<code>@end</code>之间，<code>@implementation</code>和<code>@end</code>，然后根据<code>-</code>和<code>+</code>解析所有的实例方法和类方法，以及<code>Protocol</code>。把方法加入到类的列表。</p>
+<p>2.识别被使用的方法</p>
+<p>在解析时把所有解析到的<code>method</code>定义都加入到未使用列表。在解析方法内容时每引用到一个方法，便将方法加入到使用列表。这里使用的规则是<code>[xxx func]</code>这样的显式调用。</p>
+<p>所以可以大概简化为找到一个<code>@implementation</code>和<code>@end</code>之间的部分，然后再依次找到每一个方法块进行解析。最复杂的地方在于解析方法内部。由于我们只在乎方法调用，因此不需要像<code>AST</code>一样弄懂意思，只需要匹配[]这样的OC方法调用和<code>Selector</code>这样的关键字。</p>
+<p>但是有几个局限性：</p>
+<p>1.动态调用 例如<code>performSelector</code>，<code>NSInvocation</code>甚至是直接的指针调用等等。（针对特定的解析）</p>
+<p>2.DSL语法。在MSDK的代码中有一些DSL的封装的，还有很多封装的框架实现React效果，这些都不是显示的调用。</p>
+<p>3.类方法可能的调用方式为UIColor.redColor这种等等。(特定的解析)</p>
+<p>4.NSThread，NSTimer，KVO等等非显示的调用。（可以对特定关键字进行解析）</p>
+<p>5.IBuilder拖线的类与方法，这一点也是无法分析到的。（此种方法具有<code>__attribute__((ibaction))</code>属性）</p>
+<h3 id="基于Clang的插件"><a href="#基于Clang的插件" class="headerlink" title="基于Clang的插件"></a>基于Clang的插件</h3><p><code>Clang</code>在编译时会解析代码转成具有含义的<code>AST</code>语法树，站在巨人的肩膀上总是更方便的，在此种方案下可以把避免手动解析的过程，而是直接把重心放在如何利用AST结点上。无论哪种方式要找到未使用的方法，则要找到全部的方法再减去所有被使用的方法，最终得出即为未使用的方法。</p>
+<p>其实有没有想过Xcode中为什么能够查看方法的<code>Callers</code>和<code>Callees</code>，就是因为Clang做了解析并且保存了下来。因此通过拿到<code>callees</code>就可以知道哪些方法被调用了。</p>
+<p>因此方法的核心在于解析类的方法。</p>
+<h3 id="语法树"><a href="#语法树" class="headerlink" title="语法树"></a>语法树</h3><p>先理解一下解析OC代码时语法树的大致结构，为了方便页面显示做成了从左往右的树形结构:</p>
+<pre class="mermaid">graph LR
+A[ObjCProtocolDecl]-->A1[ObjCProtocol]
+A-->A2[ObjCMethodDecl]
+A-->A3[ObjCPropertyDecl]
+A2-->A4[ParmVarDecl如果有参数的]
+
+B[ObjCInterfaceDecl]-->B1[ObjCImplementation]
+B-->B2[ObjCMethodDecl]
+B-->B3[ObjCPropertyDecl]
+
+C[ObjCCategoryDecl] --> C1[ObjCInterface]
+C-->C2[ObjCProtocol]
+C-->C3[ObjCPropertyDecl]
+C-->C4[ObjCMethodDecl]
+
+D[ObjCImplementationDecl] --> D1[ObjCInterface]
+D-->D2[ObjCMethodDecl]
+D2-->D22[VarDecl]
+D2-->D23[CompoundStmt]-->D231[DeclStmt]-->D232[VarDecl]-->D233[ImplicitCastExpr]
+D23-->D241[CompoundAssignOperator]-->D242[DeclRefExpr]-->D243[ImplicitCastExpr]
+D2-->D21[ImplicitParamDecl]
+
+D-->D3[ObjCMethodDecl]
+D-->D4[ObjCIvarDecl]
+
+
+S[AST] --> A
+S --> B
+S --> C
+S --> D</pre>
+
+<p>遍历AST通常需要通过<code>RecursiveASTVisitor</code>，它是一个深度优先遍历AST的工具。在生成完AST时，需要把ASTContext传递给vistitor：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyASTConsumer</span> :</span> <span class="keyword">public</span> ASTConsumer</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    MyASTVisitor visitor;</span><br><span class="line">  <span class="comment">//当AST生成之后会回调这个方法</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">HandleTranslationUnit</span><span class="params">(ASTContext &amp;context)</span> </span>&#123;</span><br><span class="line">      <span class="comment">//把ASTContext传递给visitor</span></span><br><span class="line">        visitor.setContext(context);</span><br><span class="line">      <span class="comment">//把AST根节点传递给visitor，然后从这个结点开始先序遍历</span></span><br><span class="line">        visitor.TraverseDecl(context.getTranslationUnitDecl());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在visitor中每解析到一个定义都会回调这些方法:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">VisitDecl</span><span class="params">(Decl *decl)</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于一个.m文件来说，可能就是头文件展开之后的解析的<code>interface</code>，<code>porotocol</code>。最终才是<code>implentation</code>（因为这几个在AST树中都是平级的），在这几个Decl之后是子树的遍历，比如<code>ObjCMethodDecl</code>，<code>ObjCPropertyDecl</code>等等更低层级的子树。</p>
+<h3 id="全部的方法"><a href="#全部的方法" class="headerlink" title="全部的方法"></a>全部的方法</h3><p>因此如果我们只在意方法，则只需要hook住<code>implentation</code>的Decl即可。再此之后的method才是这个类的方法。还有一种特殊情况是一个.m文件中有几个类的实现。 不过这种情况依然是在另一个类的<code>implementation</code>之后的子定义才是其方法。因此为了作区分，可以在解析到<code>ObjCImplDecl</code>时保存下当前的类名，然后在解析到<code>ObjCMethodDecl</code>时和当前的类结合形成<code>-[ViewController viewDidLoad]</code>这样的唯一表达形式：</p>
+<img src="/2020/02/08/%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81/image-20200317210644737.png" alt="image-20200317210644737" style="zoom:50%;">
+
+<h3 id="显式调用的方法"><a href="#显式调用的方法" class="headerlink" title="显式调用的方法"></a>显式调用的方法</h3><p>经过这么一番处理就可以拿到所有的类的方法。拿到类的方法很容易，麻烦的找到有没有caller，如果有则表明该方法被调用了，caller分为两种，一种是显式的调用，一种是隐式的调用。这必须分析OC代码的调用，好在visitor会在解析语句时回调一下接口，同Decl一样，Stmt也是一个模板类，我们只关注OC方法的调用，因此只需要判断<code>ObjCMessageExpr</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">VisitStmt</span><span class="params">(Stmt *s)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(isa&lt;ObjCMessageExpr&gt;(s)) &#123; </span><br><span class="line"><span class="comment">//    dosomething...</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里需要先明确<code>ObjCMessageExpr</code>包含哪些东东:</p>
+<pre class="mermaid">graph LR
+A[ObjCMessageExpr]-->B[ReceiverKind实例方法or类方法]
+A-->F[ReceiverType即target的类]
+A-->C[Method]-->D[Selector]</pre>
+
+<p>也就是说通过OC语句可以拿到target和selecotor，再结合根节点的<code>ObjCImplDecl</code>回调中获取的当前的类，就知道什么类调用了什么类的什么方法。这样就可以拿到显示的调用关系了。由receiverType和calleeSel就可以确认到唯一的方法：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取调用的接受者是类方法or实例方法</span></span><br><span class="line">ObjCMessageExpr::ReceiverKind kind = objcExpr-&gt;getReceiverKind();</span><br><span class="line"><span class="comment">//获取callee</span></span><br><span class="line"><span class="built_in">string</span> calleeSel = objcExpr-&gt;getSelector().getAsString();</span><br><span class="line"><span class="comment">//获取调用者的类型</span></span><br><span class="line"><span class="built_in">string</span> receiverType =objcExpr-&gt;getReceiverType().getAsString();</span><br></pre></td></tr></table></figure>
+
+<p>但是所以如果receiverType并不是一个显示的类（类对象）则也是不行的，比如在开发中使用的[self.delegate xxxFunc]，和大量的mock类例如<code>id &lt;XXXProtocol&gt;</code>，编译器并不能拿到真正的类。遇到这种情况receiveType是均为:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">receiverType: id&lt;TestViewControllerProtocol&gt;</span><br></pre></td></tr></table></figure>
+
+<p>所以如果receiverType包含了<code>&lt;。。。&gt;</code>需要单独处理，比较好的解决办法就是不处理，直接在前面的方法解析时判断它的protocol链中有没有，如果有就认为方法已经被使用了。</p>
+<h3 id="隐式调用的方法"><a href="#隐式调用的方法" class="headerlink" title="隐式调用的方法"></a>隐式调用的方法</h3><p>上面讲的都是以msgSend方式显式调用的方法，然而实际开发中还有大量显式调用的方法，隐式调用包括:</p>
+<p>1.selector类的调用。performSelector系列方法，和NSInvocation。</p>
+<p>2.target，action类方法，例如NSTimer，NSTheard，UIResponse等等需要传入Selector的方法。</p>
+<p>3.Notification。</p>
+<p>4.KVO。</p>
+<p>5.openURL系列的调用。</p>
+<p>6.类方法直接通过xxx.func这样的调用。</p>
+<p>7.一些第三方库等的动态调用。</p>
+<p><b>如果我们找一下规律的话其实是可以省去很多工作的，比如前两种虽然调用形式很多，本质上都离不开selector。那么实际应该在<code>@selector</code>和 <code>NSSelectorFormString</code>上做文章。</b></p>
+<p>所以这里需要关注的是<code>ObjCSelectorExpr</code>。所以实现应该是这样的:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//遍历参数</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; paramCount; i ++) &#123;</span><br><span class="line">    Expr *argExpr = objcExpr-&gt;getArg(i);</span><br><span class="line">    <span class="keyword">if</span> (!argExpr) &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"argExpr is None"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//如果某个参数是ObjCSelectorExpr说明通过selector调用</span></span><br><span class="line">    <span class="keyword">if</span> (isa&lt;ObjCSelectorExpr&gt;(argExpr)) &#123;</span><br><span class="line">        ObjCSelectorExpr *selExpr = (ObjCSelectorExpr *)argExpr;</span><br><span class="line">        <span class="comment">//说明是非显式对象调用，应该是通过delegate，这种直接放在后面遍历类的delegate</span></span><br><span class="line">        <span class="keyword">if</span> (!objcExpr-&gt;getReceiverInterface()) &#123;</span><br><span class="line">            <span class="built_in">cout</span> &lt;&lt; <span class="string">"非显式调用: "</span> &lt;&lt; receiverType &lt;&lt; selExpr-&gt;getSelector().getAsString() &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//显式调用，可以直接加到使用的方法的列表中</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//这一这里的sel要取@selector的，而不是本身OC调用的</span></span><br><span class="line">            <span class="built_in">string</span> sel = selExpr-&gt;getSelector().getAsString();</span><br><span class="line">            <span class="built_in">string</span> methodID = IsInstanceMethod ? <span class="string">"-"</span> : <span class="string">"+"</span>;</span><br><span class="line">            methodID += (<span class="string">"["</span> + objcExpr-&gt;getReceiverInterface()-&gt;getNameAsString() + <span class="string">" "</span>);</span><br><span class="line">            methodID += (selExpr-&gt;getSelector().getAsString() + <span class="string">"]"</span>);</span><br><span class="line">            <span class="built_in">cout</span> &lt;&lt; methodID &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>试验一下<code>performSelector</code>和<code>NSInvocation</code>如下:</p>
+<img src="/2020/02/08/%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81/image-20200318203130220.png" alt="image-20200318203130220" style="zoom:50%;">
+
+<p>可以看到即使是通过performSelector和NSInvocation调用的也能找到调用的selector。（<b>当然这里只针对显式调用了selector的实现，如果动态组装的字符串暂时就不管了，比如MSDK的代码中有些模块全是这样的动态调用，这种可以直接把类加入白名单。</b>&gt;）。</p>
+<p>如此一来只需要简单几行代码就可以把绝大多数的通过selector动态调用的方法给hook住了。</p>
+<p>如此一来只剩下一些KVO和一些第三方库的调用，以及类默认的<code>new</code> ，<code>alloc</code>，<code>init</code>等等。这些我们可以通过注入白名单来进行检查。</p>
+<p>还有一种特殊的情况是显式调用msgSend，我们输出一下AST可以看到:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun -sdk iphoneos clang -arch arm64 -Xclang -ast-dump -fsyntax-only -F UIKit ViewController.m</span><br></pre></td></tr></table></figure>
+
+
+<p><img src="/2020/02/08/%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81/image-20200319101923316.png" alt="image-20200319101923316"></p>
+<p>还是可以按照规则找到<code>DeclRefExpr</code>和<code>ObjCSelectorExpr</code>。不过由于我们的工程里还没有这样使用，暂时先不考虑了。</p>
+<h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><p>经过分析大致已经确定了解析的逻辑，之后就是数据处理。 由于解析的过程没解析一个Object文件都会创建一个AST语法树。所以需要利用静态变量来把整个编译过程中的数据保存下来，需要保存遍历到的所有类，Protocol，使用到的方法和未使用到方法。</p>
+<p>由于在递归AST的过程中，可能只知道当前类的父类符号，或是protocol符号。因此需要把这些信息保存到对应的类里面，所以我们封装<code>JClass</code>，<code>JProtocol</code>，<code>JMethod</code>类来保持过程中发现的数据。类和protocol都可以通过名字作为唯一标志，method则需要通过类和selector，以及<code>-</code>还是<code>+</code>共同组成唯一标志(Protocol中的方法，就以<code>-[XXProtocol func]</code>这样的形式作为id 吧，只不过在判断时需要判断的是selector)。</p>
+<p>每一个ASTContext解析完，可以把数据更新写入到本地文件。当build结束时本地文件已经写完了数据。此时写入的数据就是我们将要处理的数据。</p>
+<p>由于实际的数据解析方案各有不同，本文给出一个解析<a href="https://github.com/joey520/Blogs/tree/master/包体积优化/未使用代码检测" target="_blank" rel="noopener">Demo</a>。基本可以解析出大多数未被使用的方法，可以根据实际业务的需求进行修改。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://clang.llvm.org/docs/IntroductionToTheClangAST.html" target="_blank" rel="noopener">Clang AST官方文档</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree" target="_blank" rel="noopener">抽象语法树Wiki</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzUxMzcxMzE5Ng==&mid=2247488360&amp;idx=1&amp;sn=94fba30a87d0f9bc0b9ff94d3fed3386&source=41#wechat_redirect" target="_blank" rel="noopener">王康：Clang检查未使用代码</a></p>
+<p><a href="https://github.com/ming1016/SMCheckProject" target="_blank" rel="noopener">戴铭：静态扫描工程未使用代码</a></p>
+<p><a href="https://clang.llvm.org/docs/RAVFrontendAction.html" target="_blank" rel="noopener">How To write RecursiveASTVisitor</a></p>
+
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color4">包体积</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -215,17 +369,155 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2020/02/08/%E5%8E%BB%E9%99%A4%E5%B7%A5%E7%A8%8B%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          从一次memcpy说开来
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/02/04/%E6%A3%80%E9%AA%8Cmach-O%E4%B8%AD%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B1%BB/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">检验mach-O中未使用的类</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方案"><span class="toc-number">2.</span> <span class="toc-text">方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#静态扫描"><span class="toc-number">2.1.</span> <span class="toc-text">静态扫描</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于Clang的插件"><span class="toc-number">2.2.</span> <span class="toc-text">基于Clang的插件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#语法树"><span class="toc-number">2.3.</span> <span class="toc-text">语法树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#全部的方法"><span class="toc-number">2.4.</span> <span class="toc-text">全部的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#显式调用的方法"><span class="toc-number">2.5.</span> <span class="toc-text">显式调用的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#隐式调用的方法"><span class="toc-number">2.6.</span> <span class="toc-text">隐式调用的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据处理"><span class="toc-number">2.7.</span> <span class="toc-text">数据处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  var notify = 'false' == true ? true : false;
+  var verify = 'false' == true ? true : false;
+  new Valine({
+      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
+      av: AV,
+      el: '.valine_comment',
+      emoticon_url: 'https://cloud.panjunwen.com/alu',
+      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
+      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
+      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
+      placeholder: ''
+    });
+</script>
+      </section>
+    
+
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -248,8 +540,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

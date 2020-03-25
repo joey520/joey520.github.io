@@ -7,16 +7,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>Archives: 2019/11 | Joey&#39;s House</title>
+  <title>谈谈iOS堆栈那些事 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="人菜就要多读书。。。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Joey&#39;s House">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;archives&#x2F;2019&#x2F;11&#x2F;index.html">
+  <meta name="description" content="前言最近看到一个有趣的问题，我们知道方法调用的本质是msgSend，反汇编时也可以看到实际调用的是msgSend，那么为啥堆栈中显示的反而是实际调用的方法，而不是msgSend呢？">
+<meta name="keywords" content="Runtime,Mach">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈iOS堆栈那些事">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="人菜就要多读书。。。">
+<meta property="og:description" content="前言最近看到一个有趣的问题，我们知道方法调用的本质是msgSend，反汇编时也可以看到实际调用的是msgSend，那么为啥堆栈中显示的反而是实际调用的方法，而不是msgSend呢？">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200322163911333.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200322164908817.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;joey.cao&#x2F;Desktop&#x2F;Learning&#x2F;MyBlog&#x2F;joey520.github.io&#x2F;source&#x2F;_posts&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200322180004105.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200322180218135.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200325144937443.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200325145011647.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;joey.cao&#x2F;Desktop&#x2F;Learning&#x2F;MyBlog&#x2F;joey520.github.io&#x2F;source&#x2F;_posts&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200325145054867.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200325145310601.png">
+<meta property="og:updated_time" content="2020-03-25T07:56:10.799Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;03&#x2F;15&#x2F;%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD&#x2F;image-20200322163911333.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -157,52 +168,202 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-谈谈msgSend为什么不会出现在堆栈中" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/11/21/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode/" class="archive-article-date">
-  	<time datetime="2019-11-21T01:51:15.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-11-21</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/11/21/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Bitcode/">深入理解Bitcode</a>
+    <h1 class="article-title" itemprop="name">
+      谈谈iOS堆栈那些事
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/" class="archive-article-date">
+  	<time datetime="2020-03-15T15:40:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-15</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#堆栈是什么"><span class="toc-number">2.</span> <span class="toc-text">堆栈是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mach中堆栈"><span class="toc-number">3.</span> <span class="toc-text">Mach中堆栈</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mach-Host"><span class="toc-number">3.1.</span> <span class="toc-text">Mach Host</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Task"><span class="toc-number">3.2.</span> <span class="toc-text">Task</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread"><span class="toc-number">3.3.</span> <span class="toc-text">Thread</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread调用帧链"><span class="toc-number">3.4.</span> <span class="toc-text">Thread调用帧链</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#地址符号信息的获取"><span class="toc-number">4.</span> <span class="toc-text">地址符号信息的获取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MsgSend的堆栈"><span class="toc-number">5.</span> <span class="toc-text">MsgSend的堆栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">6.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
+            
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近看到一个有趣的问题，我们知道方法调用的本质是msgSend，反汇编时也可以看到实际调用的是msgSend，那么为啥堆栈中显示的反而是实际调用的方法，而不是msgSend呢？</p>
+<a id="more"></a>
+
+
+<h2 id="堆栈是什么"><a href="#堆栈是什么" class="headerlink" title="堆栈是什么"></a>堆栈是什么</h2><p>先理解下堆栈是什么。在计算机的内存上存在一种内存结构叫栈，地址是从上向下生长的，还有一种叫对堆内存是从下向上生长的。栈的空间由计算机来维护当出栈时就会销毁掉，并释放栈上的内存，因此方法调用需要在栈上分配临时变量，栈销毁时即释放栈上空间，而用户自己申请的需要长时间持有的对象内存就需要手动在堆上分配并手动释放。</p>
+<p>每一次函数调用都需要开辟一个新的调用栈（内联函数，尾调用除外）。因此必须有寄存器记住栈顶（sp）和栈基址(bp)。初次之外还需要ip寄存器（指令计数器）等等，以及各种入参的寄存器(di,si,dx,cx,r8,r9)，返回值寄存器(ax)等等，以及代码执行中使用的通用寄存器等等。可以认为每一个栈都是通过这些寄存器来进行描述的。</p>
+<p>以一个简单例子看看<code>x86_84</code>下堆栈的样子:</p>
+<img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200322163911333.png" alt="image-20200322163911333" style="zoom:50%;">
+
+<p>这是一个没有加任何一句代码的<code>viewDidLoad</code>的方法的反汇编。可以看到：</p>
+<p>1.首先需要把栈基址寄存器入栈，它决定了当前方法的起始内存。此次栈的bp就是上一个栈的sp。</p>
+<p>2.栈顶寄存器减少<code>0x20</code>。这是由于栈是向下生成的，给栈开辟了<code>0x20</code>的空间，即这个栈需要32字节的空间。</p>
+<p>3.分别把两个参数<code>self</code>, <code>_cmd</code>，压入栈中。一般rdi为第一个参数，rsi为第二个参数。</p>
+<img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200322164908817.png" alt="image-20200322164908817" style="zoom:50%;">
+
+<p>4.由于这里调用了<code>[super viewDidLoad]</code>，所以实际还需要产生一个<code>objc_super</code>，这个结构体占用16个字节，因此加起来就是栈的的总空间32个字节。先把<code>-0x8(%rbp)</code>(self)转移到rsi,再取出rsi(self)转移到<code>-0x20(%rbp)</code>(即receiver上)。</p>
+<p>再通过当前指令地址ip进行位移找到<code>class</code>数据存放的内存转移到<code>-0x18(%rbp)</code>即`super_class。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">objc_super</span> &#123;</span></span><br><span class="line">    __unsafe_unretained _Nonnull id receiver;</span><br><span class="line">    __unsafe_unretained _Nonnull Class super_class;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//查看class内存可以看到，其实是取出了数据段存放的类信息数据指针</span><br><span class="line">image lookup --address 0x00000001017ff3d8</span><br><span class="line">      Address: TestThreads[0x00000001017ff3d8] (TestThreads.__DATA.__objc_data + 0)</span><br><span class="line">      Summary: (void *)0x000000010429b400: ViewController</span><br></pre></td></tr></table></figure>
+
+<p><b>可以看到这里虽然命名为<code>super_class</code>实际传入的是当前的对象的类<code>class</code></b>。这是就涉及到msgSendSuper的实现了:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/********************************************************************</span><br><span class="line"> * id objc_msgSendSuper2</span><br><span class="line"> ********************************************************************/</span><br><span class="line"></span><br><span class="line">	ENTRY _objc_msgSendSuper2</span><br><span class="line">	UNWIND _objc_msgSendSuper2, NoFrame</span><br><span class="line">	</span><br><span class="line">	// objc_super-&gt;class is superclass of class to search</span><br><span class="line">	</span><br><span class="line">// search the cache (objc_super in %a1)</span><br><span class="line">	movq	class(%a1), %r10	// cls = objc_super-&gt;class</span><br><span class="line">	movq	receiver(%a1), %a1	// load real receiver</span><br><span class="line">	movq	8(%r10), %r10		// cls = class-&gt;superclass //去class的superClass作为参数入参</span><br><span class="line">	CacheLookup NORMAL, CALL	// calls IMP on success</span><br><span class="line">	...</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，确实是取的class,然后去后isa后的8个字节即superClass才执行的。也就是<code>msgSendSuper</code>实际是在汇编实现时直接从当前对象类的父类开始进行方法查找的。</p>
+<p>6.分别把<code>objc_super</code>和<code>_cmd</code>转移到寄存器rdi和rsi上作为<code>msgSendSuper</code>方法的入参进行调用。</p>
+<p>7.更新栈顶寄存器，出栈基址寄存器，重置返回值寄存器。</p>
+<h2 id="Mach中堆栈"><a href="#Mach中堆栈" class="headerlink" title="Mach中堆栈"></a>Mach中堆栈</h2><p>由<a href="https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/About/About.html#//apple_ref/doc/uid/TP30000905-CH204-TPXREF101" target="_blank" rel="noopener">官方文档</a>可知，Mach最基本的功能之一是进程/线程的通信和调度。不过在Mach中引入了task的概念，它是一种和进程相似的资源管理单元，但是比进程更轻量级。一个任务就是一个独立的资源分配单位，内部包含了多个线程。它是和BSD的进程一一对应的，不过Mach内核是不需要知道上层进程的信息的。这样可以保证微内核足够的简单与高效。</p>
+<p>通过<code>mach_task_self()</code>可以拿到当前任务所处进程对应的task的端口。一下几个<code>&lt;mach/mach_init.h&gt;</code>中声明的方法，可以获取到内核线程和host。Host可以看做机器内核本身，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">xtern mach_port_t <span class="title">mach_host_self</span><span class="params">(<span class="keyword">void</span>)</span></span>; <span class="comment">//获取当前host</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> mach_port_t <span class="title">mach_thread_self</span><span class="params">(<span class="keyword">void</span>)</span></span>; <span class="comment">//获取当前的mach线程</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> kern_return_t <span class="title">host_page_size</span><span class="params">(<span class="keyword">host_t</span>, <span class="keyword">vm_size_t</span> *)</span></span>; <span class="comment">//获取host的页大小。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Mach-Host"><a href="#Mach-Host" class="headerlink" title="Mach Host"></a>Mach Host</h3><p>Host是就是机器内核，通过它可以获取到系统内核的信息:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取Host句柄</span></span><br><span class="line"><span class="keyword">host_t</span> myhost = mach_host_self();</span><br><span class="line"><span class="keyword">kernel_version_t</span> version;</span><br><span class="line"><span class="comment">//获取Cpu version</span></span><br><span class="line"><span class="keyword">kern_return_t</span> kr = host_kernel_version(myhost, version);</span><br><span class="line"><span class="keyword">mach_msg_type_number_t</span> count = HOST_BASIC_INFO_COUNT;      <span class="comment">// size of the buffer</span></span><br><span class="line"><span class="keyword">host_basic_info_data_t</span> hinfo;</span><br><span class="line"><span class="comment">//获取host信息</span></span><br><span class="line">kr = host_info(myhost,              <span class="comment">// the host name port</span></span><br><span class="line">               HOST_BASIC_INFO,     <span class="comment">// flavor</span></span><br><span class="line">               (<span class="keyword">host_info_t</span>)&amp;hinfo, <span class="comment">// out structure</span></span><br><span class="line">               &amp;count);             <span class="comment">// in/out size</span></span><br><span class="line"><span class="comment">//获取虚拟内存页大小，单位为Byte</span></span><br><span class="line"><span class="keyword">vm_size_t</span> <span class="built_in">size</span>;</span><br><span class="line">kr = host_page_size(myhost, &amp;<span class="built_in">size</span>);</span><br><span class="line"><span class="comment">//获取CPU类型转换的名称。这些定义都可以再meachine.h中找到</span></span><br><span class="line"><span class="keyword">char</span> *cpuTypeName = <span class="built_in">malloc</span>(<span class="number">100</span>);</span><br><span class="line"><span class="keyword">char</span> *cpuSubTypeName = <span class="built_in">malloc</span>(<span class="number">100</span>);</span><br><span class="line">slot_name(hinfo.cpu_type, hinfo.cpu_subtype, &amp;cpuTypeName, &amp;cpuSubTypeName);</span><br></pre></td></tr></table></figure>
+
+<p>所以通过Host可以做一些系统状态的监测。通过Host还可以拿到进程的句柄等等信息。</p>
+<h3 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h3><p>task是内核资源分配的独立单元，每个task管理一块独立的虚拟空间。<code>&lt;mach/task.h&gt;</code>中声明了task的接口。</p>
+<p>task的threads中包含了全部的线程，通过下面方法可以获取当前task下的所有线程:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">kern_return_t</span> ret = task_threads(mach_task_self(), &amp;threads, &amp;thread_count);</span><br></pre></td></tr></table></figure>
+
+<p>在Mach内核启动时会通过<code>thread_bootstrap()</code>初始化一个线程模板。之后的线程创建<code>thread_create()</code>都是通过这个模板来创建。</p>
+<h3 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h3><p>内核的线程为<code>thread_t</code>。它映射到BSD层就是pthread，pthread比内核thread提供了更多接口和特性，比如线程名等等:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过mach thread获取Pthread</span></span><br><span class="line"><span class="keyword">pthread_t</span> pthread = pthread_from_mach_thread_np(thread);</span><br><span class="line"><span class="keyword">char</span> name[<span class="number">100</span>];</span><br><span class="line">pthread_getname_np(pthread, name, <span class="keyword">sizeof</span>(name));</span><br></pre></td></tr></table></figure>
+
+<p>在<code>&lt;mach/thread_act.h&gt;</code>定义了thread的行为。通过下面接口获取到线程的信息：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">kern_return_t</span> thread_get_state</span><br><span class="line">(</span><br><span class="line">	<span class="keyword">thread_act_t</span> target_act,      <span class="comment">//线程编号</span></span><br><span class="line">	<span class="keyword">thread_state_flavor_t</span> flavor, <span class="comment">//特性</span></span><br><span class="line">	<span class="keyword">thread_state_t</span> old_state,  <span class="comment">//获取当前的线程状态</span></span><br><span class="line">	<span class="keyword">mach_msg_type_number_t</span> *old_stateCnt <span class="comment">//线程状态个数</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>在系统中有一个兼容多平台的宏定义<code>_STRUCT_MCONTEXT64</code>。它是一个结构体，这里以64位darwin系统为例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _STRUCT_MCONTEXT64      struct __darwin_mcontext64</span></span><br><span class="line">_STRUCT_MCONTEXT64</span><br><span class="line">&#123;</span><br><span class="line">	_STRUCT_X86_EXCEPTION_STATE64   __es; <span class="comment">//异常状态</span></span><br><span class="line">	_STRUCT_X86_THREAD_STATE64      __ss; <span class="comment">//线程状态</span></span><br><span class="line">	_STRUCT_X86_FLOAT_STATE64       __fs; <span class="comment">//浮点状态</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>通过上面的<code>thread_get_state</code>可以把线程状态信息拷贝到<code>__ss</code>中。线程状态(<code>__ss</code>)说白了就是堆栈信息。也就是寄存器信息。每个线程有自己独立的一套寄存器信息，发送线程切换时会优先保存下寄存器信息。重新获取时间片后才回复寄存器信息。例如64位Darwin系统，64位为了避免冲突寄存器加了r前缀：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	_STRUCT_X86_THREAD_STATE64	struct __darwin_x86_thread_state64</span></span><br><span class="line">_STRUCT_X86_THREAD_STATE64</span><br><span class="line">_STRUCT_X86_THREAD_STATE64</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rax;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rbx;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rcx;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rdx;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rdi;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rsi;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rbp; <span class="comment">//栈基址寄存器</span></span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rsp; <span class="comment">//栈顶寄存器</span></span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r8;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r9;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r10;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r11;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r12;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r13;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r14;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__r15;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rip; <span class="comment">//指令计数器</span></span><br><span class="line">	<span class="keyword">__uint64_t</span>	__rflags;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__cs;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__fs;</span><br><span class="line">	<span class="keyword">__uint64_t</span>	__gs;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>还是以上一个例子:</p>
+<p><img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/joey.cao/Desktop/Learning/MyBlog/joey520.github.io/source/_posts/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200322180004105.png" alt="image-20200322180004105"></p>
+<p>这是在当前执行<code>[super viewDidLoad]</code>前的寄存器信息，此时IP寄存器正指向下一条要执行的指令:</p>
+<img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200322180218135.png" alt="image-20200322180218135" style="zoom:50%;">
+
+<p>可以看到其它的寄存器也还有一些不相干的信息，说明寄存器不会每个堆栈执行完都全部清理，一般只需要使用时候正确取值即可。所以本次调用栈不相干的寄存器保存的可能是之前某一次调用栈取值的数据。这里rdx是一般第3个参数才会使用到它，而它第一次被使用到是在起启动主程序时候，之后到断点前再也没有被使用过，所以保存了数据。</p>
+<p>通过<code>thread_get_state</code>方法可以获取这一时刻该线程的状态。例如:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">kern_return_t</span> fetchMachineContext(<span class="keyword">thread_t</span> thread, _STRUCT_MCONTEXT *machineCxt) &#123;</span><br><span class="line">    <span class="keyword">mach_msg_type_number_t</span> state_count = x86_THREAD_STATE64_COUNT;</span><br><span class="line">  <span class="comment">//把x86_64结构的线程状态拷贝到__ss指针</span></span><br><span class="line">    <span class="keyword">kern_return_t</span> ret = thread_get_state(thread, x86_THREAD_STATE64, (<span class="keyword">thread_state_t</span>)&amp;machineCxt-&gt;__ss, &amp;state_count);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其实这个thread_state_t就是一个指针，指向的是那个寄存器结构体的数据。</p>
+<p>可以看到其实这个thread_state_t就是一个指针，指向的是那个寄存器结构体的数据。如此一来就可以拿到这一时刻该线程的执行状态了。</p>
+<h3 id="Thread调用帧链"><a href="#Thread调用帧链" class="headerlink" title="Thread调用帧链"></a>Thread调用帧链</h3><p>前面知道了栈帧的结构，那么在调用堆栈上，这些栈帧是怎么进行内存布局的呢。KSCrash](<a href="https://github.com/kstenerud/KSCrash)给出了结构定义，" target="_blank" rel="noopener">https://github.com/kstenerud/KSCrash)给出了结构定义，</a></p>
+<p>无论是i386，还是x86还是arm64。调用帧结构如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">FrameEntry</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">/** The previous frame in the list. */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">FrameEntry</span>* <span class="title">previous</span>;</span> <span class="comment">//上一个调用帧的指针</span></span><br><span class="line">    <span class="comment">/** The instruction address. */</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> return_address; <span class="comment">//当前栈返回地址即BP</span></span><br><span class="line">&#125; FrameEntry;</span><br></pre></td></tr></table></figure>
+
+<p>因此可知调用链就是一个链表结构。<b>这里特别要注意一点，帧的地址就是栈基址寄存器的地址。而每个帧的返回地址指针就是上一个栈的基址寄存器</b>。</p>
+<p>内核为了能在出现异常时回溯调用过程，会把整个调用链的堆栈保存下来。在<code>&lt;mach/vm_map.h&gt;</code>提供了一些处理虚拟内存的方法，比如下面这个方法可以可以读取内存地址指向内存数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">kern_return_t vm_read_overwrite</span><br><span class="line">(</span><br><span class="line">	vm_map_t target_task, //虚拟内存所处的task</span><br><span class="line">	vm_address_t address, //传入一个内存地址</span><br><span class="line">	vm_size_t size, //虚拟内存大小（要返回内存大小）</span><br><span class="line">	vm_address_t data, //虚拟内存数据</span><br><span class="line">	vm_size_t *outsize //真正返回的数据大小</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://github.com/kstenerud/KSCrash" target="_blank" rel="noopener">KSCrash</a>对这个方法进行了非常好的，封装，实现了一套mach内核的操作接口。KSCrash已经不单单只是一个崩溃收集工具，简直就是无数小工具的瑰宝。</p>
+<p>通过链表的遍历，依次取出return</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//栈帧是一个链表式结构</span></span><br><span class="line">FrameEntry frame = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"><span class="comment">//拷贝调用帧的数据</span></span><br><span class="line"><span class="comment">//首先通过machineCxt中保存的最后栈的栈基址获取最后一个调用栈的帧信息</span></span><br><span class="line">ret = copySafely((<span class="keyword">const</span> <span class="keyword">void</span> *)framePtr, (<span class="keyword">void</span> *)&amp;frame, <span class="keyword">sizeof</span>(frame));</span><br><span class="line"><span class="keyword">if</span> (ret != KERN_SUCCESS) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"copy stack frames failed\n"</span>);</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//按需要栈个数来往回回溯调用栈</span></span><br><span class="line"> <span class="keyword">for</span> (; i &lt; kBacktraceCount; i ++) &#123;</span><br><span class="line">    <span class="comment">//把上一个帧的指针（栈基址寄存器）入栈</span></span><br><span class="line">    backtrace[i] = frame.return_address;</span><br><span class="line">    <span class="comment">//重新把上一个帧的数据拷贝入帧</span></span><br><span class="line">    <span class="comment">//栈不一定有50个，碰到空栈，表明前面已经没有数据了</span></span><br><span class="line">    <span class="keyword">if</span> (backtrace[i] == <span class="number">0</span> || frame.previous == <span class="number">0</span> ||</span><br><span class="line">        copySafely(frame.previous, &amp;frame, <span class="keyword">sizeof</span>(frame)) != KERN_SUCCESS) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以把整个调用栈回溯到backtrace数组中了，不过他们都只是指针，还需要通过Dyld转成符号信息:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//此时backtrace里已经是从最近的指令地址回溯的每一个栈基址寄存器指针</span></span><br><span class="line"><span class="comment">//利用Dyld依次寻找每一个地址最近的符号信息</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; i; j ++) &#123;</span><br><span class="line">  <span class="comment">//依次取出每一个调用帧的地址指针</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> bp = backtrace[j];</span><br><span class="line">  <span class="comment">//利用Dyld获取指针的符号信息</span></span><br><span class="line">    Dl_info info;</span><br><span class="line">    dladdr((<span class="keyword">void</span> *)bp, &amp;info);</span><br><span class="line">  <span class="comment">//计算地址偏移</span></span><br><span class="line">    <span class="keyword">uintptr_t</span> offset = bp - (<span class="keyword">uintptr_t</span>)info.dli_saddr;</span><br><span class="line">  <span class="comment">//这里是模拟系统backtrace的格式进行输出</span></span><br><span class="line">    NSString *str = [NSString stringWithFormat:@<span class="string">"%d %-30s  0x%08"</span> PRIxPTR <span class="string">" %s + %lu\n"</span> , j, lastPathEntry(info.dli_fname), (<span class="keyword">uintptr_t</span>)bp, info.dli_sname, offset];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, [str cStringUsingEncoding:NSUTF8StringEncoding]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如此一来就可以拿到线程的栈调用情况，以及各个线程。</p>
+<h2 id="地址符号信息的获取"><a href="#地址符号信息的获取" class="headerlink" title="地址符号信息的获取"></a>地址符号信息的获取</h2><p>前面分析调用栈判断地址靠的是每次开辟一个新栈，通过栈基址寄存器来确定栈的地址。通过dladdr或者其它入口在dyld中查找地址对应的符号信息，就能拿到堆栈。无论是backtrace函数还是其它的都依赖dyld（只要想要获取库中的符号信息）。</p>
+<p>而dyld最终的实现是通过传入的地址找到对应的image，然后在image中查找与地址最相近的符号信息。为什么是最相近呢，因为例如一个函数，符号表中之后保存该函数的符号（例如字符串表中的位置。程序段的位置，所属库文件路径等等）。所以假如传入的是函数中的某个地址，必然不存在这样的符号，因此只能找最近的符号。</p>
+<p>在dyld的<code>findClosestSymbol</code>中可以看的具体的实现</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* ImageLoaderMachO::findClosestSymbol(<span class="keyword">const</span> mach_header* mh, <span class="keyword">const</span> <span class="keyword">void</span>* addr, <span class="keyword">const</span> <span class="keyword">void</span>** closestAddr)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//1.找到linkedit base，符号表，字符串表，和Index Table。 这一段省略</span></span><br><span class="line">  <span class="comment">// no symbol table =&gt; no lookup by address</span></span><br><span class="line">	<span class="keyword">if</span> ( (symtab == <span class="literal">NULL</span>) || (dynSymbolTable == <span class="literal">NULL</span>) || !linkEditBaseFound )</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">uint8_t</span>* linkEditBase = unslidLinkEditBase + slide;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span>* symbolTableStrings = (<span class="keyword">const</span> <span class="keyword">char</span>*)&amp;linkEditBase[symtab-&gt;stroff];</span><br><span class="line">	<span class="keyword">const</span> macho_nlist* symbolTable = (macho_nlist*)(&amp;linkEditBase[symtab-&gt;symoff]);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">uintptr_t</span> targetAddress = (<span class="keyword">uintptr_t</span>)addr - slide;</span><br><span class="line">	<span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">macho_nlist</span>* <span class="title">bestSymbol</span> = <span class="title">NULL</span>;</span></span><br><span class="line">	<span class="comment">// first walk all global symbols</span></span><br><span class="line">	<span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">macho_nlist</span>* <span class="title">const</span> <span class="title">globalsStart</span> = &amp;<span class="title">symbolTable</span>[<span class="title">dynSymbolTable</span>-&gt;<span class="title">iextdefsym</span>];</span></span><br><span class="line">	<span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">macho_nlist</span>* <span class="title">const</span> <span class="title">globalsEnd</span>= &amp;<span class="title">globalsStart</span>[<span class="title">dynSymbolTable</span>-&gt;<span class="title">nextdefsym</span>];</span></span><br><span class="line">  <span class="comment">//遍历符号表</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">const</span> struct macho_nlist* s = globalsStart; s &lt; globalsEnd; ++s) &#123;</span><br><span class="line"> 		<span class="keyword">if</span> ( (s-&gt;n_type &amp; N_TYPE) == N_SECT ) &#123;</span><br><span class="line">      <span class="comment">//如果是找到的第一个，符号地址&lt;=目标地址，注意这里的地址并不是函数栈中遍历的地址。</span></span><br><span class="line">      <span class="comment">//而是指汇编实现中的地址，因此若是同一个函数的实现，内部指令地址一定大于栈基址</span></span><br><span class="line">			<span class="keyword">if</span> ( bestSymbol == <span class="literal">NULL</span> ) &#123;</span><br><span class="line">				<span class="keyword">if</span> ( s-&gt;n_value &lt;= targetAddress )</span><br><span class="line">					bestSymbol = s;</span><br><span class="line">			&#125;</span><br><span class="line">      <span class="comment">//如果已经找到了一个符号。但是新的符号更接近目标地址。</span></span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> ( (s-&gt;n_value &lt;= targetAddress) &amp;&amp; (bestSymbol-&gt;n_value &lt; s-&gt;n_value) ) &#123;</span><br><span class="line">				bestSymbol = s;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// next walk all local symbols</span></span><br><span class="line">  <span class="comment">//遍历Local Symbols</span></span><br><span class="line">	<span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">macho_nlist</span>* <span class="title">const</span> <span class="title">localsStart</span> = &amp;<span class="title">symbolTable</span>[<span class="title">dynSymbolTable</span>-&gt;<span class="title">ilocalsym</span>];</span></span><br><span class="line">	<span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">macho_nlist</span>* <span class="title">const</span> <span class="title">localsEnd</span>= &amp;<span class="title">localsStart</span>[<span class="title">dynSymbolTable</span>-&gt;<span class="title">nlocalsym</span>];</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">const</span> struct macho_nlist* s = localsStart; s &lt; localsEnd; ++s) &#123;</span><br><span class="line">    <span class="comment">//调试符号不处理</span></span><br><span class="line"> 		<span class="keyword">if</span> ( ((s-&gt;n_type &amp; N_TYPE) == N_SECT) &amp;&amp; ((s-&gt;n_type &amp; N_STAB) == <span class="number">0</span>) ) &#123;</span><br><span class="line">			<span class="keyword">if</span> ( bestSymbol == <span class="literal">NULL</span> ) &#123;</span><br><span class="line">				<span class="keyword">if</span> ( s-&gt;n_value &lt;= targetAddress )</span><br><span class="line">					bestSymbol = s;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> ( (s-&gt;n_value &lt;= targetAddress) &amp;&amp; (bestSymbol-&gt;n_value &lt; s-&gt;n_value) ) &#123;</span><br><span class="line">				bestSymbol = s;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">if</span> ( bestSymbol != <span class="literal">NULL</span> ) &#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __arm__</span></span><br><span class="line">		<span class="keyword">if</span> (bestSymbol-&gt;n_desc &amp; N_ARM_THUMB_DEF)</span><br><span class="line">			*closestAddr = (<span class="keyword">void</span>*)((bestSymbol-&gt;n_value | <span class="number">1</span>) + slide);</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			*closestAddr = (<span class="keyword">void</span>*)(bestSymbol-&gt;n_value + slide);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="comment">//由于ASLR需要加上slide</span></span><br><span class="line">		*closestAddr = (<span class="keyword">void</span>*)(bestSymbol-&gt;n_value + slide);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      <span class="comment">//返回符号名</span></span><br><span class="line">		<span class="keyword">return</span> &amp;symbolTableStrings[bestSymbol-&gt;n_un.n_strx];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以发现会优先处理本地符号，再处理外部符号。</p>
+<h2 id="MsgSend的堆栈"><a href="#MsgSend的堆栈" class="headerlink" title="MsgSend的堆栈"></a>MsgSend的堆栈</h2><p>但是这里依旧没有解决开头的问题，为什么msgSend并不在调用栈链里呢？因为msgSend这个方法是调用最频繁的方法，必须做到最大的优化。其中之一避免调用栈的开销，因此runtime把它以纯汇编的形式实现，相当于内嵌在当前的调用栈里执行，即它共用的是当前调用栈的空间，而不需要新开辟一个调用栈。以前面的例子：</p>
+<img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200325144937443.png" alt="image-20200325144937443" style="zoom:50%;">
+
+<p>查看此时的栈帧信息:</p>
+<img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200325145011647.png" alt="image-20200325145011647" style="zoom:50%;">
+
+<p>然后通过LLDB的<code>si</code>指令级别的步入，然后进入msgSend的调用栈:</p>
+<p><img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/joey.cao/Desktop/Learning/MyBlog/joey520.github.io/source/_posts/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200325145054867.png" alt="image-20200325145054867"></p>
+<p>可以看到msgSend的调用中不会入栈bp。并且完全使用寄存器，即不会对栈空间产生任何影响。</p>
+<p>此时我们查看一下栈帧信息:</p>
+ <img src="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/image-20200325145310601.png" alt="image-20200325145310601" style="zoom:50%;">
+
+<p>可以发现仍然是原来的<code>viewDidLoad</code>的栈基址，也就是当前还是处于<code>viewDidLoad</code>的调用帧里面。</p>
+<p>所以msgSend并没有产生新的栈帧，所以在不会出现在backtrace里。</p>
+<p>而OC的方法本质上是C的实现，在编译时通过IMP指针绑定到方法列表中而已。利用clang可以将其转换成Cpp：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcrun -sdk iphonesimulator13.2 clang -rewrite-objc ViewController.m</span><br></pre></td></tr></table></figure>
+
+<p>转换后的Cpp代码如下:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> _I_ViewController_test(ViewController * self, SEL _cmd) &#123;</span><br><span class="line">     NSLog((NSString *)&amp;__NSConstantStringImpl__var_folders_64_2_nlwt_s6kq250l7_t5mfdzwrh9_pg_T_ViewController_a7c035_mi_0, __PRETTY_FUNCTION__);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> _I_ViewController_viewDidLoad(ViewController * self, SEL _cmd) &#123;</span><br><span class="line">     ((<span class="keyword">void</span> (*)(__rw_objc_super *, SEL))(<span class="keyword">void</span> *)objc_msgSendSuper)((__rw_objc_super)&#123;(id)self, (id)class_getSuperclass(objc_getClass(<span class="string">"ViewController"</span>))&#125;, sel_registerName(<span class="string">"viewDidLoad"</span>));</span><br><span class="line">     ((<span class="keyword">void</span> (*)(id, SEL))(<span class="keyword">void</span> *)objc_msgSend)((id)self, sel_registerName(<span class="string">"test"</span>));</span><br><span class="line"></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>而这些方法由于不是系统特定的，无法得知其实现（即使是一些Foundation库自带的方法其实也没必要想msgSend这样来优化不开辟新栈)。所以这些OC方法在在转成汇编实现时必定要先开辟栈空间，所以就可以在backtrace中追溯到实际调用的方法了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://opensource.apple.com" target="_blank" rel="noopener">https://opensource.apple.com</a></p>
+<p><a href="https://github.com/apple/darwin-xnu" target="_blank" rel="noopener">https://github.com/apple/darwin-xnu</a></p>
+<p><a href="https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/About/About.html#//apple_ref/doc/uid/TP30000905-CH204-TPXREF101" target="_blank" rel="noopener">https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/About/About.html#//apple_ref/doc/uid/TP30000905-CH204-TPXREF101</a></p>
+<p><a href="https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/scheduler/scheduler.html#//apple_ref/doc/uid/TP30000905-CH211-BABCHEEB" target="_blank" rel="noopener">https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/scheduler/scheduler.html#//apple_ref/doc/uid/TP30000905-CH211-BABCHEEB</a></p>
+<p>能否用简单通俗的话说一说什么是微内核？ - 余天升的回答 - 知乎 <a href="https://www.zhihu.com/question/20105717/answer/13993808" target="_blank" rel="noopener">https://www.zhihu.com/question/20105717/answer/13993808</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Microkernel" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Microkernel</a></p>
+<p><a href="https://github.com/kstenerud/KSCrash" target="_blank" rel="noopener">https://github.com/kstenerud/KSCrash</a></p>
+<p>汇编过程调用是怎样操作栈的？ - 北极的回答 - 知乎 <a href="https://www.zhihu.com/question/49410551/answer/115870825" target="_blank" rel="noopener">https://www.zhihu.com/question/49410551/answer/115870825</a></p>
+<p><a href="https://stackoverflow.com/questions/310974/what-is-tail-call-optimization" target="_blank" rel="noopener">https://stackoverflow.com/questions/310974/what-is-tail-call-optimization</a></p>
+
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Runtime</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">Bitcode</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">Mach</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -215,17 +376,146 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2020/02/28/%E4%BB%8E%E4%B8%80%E6%AC%A1Memcpy%E8%AF%B4%E5%BC%80/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">从一次memcpy说开来</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#堆栈是什么"><span class="toc-number">2.</span> <span class="toc-text">堆栈是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mach中堆栈"><span class="toc-number">3.</span> <span class="toc-text">Mach中堆栈</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mach-Host"><span class="toc-number">3.1.</span> <span class="toc-text">Mach Host</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Task"><span class="toc-number">3.2.</span> <span class="toc-text">Task</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread"><span class="toc-number">3.3.</span> <span class="toc-text">Thread</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Thread调用帧链"><span class="toc-number">3.4.</span> <span class="toc-text">Thread调用帧链</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#地址符号信息的获取"><span class="toc-number">4.</span> <span class="toc-text">地址符号信息的获取</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MsgSend的堆栈"><span class="toc-number">5.</span> <span class="toc-text">MsgSend的堆栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">6.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  var notify = 'false' == true ? true : false;
+  var verify = 'false' == true ? true : false;
+  new Valine({
+      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
+      av: AV,
+      el: '.valine_comment',
+      emoticon_url: 'https://cloud.panjunwen.com/alu',
+      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
+      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
+      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
+      placeholder: ''
+    });
+</script>
+      </section>
+    
+
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -248,8 +538,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
