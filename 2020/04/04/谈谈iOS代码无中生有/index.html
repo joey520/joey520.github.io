@@ -7,16 +7,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://joey.github.io.com">
-  <title>Archives: 2019/12 | Joey&#39;s House</title>
+  <title>谈谈iOS开发如何注入代码 | Joey&#39;s House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="人菜就要多读书。。。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Joey&#39;s House">
-<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;archives&#x2F;2019&#x2F;12&#x2F;index.html">
+  <meta name="description" content="前言之前一直听说过libffi大名，但是并没有时间去真正了解，也了解过一些热修复的软件，但是很好奇它们是如何做到函数不参与编译而无中生有注入到执行序列的。本文对两种热修复软件JSPatch和mangoFix如何执行利用脚本文件执行代码进行了分析。">
+<meta name="keywords" content="JSPatch,mangoFix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈iOS开发如何注入代码">
+<meta property="og:url" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89&#x2F;index.html">
 <meta property="og:site_name" content="Joey&#39;s House">
-<meta property="og:description" content="人菜就要多读书。。。">
+<meta property="og:description" content="前言之前一直听说过libffi大名，但是并没有时间去真正了解，也了解过一些热修复的软件，但是很好奇它们是如何做到函数不参与编译而无中生有注入到执行序列的。本文对两种热修复软件JSPatch和mangoFix如何执行利用脚本文件执行代码进行了分析。">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89&#x2F;image-20200405212622155.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89&#x2F;image-20200405233321620.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89&#x2F;image-20200406163755746.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89&#x2F;image-20200406164508213.png">
+<meta property="og:updated_time" content="2020-04-06T10:05:41.256Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;joey.github.io.com&#x2F;2020&#x2F;04&#x2F;04&#x2F;%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89&#x2F;image-20200405212622155.png">
   
   
     <link rel="icon" href="/themes/yilia/source/">
@@ -157,52 +164,201 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
+            <article id="post-谈谈iOS代码无中生有" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      谈谈iOS开发如何注入代码
+    </h1>
+  
+
+        <!--显示阅读次数-->
+        
+          <br/>
+          <a class="cloud-tie-join-count" href="javascript:void(0);" target="_blank" rel="noopener" style="color:gray;font-size:14px;">
+          <span class="icon-sort"></span>
+          <span id="busuanzi_container_page_pv" style="color:#ef7522;font-size:14px;">
+                    阅读数: <span id="busuanzi_value_page_pv"></span>次 &nbsp;&nbsp;
+          </span>
+          </a>
+        
+        <!--显示阅读次数完毕-->
+        
+        <a href="/2020/04/04/%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89/" class="archive-article-date">
+  	<time datetime="2020-04-04T08:06:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-04</time>
+</a>
+        
+      </header>
+    
+    <!-- 目录内容 -->
+    
+        <p class="show-toc-btn" id="show-toc-btn" onclick="showToc();" style="display:none">
+            <span class="btn-bg"></span>
+            <span class="btn-text">文章导航</span>
+        </p>
+        <div id="toc-article" class="toc-article">
+        <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
+        <strong class="toc-title">文章目录</strong>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数的本质"><span class="toc-number">2.</span> <span class="toc-text">函数的本质</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSPatch的实现"><span class="toc-number">3.</span> <span class="toc-text">JSPatch的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JSContext"><span class="toc-number">3.1.</span> <span class="toc-text">JSContext</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MangoFix的实现"><span class="toc-number">4.</span> <span class="toc-text">MangoFix的实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Libffi"><span class="toc-number">5.</span> <span class="toc-text">Libffi</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#调用模板"><span class="toc-number">5.1.</span> <span class="toc-text">调用模板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#面向切面"><span class="toc-number">5.2.</span> <span class="toc-text">面向切面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Libffi的实现原理"><span class="toc-number">5.3.</span> <span class="toc-text">Libffi的实现原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MangoFix怎么做到无中生有的"><span class="toc-number">6.</span> <span class="toc-text">MangoFix怎么做到无中生有的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">7.</span> <span class="toc-text">参考资料</span></a></li></ol>
+       </div>
+      <script type="text/javascript">
+      function showToc(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:block");
+          show_toc_btn.setAttribute("style","display:none");
+      };
+      function showBtn(){
+          var toc_article = document.getElementById("toc-article");
+          var show_toc_btn = document.getElementById("show-toc-btn");
+          toc_article.setAttribute("style","display:none");
+          show_toc_btn.setAttribute("style","display:block");
+      };
+    </script>
+    
+    <!-- 目录内容结束 -->
+    <div class="article-entry" itemprop="articleBody">         
             
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2019-12-27T11:21:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Unix%E4%BF%A1%E5%8F%B7%E6%9C%BA%E5%88%B6/">深入理解Unix信号机制</a>
-    </h1>
-  
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前一直听说过<a href="https://github.com/libffi/libffi" target="_blank" rel="noopener">libffi</a>大名，但是并没有时间去真正了解，也了解过一些热修复的软件，但是很好奇它们是如何做到函数不参与编译而无中生有注入到执行序列的。本文对两种热修复软件<a href="https://github.com/bang590/JSPatch" target="_blank" rel="noopener">JSPatch</a>和<a href="https://github.com/YPLiang19/Mango" target="_blank" rel="noopener">mangoFix</a>如何执行利用脚本文件执行代码进行了分析。</p>
+<a id="more"></a>
 
-        <div class="article-info info-on-right">
-          
+
+
+<h2 id="函数的本质"><a href="#函数的本质" class="headerlink" title="函数的本质"></a>函数的本质</h2><p>无论是OC的方法还是C函数。 本质上都是程序段的汇编实现，也就是说一段机器指令来指导CPU完成某个任务。所以要进行方法调用必定需要的是一段特定的汇编指令。即使是OC中的Block，我们知道也会在编译时生成一个2级命名函数，最终调用到的就是这个函数。</p>
+<p>而且在调用时必须指明方法签名，因为函数签名决定了到底是调用哪个方法，怎么调用。</p>
+<p>但是那些热修复工具注入的方法并没有参与编译又是如何做到无中生有的呢?</p>
+<h2 id="JSPatch的实现"><a href="#JSPatch的实现" class="headerlink" title="JSPatch的实现"></a>JSPatch的实现</h2><p>热修复中最鼎鼎有名的当属<a href="https://github.com/bang590/JSPatch" target="_blank" rel="noopener">JSPatch</a>。它主要的原理是通过JSScriptCore和Runtime来运行时修改原来的代码，比如方法替换等等。所以也就是它需要在运行时注入原来的二进制文件中没有方法。那么又是如何做到的呢?</p>
+<h3 id="JSContext"><a href="#JSContext" class="headerlink" title="JSContext"></a>JSContext</h3><p>JSPatch依赖js的语法规则。在<code>startEngine</code>中创建了一个JSContext对象，并注入了多个基础方法，比如<code>defineClass</code>，<code>callI</code>等。为了避免冲突还加了一些前缀。 这些最基本的方法就是整个JSPatch引擎的核心部分。</p>
+<p>先要了解一下JSContext。<code>JavaScript高级程序设计</code>给出的定义如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">执行环境是JS中最为重要的一个概念，执行环境定义了变量或函数有权访问的其他数据，决定了它们各自的行为。每个执行环境都有一个与之关联的`变量对象`，环境中定义的所有变量和函数都保存在这个对象中。代码中是无法访问这个变量对象的，但是解析器在处理数据时会用到。Web浏览器中，全局执行环境会被认为是window对象，因此所有的全局变量和函数都是作为window对象的属性和方法创建的。每个函数在被调用时也会创建自己的执行环境 ......</span><br></pre></td></tr></table></figure>
+
+<p>可以把这个东东认为是一个平台，js脚本的运行必须依赖它，同时还可以向其中注入函数，就像<code>startEngine</code>中做的那样。此时这些环境中就有了一些函数，在后续执行js脚本时就可以直接调用到它们了。 当然最厉害的是这些函数是直接调用源生的方法，同样的源生代码通过执行JS脚本也可以调用JS中的方法。 也就是说此时JSContext形成了一个桥:</p>
+<figure class="highlight m"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JSScript -----------》JSContext 《--------------Native</span><br></pre></td></tr></table></figure>
+
+<p>那么这个桥又是如何搭建起来的呢，先看看JS如何调用OC：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">context[@&quot;_OC_defineClass&quot;] = ^(NSString *classDeclaration, JSValue *instanceMethods, JSValue *classMethods) &#123;</span><br><span class="line">    return defineClass(classDeclaration, instanceMethods, classMethods);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>JSContext中注入的方法可以转换成OC的Block。 并且会按参数顺序传递到Block的参数中。那么就可以直接调用到OC了。</p>
+<p>那么OC又是如何调用JS，通过的是<code>evaluateScript</code>这个方法来执行JS脚本。 所以就形成了OC调用JS再调用到OC。</p>
+<p>不过这些还没到重点，如何把这个方法JS的方法注入到OC的类里呢？JSPatch会解析js脚本，拿到传入的方法参数。格式化之前和之后的效果如下:</p>
+<img src="/2020/04/04/%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89/image-20200405212622155.png" alt="image-20200405212622155" style="zoom:50%;">
+
+<p>然后取出第二个参数即一个JS方法体转换成JSValue（即下图中的参数）绑定到类身上。然后就开始超级长的逻辑通过runtime把方法替换到<code>msgForward</code>。 然后在Hook住msgForward。当原来的类调用到被Hook的方法时就会转到被hook的<code>msgForward</code>中。 然后取出JSValue拿到JS的方法，并传入参数进行执行，如此就实现了方法的替换。</p>
+<p>JS方法的调用很简单，就是通过下面这个接口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//传入参数列表调用JS方法</span><br><span class="line">- (JSValue *)callWithArguments:(NSArray *)arguments;</span><br></pre></td></tr></table></figure>
+
+<p>当然由于JSPatch是一个要涵盖所有情况的开源库，整个过程是非常复杂，而且细节很多的，需要考虑非常多的情况。 </p>
+<p>不过我们只需要知道其实是通过JSContext来实现方法互调就可以了。 也就是这种无中生有的方式依赖的是JSContext。JSContext提供了不编译代码就可以执行的方式。 </p>
+<h2 id="MangoFix的实现"><a href="#MangoFix的实现" class="headerlink" title="MangoFix的实现"></a>MangoFix的实现</h2><p>还有一种热修复的方案可以做到运行时注入代码，但是不需要使用JSContext。 <a href="https://github.com/YPLiang19/Mango" target="_blank" rel="noopener">mangoFix</a>利用Yacc解析器来进行文本文件的解析，然后动态插入方法。</p>
+<p>关于yacc的部分，放着下次再学习。先看一下MangoFix是怎么把方法注入的。</p>
+<p>由于这个代码写的很多文件，看起来并不是那么方便，搜索一下看到还是利用了NSInvocation来进行调用的。所以打一个符号断点。 直接跑一把Demo，然后查看堆栈来进行回溯。可以看到调用栈如下：</p>
+<img src="/2020/04/04/%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89/image-20200405233321620.png" alt="image-20200405233321620" style="zoom:50%;">
+
+<p>大致可以知道就是利用libffi，把原始方法进行替换，换成了下面这个方法。就是在replaceIMP这个方法之后进还是经过组装得到NSInvocation进行动态调用:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">replaceIMP</span><span class="params">(ffi_cif *cif, <span class="keyword">void</span> *ret, <span class="keyword">void</span> **args, <span class="keyword">void</span> *userdata)</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还是直奔主题libffi吧！</p>
+<h2 id="Libffi"><a href="#Libffi" class="headerlink" title="Libffi"></a>Libffi</h2><p><a href="https://github.com/libffi/libffi" target="_blank" rel="noopener">libffi</a>是一个开源软件。可以实现C的动态调用。它可以运行时动态调用到某个C函数，也可以Hook C函数到指定的函数。</p>
+<h3 id="调用模板"><a href="#调用模板" class="headerlink" title="调用模板"></a>调用模板</h3><p>在libffi中有一个调用模板<code>ffi_cif</code>，可以理解是对一次调用的描述，类似OC中的方法签名，结构如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">  ffi_abi abi; <span class="comment">//ABI</span></span><br><span class="line">  <span class="keyword">unsigned</span> nargs; <span class="comment">//参数个数</span></span><br><span class="line">  ffi_type **arg_types; <span class="comment">//参入类型，类似iOS中的typeEncoding</span></span><br><span class="line">  ffi_type *rtype; <span class="comment">//返回值类型</span></span><br><span class="line">  <span class="keyword">unsigned</span> bytes; </span><br><span class="line">  <span class="keyword">unsigned</span> flags;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> FFI_EXTRA_CIF_FIELDS</span></span><br><span class="line">  FFI_EXTRA_CIF_FIELDS;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125; ffi_cif;</span><br></pre></td></tr></table></figure>
+
+<p>通过它来描述一次方法调用所需要的关键信息：ABI，参数个数，返回值类型，函数签名。（放到OC里就是方法签名）。</p>
+<p><code>ffi_call</code>可以动态调用方法，需要传入调用模板，函数指针，参数已经保存返回值的地址：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">		<span class="comment">//参数类型</span></span><br><span class="line">    ffi_type **types;</span><br><span class="line">    <span class="comment">//typeEncoding</span></span><br><span class="line">    types = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(ffi_type *) * <span class="number">2</span>) ;</span><br><span class="line">    <span class="comment">//两个int</span></span><br><span class="line">    types[<span class="number">0</span>] = &amp;ffi_type_sint;</span><br><span class="line">    types[<span class="number">1</span>] = &amp;ffi_type_sint;</span><br><span class="line">    <span class="comment">//返回值类型</span></span><br><span class="line">    ffi_type *retType = &amp;ffi_type_sint;</span><br><span class="line">    <span class="comment">//设置参数</span></span><br><span class="line">    <span class="keyword">void</span> **args = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">void</span> *) * <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">1</span>, y = <span class="number">2</span>;</span><br><span class="line">    args[<span class="number">0</span>] = &amp;x;</span><br><span class="line">    args[<span class="number">1</span>] = &amp;y;</span><br><span class="line">    <span class="keyword">int</span> ret;</span><br><span class="line">    <span class="comment">//ffi调用模板</span></span><br><span class="line">    ffi_cif cif;</span><br><span class="line">    <span class="comment">//初始化模板，传入 ABI, 参数个数， 返回值类型和方法签名</span></span><br><span class="line">    ffi_prep_cif(&amp;cif, FFI_DEFAULT_ABI, <span class="number">2</span>, retType, types);</span><br><span class="line">    <span class="comment">// 动态调用fun1。 做一下类型转换避免编译器警告</span></span><br><span class="line">    ffi_call(&amp;cif, (<span class="keyword">void</span> (*)(<span class="keyword">void</span>))fun1,  &amp;ret, args);</span><br><span class="line">    NSLog(@<span class="string">"--- %d"</span>, ret);</span><br><span class="line"></span><br><span class="line"><span class="comment">//输出</span></span><br><span class="line"><span class="number">2020</span><span class="number">-04</span><span class="number">-05</span> <span class="number">23</span>:<span class="number">56</span>:<span class="number">26.480321</span>+<span class="number">0800</span> LibffiDemo[<span class="number">57553</span>:<span class="number">1397731</span>] --- <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p>有没有感觉这玩意和NSInvocation很相像。 是的，因为这是函数调用的共同性。函数调用必须要约定好，称之为调用惯例(Calling Convention)。必须函数的参数和返回值对应的上，这样调用时取的参数内存才不会出现错误，返回时也有内存可以存放返回结果。 所以其实并不care谁来调用，只要准备好了调用条件就可以。</p>
+<p>不过上面这个例子只是动态调用了一个本地的函数，还不能完全体现libffi的强大。在OC里我们可以通过IMP的替换来Hook方法，实现的原理即是同上面一样满足OC方法的调用约定即可。如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">hookOCFunc</span><span class="params">(id self, SEL _cmd, ...)</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要保证必须的两个参数self 和_cmd。 剩下的参数可以利用c的可变参数来实现。 这样就可以做到调用<code>hookOCFunc</code>来替换原有的实现了。不过缺点也有，比如如何确定返回值。 因此通常采用采用Hook的方式是替换成msgForward，这样就可以轻易的拿到NSInvocation，然后把returnValue传入。 比如JSPatch，Aspects都是这么做的，简化一下就是如下:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="keyword">void</span>)testHookedOC &#123;</span><br><span class="line">    Class cls = object_getClass(<span class="keyword">self</span>);</span><br><span class="line">    IMP msgForwardIMP = _objc_msgForward;</span><br><span class="line">  	<span class="comment">//把原类的forwardInvocation替换成自己的hookMsgForward函数</span></span><br><span class="line">		class_replaceMethod(cls, <span class="keyword">@selector</span>(forwardInvocation:), (IMP)hookMsgForward, <span class="string">"v@:@"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//再把要调用的test替换为forward。 所以此时调用test时最终调到的是hookMsgForward</span></span><br><span class="line">    SEL selector = <span class="keyword">@selector</span>(test4444);</span><br><span class="line">    Method method = class_getInstanceMethod(cls, selector);</span><br><span class="line">    <span class="keyword">char</span> *typeDescription = (<span class="keyword">char</span> *)method_getTypeEncoding(method);</span><br><span class="line">    <span class="keyword">if</span> (typeDescription == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        typeDescription = <span class="string">"v@:@"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!class_addMethod(cls, selector, msgForwardIMP, typeDescription)) &#123;</span><br><span class="line">        class_replaceMethod(cls, selector, msgForwardIMP, typeDescription);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//调用一下。可以发现直接走到了hookMsgForward</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"--- %@"</span>, [<span class="keyword">self</span> test4444]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//这样做的好处是，可以直接获取到一个NSInvocation。 通过它可以进行返回指定传递等等。</span></span><br><span class="line"><span class="comment">//并且通过这个NSInvocation还可以方法的拿到参数列表</span></span><br><span class="line"><span class="keyword">void</span> hookMsgForward(<span class="keyword">id</span> <span class="keyword">self</span>, SEL _cmd, <span class="built_in">NSInvocation</span> *invocation) &#123;</span><br><span class="line">  <span class="comment">//如果是OC对象，可以利用 __autoreleasing来避免栈对象的释放，导致内存问题。</span></span><br><span class="line">    __autoreleasing <span class="built_in">NSString</span> *a = <span class="string">@"cao"</span>;</span><br><span class="line">    [invocation setReturnValue:&amp;a];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//输出</span></span><br><span class="line"><span class="number">2020</span><span class="number">-04</span><span class="number">-06</span> <span class="number">16</span>:<span class="number">00</span>:<span class="number">30.400570</span>+<span class="number">0800</span> LibffiDemo[<span class="number">88311</span>:<span class="number">3227571</span>] --- cao</span><br></pre></td></tr></table></figure>
+
+<p>但是这里有一个问题，它很依赖<code>msgForward</code>这个，而<code>msgForward</code>又是一个类唯一的，所以当多个工具都去<code>Hook msgForward</code>时就会出现问题，只会响应最后一个。因为<code>msgForward</code>这个selector只能对应到一个实现。举个例子，如果JSPatch和Aspect一起混用，就会因为他们都<code>Hook msgForward</code>而出错。</p>
+<p>libffi同样提供了类似的Hook方式，并且不需要多做一道方法的替换，它可以直接把方法的函数指针替换到另一个函数，并且能够拿到相应的调用信息。 这样每个方法就是独立的了，然后在那个方法中利用<code>ffi_call</code>就可以调用到任意方法了。</p>
+<h3 id="面向切面"><a href="#面向切面" class="headerlink" title="面向切面"></a>面向切面</h3><p><code>libffi</code>更强大的地方是可以把任意函数转换到一个指定的函数，实现一个AOP的效果:</p>
+<p><code>ffi_prep_closure_loc</code>可以把函数调用封装成一个闭包，并且把指定到一个函数，这个函数会根据实际调用的规则传入参数，返回值信息和一个附带信息(userdata):</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//    替换方法。 由于替换的类方法，这里需要取到metaClass</span></span><br><span class="line">    SEL sel = @selector(test:name:);</span><br><span class="line">    Method m = class_getClassMethod(self, sel);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *typeEncoding = method_getTypeEncoding(m);</span><br><span class="line"></span><br><span class="line">    ffi_type **types;</span><br><span class="line">    <span class="comment">//构建参数类型</span></span><br><span class="line">    types = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(ffi_type *) * <span class="number">2</span>);</span><br><span class="line">    <span class="comment">//两个参数，第一个为int，第二个为NSSting *</span></span><br><span class="line">    types[<span class="number">0</span>] = &amp;ffi_type_sint;</span><br><span class="line">    types[<span class="number">1</span>] = &amp;ffi_type_pointer;</span><br><span class="line">    <span class="comment">//返回值类型</span></span><br><span class="line">    ffi_type *retType = &amp;ffi_type_void;</span><br><span class="line">    <span class="comment">//创建函数调用模板</span></span><br><span class="line">    ffi_cif cif;</span><br><span class="line">    ffi_prep_cif(&amp;cif, FFI_DEFAULT_ABI, <span class="number">2</span>, retType, types);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//声明一个函数指针</span></span><br><span class="line">    <span class="keyword">void</span> *imp = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="comment">//创建closure,就是一个函数闭包。 它包含了一个函数指针。</span></span><br><span class="line">    ffi_closure *closure = ffi_closure_alloc(<span class="keyword">sizeof</span>(ffi_closure), (<span class="keyword">void</span> **)&amp;imp);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//该方法通过closure把 函数原型，函数实体，上下文已经函数指针关联起来。</span></span><br><span class="line">    <span class="comment">//第一个参数closure</span></span><br><span class="line">    <span class="comment">//第二个参数是调用模板</span></span><br><span class="line">    <span class="comment">//第三个是Hook后的函数指针</span></span><br><span class="line">    <span class="comment">//第四个是传入的userdata。 你可以传入任何数据，作为传递时的调用。 这样在外部调用是就会把self作为userdata传递过去</span></span><br><span class="line">    <span class="comment">//第五个是之前闭包的指针。</span></span><br><span class="line">    ffi_prep_closure_loc(closure, &amp;cif, ffi_hookFunc, (__bridge <span class="keyword">void</span> *)(self), imp);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//释放闭包</span></span><br><span class="line">    ffi_closure_free(closure);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果当前没有这个方法，尝试添加，如果有的话替换IMP。 </span></span><br><span class="line">		<span class="comment">//此时imp就指向了ffi封装好的那个方法。并且在调用是把会userdata传入</span></span><br><span class="line">    <span class="keyword">if</span> (!class_addMethod(object_getClass(self), sel, imp, typeEncoding)) &#123;</span><br><span class="line">        class_replaceMethod(object_getClass(self), sel, imp, typeEncoding);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，当方法调用时就会调用的是:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//此时userdata传入的就是上面绑定的self。所以可以通过这里拿到全部的信息</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ffi_hookFunc</span><span class="params">(ffi_cif *cif, <span class="keyword">void</span> *ret, <span class="keyword">void</span> **args, <span class="keyword">void</span> *userdata)</span> </span>&#123; </span><br><span class="line">    <span class="comment">//在此处在做消息转发， 利用ffi_call就可以任意调用其它函数了。 例如block等等</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其实这么一看好像和<code>msgSwizle</code>没啥区别啊。如果在上面那一段里，不做<code>ffi_prep_closure_loc</code>，直接方法替换到<code>ffi_hookFunc</code>也依然可以做到调用到<code>ffi_hookFunc</code>的呀？</p>
+<p>不过OC方法就有一个限制了，一定的默认有两个参数<code>self</code>, <code>_cmd</code>。也就是你Hook的C函数必须带这两个参数，如上面的例子。并且为了方便拿到消息转发的信息，又必须通过<code>msgForward</code>。 所以这么看下来libffi的通用性更广一点。还可以对单纯的C函数进行Hook。</p>
+<h3 id="Libffi的实现原理"><a href="#Libffi的实现原理" class="headerlink" title="Libffi的实现原理"></a>Libffi的实现原理</h3><p>想更详细的了解实现原理可以参考<a href="https://time.geekbang.org/column/article/98154" target="_blank" rel="noopener">戴铭老师的课程</a>。但是核心可以归纳为一句话:</p>
+<p><b>如果少了编译过程，直接在运行时去动态地调用函数，就需要先生成动态调用相应寄存器和栈状态的汇编指令。而要达到事先生成相应寄存器和栈的目的，就不能使用遵循调用惯例的高级编程语言，而需要使用汇编语言。</b></p>
+<p>libffi的核心在于能通过<code>ffi_call</code>调用其他方法。实质上调用的是<code>ffi_call_SYSV</code>这个汇编实现:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在arm64下，这些参数按从左到右保存在x0 ... x5寄存器中</span></span><br><span class="line"><span class="comment">//在x86_64下，分别存放到di,si...中。</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">ffi_call_SYSV</span> <span class="params">(<span class="keyword">void</span> *<span class="built_in">stack</span>, <span class="keyword">void</span> *frame,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">void</span> (*fn)(<span class="keyword">void</span>), <span class="keyword">void</span> *rvalue,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">int</span> flags, <span class="keyword">void</span> *closure)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>汇编源码主要做了一下6件事:</p>
+<p>1.分配栈帧(stack，frame)。以及保存后续参数。</p>
+<p>2.把参数转移到寄存器，并修改栈顶寄存器(sp)开辟栈空间。</p>
+<p>3.把参数存放到寄存器，存放完毕释放上下文，留下栈里的参数。</p>
+<p>4.调用fn执行的指令地址 (call x9)，即调用传入的参数。</p>
+<p>5.函数执行完成时，就重新读取 rvalue 和 flags，回收栈内存。</p>
+<p>6.保存返回值。</p>
+<p>其实和msgSend非常类似，msgSend其实也是进行动态调用，把一个c函数的指针调用(msgSend)转换成真正需要调用的函数指针。</p>
+<p>msgSend的具体原理可以参考<a href="https://www.mikeash.com/pyblog/friday-qa-2017-06-30-dissecting-objc_msgsend-on-arm64.html" target="_blank" rel="noopener">这篇文章</a>。</p>
+<h2 id="MangoFix怎么做到无中生有的"><a href="#MangoFix怎么做到无中生有的" class="headerlink" title="MangoFix怎么做到无中生有的"></a>MangoFix怎么做到无中生有的</h2><p>在了解了libffi，就知道了Mongfix大致的执行过程。 本质上也是利用libffi进行了转换，但是仍然未能理解是如何做到动态把方法注入的。</p>
+<p>经过代码一步一步调试，发现非常牛逼。它是在前面利用yacc解析语句后生成了多个<code>MFExpression</code>。 以它Demo中的例子，在mg文件中有一下语句:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)ifStatementExample&#123;</span><br><span class="line">	<span class="keyword">int</span> a = <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">	NSString *<span class="built_in">text</span>;</span><br><span class="line">	<span class="keyword">if</span>(a &gt; b)&#123;</span><br><span class="line">		<span class="built_in">text</span> = @<span class="string">"执行结果: a &gt; b"</span>;</span><br><span class="line">	&#125;<span class="keyword">else</span> <span class="keyword">if</span> (a == b)&#123;</span><br><span class="line">		<span class="built_in">text</span> = @<span class="string">"执行结果: a == b"</span>;</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		<span class="built_in">text</span> = @<span class="string">"执行结果: a &lt; b"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	self.resultView.<span class="built_in">text</span> = <span class="built_in">text</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解析生成了5个MFStatement。其实相当于5条语句。 语句的类型有：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MFStatementKindExpression <span class="comment">//执行语句</span></span><br><span class="line">MFStatementKindDeclaration <span class="comment">//声明语句</span></span><br><span class="line">...<span class="comment">//以及几个if, siwtch之类的逻辑语句</span></span><br></pre></td></tr></table></figure>
+
+<p>这5条语句由yacc解析得到。此时需要执行就需要通过利用libffi拦截的方法，把参数传入<code>MFScopeChain</code>，注意这个<code>MFScopeChain</code>可以理解为执行环境（函数栈）。</p>
+<p><code>MFScopeChain</code>是一个链表结构可以保存多信息。并且可以把变量值保存下来。这里重点看一下执行的过程:</p>
+<p>第一条语句是声明语句即 <code>int a = 2</code>，于是调用处理声明语句的方法。 只是把yacc解析的到statement强转为<code>MFDeclaration</code>。然后把值传入到一个封装的MFValue。 并存入Scope。</p>
+<p>第二句还是声明语句，即<code>int b = 2</code>，同样的处理，相当于把b入栈。</p>
+<p>第三句为类型声明语句，即上面的 <code>NSString *text;</code>。此时也需要创建一个MFValue入栈（不过是给了一个默认值，就是开辟了）</p>
+<p>第四句为if条件语句，即上面的逻辑判断。 这里就开始真的逻辑处理了，此时看一下Scope可以看到，已经有了保存了执行需要的变量：</p>
+<img src="/2020/04/04/%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89/image-20200406163755746.png" alt="image-20200406163755746" style="zoom:50%;">
+
+<p>和调用栈上的变量一样。此时只需要根据逻辑语句取出变量进行处理。解析的过程非常复杂，条件语句封装成对象如下:</p>
+<img src="/2020/04/04/%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89/image-20200406164508213.png" alt="image-20200406164508213" style="zoom:50%;">
+
+<p>相当于对 if (a==b)这一句进行了封装。然后判断。 比较过程如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">eval_gt_expression</span><span class="params">(MFInterpreter *inter, MFScopeChain *scope, MFBinaryExpression *expr)</span></span>&#123;</span><br><span class="line">	eval_expression(inter, scope, expr.left);</span><br><span class="line">	eval_expression(inter, scope, expr.right);</span><br><span class="line">	MFValue *leftValue = [inter.<span class="built_in">stack</span> peekStack:<span class="number">1</span>];</span><br><span class="line">	MFValue *rightValue = [inter.<span class="built_in">stack</span> peekStack:<span class="number">0</span>];</span><br><span class="line">	BOOL gt = gt_value(expr.left.lineNumber, leftValue, rightValue);</span><br><span class="line">	MFValue *resultValue = [MFValue <span class="keyword">new</span>];</span><br><span class="line">	resultValue.type = mf_create_type_specifier(MF_TYPE_BOOL);</span><br><span class="line">	resultValue.uintValue = gt;</span><br><span class="line">	[inter.<span class="built_in">stack</span> pop];</span><br><span class="line">	[inter.<span class="built_in">stack</span> pop];</span><br><span class="line">	[inter.<span class="built_in">stack</span> push:resultValue];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到就是分别取出a和b然后进行并把结果放入栈。比较时很巧妙哈，采用的宏文本替换来利用编译器解决:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//根据比较符来调用不同宏命令</span></span><br><span class="line">compare_number_func(lt, &lt;)</span><br><span class="line">compare_number_func(le, &lt;=)</span><br><span class="line">compare_number_func(ge, &gt;=)</span><br><span class="line">compare_number_func(gt, &gt;)</span><br><span class="line"><span class="comment">//利用文本替换把运算符插入，然后利用编译器计算结果</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> number_value_compare(sel,oper)\</span></span><br><span class="line"><span class="keyword">switch</span> (value2.type.typeKind) &#123;\</span><br><span class="line"><span class="keyword">case</span> MF_TYPE_BOOL:\</span><br><span class="line"><span class="keyword">return</span> value1.sel oper value2.uintValue;\</span><br><span class="line"><span class="keyword">case</span> MF_TYPE_U_INT:\</span><br><span class="line"><span class="keyword">return</span> value1.sel oper value2.uintValue;\</span><br><span class="line"><span class="keyword">case</span> MF_TYPE_INT:\</span><br><span class="line"><span class="keyword">return</span> value1.sel oper value2.integerValue;\</span><br><span class="line"><span class="keyword">case</span> MF_TYPE_DOUBLE:\</span><br><span class="line"><span class="keyword">return</span> value1.sel oper value2.doubleValue;\</span><br><span class="line"><span class="keyword">default</span>:\</span><br><span class="line">NSCAssert(<span class="number">0</span>, @<span class="string">"line:%zd == 、 != 、 &lt; 、 &lt;= 、 &gt; 、 &gt;= can not use between %@ and %@"</span>,lineNumber, value1.type.typeName, value2.type.typeName);\</span><br><span class="line"><span class="keyword">break</span>;\</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如此就可以进行计算了。</p>
+<p>yacc解析时把if相关的语句编译进了一起，所以如果<code>if case</code>不满足，会继续执行下面的case直到找到结果为止。</p>
+<p>第五句是执行语句，把结果赋值给 <code>self.resultView.text</code>。</p>
+<p>可见MangoFix也无法做到无中生有，相反它构建了一个解释器系统，利用yacc解析文本，然后利用解释器系统调用对应的方法，然后通过runtime修改到OC上。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://github.com/libffi/libffi" target="_blank" rel="noopener">https://github.com/libffi/libffi</a></p>
+<p><a href="http://sealiesoftware.com/blog/archive/2008/10/30/objc_explain_objc_msgSend_stret.html" target="_blank" rel="noopener">http://sealiesoftware.com/blog/archive/2008/10/30/objc_explain_objc_msgSend_stret.html</a></p>
+<p><a href="https://github.com/YPLiang19/Mango" target="_blank" rel="noopener">https://github.com/YPLiang19/Mango</a></p>
+<p><a href="http://blog.cnbang.net/tech/3219/" target="_blank" rel="noopener">http://blog.cnbang.net/tech/3219/</a></p>
+<p><a href="https://blog.csdn.net/ayu_ag/article/details/50706429" target="_blank" rel="noopener">https://blog.csdn.net/ayu_ag/article/details/50706429</a></p>
+<p><a href="https://time.geekbang.org/column/article/98154" target="_blank" rel="noopener">https://time.geekbang.org/column/article/98154</a></p>
+<p><a href="https://www.mikeash.com/pyblog/friday-qa-2017-06-30-dissecting-objc_msgsend-on-arm64.html" target="_blank" rel="noopener">https://www.mikeash.com/pyblog/friday-qa-2017-06-30-dissecting-objc_msgsend-on-arm64.html</a></p>
+
+            
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">signals</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color3">JSPatch</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">Unix</a>
+        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color4">mangoFix</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -215,119 +371,146 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" target="_blank" rel="noopener" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" target="_blank" rel="noopener" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" target="_blank" rel="noopener" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" target="_blank" rel="noopener"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://joey520.github.io/o.com/2020/04/04/%E8%B0%88%E8%B0%88iOS%E4%BB%A3%E7%A0%81%E6%97%A0%E4%B8%AD%E7%94%9F%E6%9C%89/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/" class="archive-article-date">
-  	<time datetime="2019-12-12T09:04:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-12</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/03/15/%E8%B0%88%E8%B0%88msgSend%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%9C%A8%E5%A0%86%E6%A0%88%E4%B8%AD/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">谈谈iOS堆栈那些事</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" target="_blank" rel="noopener" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/12/%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Socket%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/">深入学习Socket网络通信</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">socket</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数的本质"><span class="toc-number">2.</span> <span class="toc-text">函数的本质</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSPatch的实现"><span class="toc-number">3.</span> <span class="toc-text">JSPatch的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JSContext"><span class="toc-number">3.1.</span> <span class="toc-text">JSContext</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MangoFix的实现"><span class="toc-number">4.</span> <span class="toc-text">MangoFix的实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Libffi"><span class="toc-number">5.</span> <span class="toc-text">Libffi</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#调用模板"><span class="toc-number">5.1.</span> <span class="toc-text">调用模板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#面向切面"><span class="toc-number">5.2.</span> <span class="toc-text">面向切面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Libffi的实现原理"><span class="toc-number">5.3.</span> <span class="toc-text">Libffi的实现原理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MangoFix怎么做到无中生有的"><span class="toc-number">6.</span> <span class="toc-text">MangoFix怎么做到无中生有的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">7.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
+  
+  
+    <section id="comments" class="comments">
+      <style>
+        .comments{margin:30px;padding:10px;background:#fff}
+        @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+      </style>
+      <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  var notify = 'false' == true ? true : false;
+  var verify = 'false' == true ? true : false;
+  new Valine({
+      // AV 对象来自上面引入av-min.js(老司机们不要开车➳♡゛扎心了老铁)
+      av: AV,
+      el: '.valine_comment',
+      emoticon_url: 'https://cloud.panjunwen.com/alu',
+      emoticon_list: ["狂汗.png","不说话.png","汗.png","坐等.png","献花.png","不高兴.png","中刀.png","害羞.png","皱眉.png","小眼睛.png","暗地观察.png"],
+      app_id: 'f1pxDGbVlIq2a9dmDdtKuulT-gzGzoHsz',
+      app_key: '6aqkifq4vKMCSsLExEGzL0Wl',
+      placeholder: ''
+    });
+</script>
+      </section>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/" class="archive-article-date">
-  	<time datetime="2019-12-02T01:29:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/12/02/%E8%B0%88%E8%B0%88iOS%E7%9A%84%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/">谈谈iOS的链接问题</a>
-    </h1>
+
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color5">LLVM</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag article-tag-list-link color2">LINKER</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/iOS//" class="article-tag-list-link color4">iOS</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -350,8 +533,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
