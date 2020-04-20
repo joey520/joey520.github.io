@@ -17,7 +17,7 @@
 <meta property="og:site_name" content="Joey&#39;s House">
 <meta property="og:description" content="前言查找未使用的类有两种方式，一种是基于代码的静态扫描，但是非常耗时，而且逻辑复杂。而mach-O中通过classlist和classrefs差集可以快速的定位出哪些未在代码中显式被调用的类。而且速度非常快，所以优先采用这种方式实现，具体脚本见github。">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-03-25T06:18:45.931Z">
+<meta property="og:updated_time" content="2020-04-20T02:19:14.282Z">
 <meta name="twitter:card" content="summary">
   
   
@@ -197,7 +197,7 @@
         <div id="toc-article" class="toc-article">
         <span id="toc-close" class="toc-close" title="隐藏导航" onclick="showBtn();">×</span>
         <strong class="toc-title">文章目录</strong>
-         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ctypes"><span class="toc-number">2.</span> <span class="toc-text">Ctypes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结构体解释脚本"><span class="toc-number">3.</span> <span class="toc-text">结构体解释脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#解析文本"><span class="toc-number">3.1.</span> <span class="toc-text">解析文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析宏命令"><span class="toc-number">3.2.</span> <span class="toc-text">解析宏命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析块域"><span class="toc-number">3.3.</span> <span class="toc-text">解析块域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析数据"><span class="toc-number">3.4.</span> <span class="toc-text">解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mach-O解析"><span class="toc-number">4.</span> <span class="toc-text">mach-O解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+         <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ctypes"><span class="toc-number">2.</span> <span class="toc-text">Ctypes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结构体解释脚本"><span class="toc-number">3.</span> <span class="toc-text">结构体解释脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#解析文本"><span class="toc-number">3.1.</span> <span class="toc-text">解析文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析宏命令"><span class="toc-number">3.2.</span> <span class="toc-text">解析宏命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析块域"><span class="toc-number">3.3.</span> <span class="toc-text">解析块域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析数据"><span class="toc-number">3.4.</span> <span class="toc-text">解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mach-O解析"><span class="toc-number">4.</span> <span class="toc-text">mach-O解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态检测类是否无用"><span class="toc-number">5.</span> <span class="toc-text">动态检测类是否无用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">6.</span> <span class="toc-text">参考资料</span></a></li></ol>
        </div>
       <script type="text/javascript">
       function showToc(){
@@ -262,8 +262,7 @@
 <p>6.根据类白名单掉白名单中的类。</p>
 <p>由于我们只解析了<code>classlist</code>和<code>classrefs</code>，脚本的运行非常快速，可以随时随意的跑脚本检测。</p>
 <p><b>由于可执行文件具有<code>PAGEZERO</code>因此它的虚拟地址的其实和动态库等不一样，需要特别在解析时注意。</b></p>
-<p>##动态检测类是否无用</p>
-<p>在上一步中已经可以通过脚本拿到未使用的类，虽然我们过滤了仅仅作为superclass这样情况，但是还有其它的比如是IBuild构建的类等等，通常需要手动过滤一遍。而我再MSDK的工程中直接扫出来100多个，手动过滤是很麻烦的。于是想到利用脚本来实现。一个取巧的办法是把这些类移除buildFile然后编译来判断。相当于删除了，虽然头文件import可能还在，但至少可以帮助结局一大部分情况。</p>
+<h2 id="动态检测类是否无用"><a href="#动态检测类是否无用" class="headerlink" title="动态检测类是否无用"></a>动态检测类是否无用</h2><p>在上一步中已经可以通过脚本拿到未使用的类，虽然我们过滤了仅仅作为superclass这样情况，但是还有其它的比如是IBuild构建的类等等，通常需要手动过滤一遍。而我再MSDK的工程中直接扫出来100多个，手动过滤是很麻烦的。于是想到利用脚本来实现。一个取巧的办法是把这些类移除buildFile然后编译来判断。相当于删除了，虽然头文件import可能还在，但至少可以帮助结局一大部分情况。</p>
 <p>这些重复的事情可以由脚本来完成，脚本的实现需要借助于pbxproj这个python开源库，主要工作有一下两步:</p>
 <p>1.遍历未使用的类，遍历buildTarget列表，把相应的buildFile去掉。</p>
 <p>2.尝试编译，如果成功则表明该文件确实无用。如果失败，表明还有隐式的使用。</p>
@@ -407,7 +406,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ctypes"><span class="toc-number">2.</span> <span class="toc-text">Ctypes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结构体解释脚本"><span class="toc-number">3.</span> <span class="toc-text">结构体解释脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#解析文本"><span class="toc-number">3.1.</span> <span class="toc-text">解析文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析宏命令"><span class="toc-number">3.2.</span> <span class="toc-text">解析宏命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析块域"><span class="toc-number">3.3.</span> <span class="toc-text">解析块域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析数据"><span class="toc-number">3.4.</span> <span class="toc-text">解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mach-O解析"><span class="toc-number">4.</span> <span class="toc-text">mach-O解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ctypes"><span class="toc-number">2.</span> <span class="toc-text">Ctypes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#结构体解释脚本"><span class="toc-number">3.</span> <span class="toc-text">结构体解释脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#解析文本"><span class="toc-number">3.1.</span> <span class="toc-text">解析文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析宏命令"><span class="toc-number">3.2.</span> <span class="toc-text">解析宏命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析块域"><span class="toc-number">3.3.</span> <span class="toc-text">解析块域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#解析数据"><span class="toc-number">3.4.</span> <span class="toc-text">解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mach-O解析"><span class="toc-number">4.</span> <span class="toc-text">mach-O解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态检测类是否无用"><span class="toc-number">5.</span> <span class="toc-text">动态检测类是否无用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考资料"><span class="toc-number">6.</span> <span class="toc-text">参考资料</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -574,15 +573,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">Bitcode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">JSPatch</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color4">mangoFix</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -598,11 +593,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color3">JSPatch</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">socket</a>
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color4">mangoFix</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -611,6 +606,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color5">Mach</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" target="_blank" rel="noopener" class="js-tag color2">LINKER</a>
               </li>
              
               <li class="article-tag-list-item">
